@@ -13,7 +13,7 @@ public class TestdriveServicePoint extends ServicePoint {
     }
 
     public void customerBackToQueue() {
-        Customer c = removeQueue();
+        Customer c = queue.poll();
         addQueue(c);
     }
 

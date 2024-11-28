@@ -92,10 +92,10 @@ public class MyEngine extends Engine {
 			arrivalProcess = new ArrivalProcess(arrivalTime, eventList, EventType.ARR1);
 		} else {
 			// Realistic simulation with variable arrival and service times
-			servicePoints[0] = new ArrivalServicePoint(new Normal(10, 6), eventList, EventType.DEP1);
-			servicePoints[1] = new FinanceServicePoint(new Normal(10, 10), eventList, EventType.DEP2);
-			servicePoints[2] = new TestdriveServicePoint(new Normal(5, 3), eventList, EventType.DEP3);
-			servicePoints[3] = new ClosureServicePoint(new Normal(7, 4), eventList, EventType.DEP4);
+			servicePoints[0] = new ArrivalServicePoint(new Normal(10, 5), eventList, EventType.DEP1);
+			servicePoints[1] = new FinanceServicePoint(new Normal(30, 10), eventList, EventType.DEP2);
+			servicePoints[2] = new TestdriveServicePoint(new Normal(45, 15), eventList, EventType.DEP3);
+			servicePoints[3] = new ClosureServicePoint(new Normal(10, 5), eventList, EventType.DEP4);
 
 			arrivalProcess = new ArrivalProcess(new Negexp(15, new Random().nextLong()), eventList, EventType.ARR1);
 		}

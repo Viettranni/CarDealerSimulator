@@ -7,6 +7,8 @@ import simu.model.Customer;
 import simu.model.EventType;
 import simu.model.ServicePoint;
 
+import java.util.Arrays;
+
 public class TestdriveServicePoint extends ServicePoint {
     public TestdriveServicePoint(ContinuousGenerator generator, EventList eventList, EventType type) {
         super(generator, eventList, type);
@@ -32,13 +34,21 @@ public class TestdriveServicePoint extends ServicePoint {
             Trace.out(Trace.Level.INFO, "Customer #" + customer.getId() + " is test driving.");
             super.beginService();  // Simulate test drive
 
-            boolean likesCar = Math.random() > 0.3;  // 70% chance they like the car
+            boolean likesCar = Math.random() > 0.8;  // 80% chance they like the car
             if (!likesCar) {
                 Trace.out(Trace.Level.INFO, "Customer #" + customer.getId() + " did not like the car. Returning to queue for another test drive.");
                 customerBackToQueue();
+                /* Currently myEngine removes the first customer in the queue.
+                   In this case if the current customer wants a new test drive
+                   The customer will be added to the back of the queue BUT
+                   the customer from the front will be removed WITHOUT test-driving
+                   Fix is in the work.
+                   */
+
             } else {
                 Trace.out(Trace.Level.INFO, "Customer #" + customer.getId() + " liked the car and will proceed.");
             }
+            Trace.out(Trace.Level.INFO, "queue"+ queue.toString());
         }
     }
 }

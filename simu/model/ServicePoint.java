@@ -7,7 +7,7 @@ import java.util.LinkedList;
 // TODO:
 // Service Point functionalities & calculations (+ variables needed) and reporting to be implemented
 public class ServicePoint {
-	private LinkedList<Customer> queue = new LinkedList<>(); // Data Structure used
+	protected LinkedList<Customer> queue = new LinkedList<>(); // Data Structure used
 	private ContinuousGenerator generator;
 	private EventList eventList;
 	private EventType eventTypeScheduled;

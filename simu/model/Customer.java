@@ -8,6 +8,7 @@ public class Customer {
 	// Simulation-specific variables (from first class)
 	private double arrivalTime;
 	private double removalTime;
+	private double totalTime;
 	private int id;
 	private static int i = 1;
 	private static long sum = 0;
@@ -17,6 +18,10 @@ public class Customer {
 	private String preferredFuelType;
 	private double budget;
 	private int creditScore;
+	private boolean financeAccepted = false;
+	private boolean happyWithTestdrive = false;
+	private boolean purchased = false;
+
 
 	// Normal distribution parameters for Budget and Credit Score
 	// Will be user inputs later on
@@ -49,6 +54,9 @@ public class Customer {
 		// Assign random car type and fuel type
 		this.preferredCarType = assignCarType();
 		this.preferredFuelType = assignFuelType();
+		this.happyWithTestdrive = false;
+		this.financeAccepted = false;
+		this.purchased = false;
 	}
 
 	// Method to assign a random car type based on predefined probabilities (discrete distribution)
@@ -96,16 +104,24 @@ public class Customer {
 		this.removalTime = removalTime;
 	}
 
+	public double getTotalTime() {
+		return totalTime;
+	}
+
+	public void setTotalTime() {
+		totalTime = removalTime - arrivalTime;
+	}
+
 	public int getId() {
 		return id;
 	}
 
 	// Report results for this customer
 	public void reportResults() {
-		Trace.out(Trace.Level.INFO, "\nCustomer " + id + " ready!");
-		Trace.out(Trace.Level.INFO, "Customer " + id + " arrived at: " + arrivalTime);
-		Trace.out(Trace.Level.INFO, "Customer " + id + " removed at: " + removalTime);
-		Trace.out(Trace.Level.INFO, "Customer " + id + " stayed for: " + (removalTime - arrivalTime));
+		Trace.out(Trace.Level.INFO, "\nCustomer #" + id + " ready!");
+		Trace.out(Trace.Level.INFO, "Customer #" + id + " arrived at: " + arrivalTime);
+		Trace.out(Trace.Level.INFO, "Customer #" + id + " removed at: " + removalTime);
+		Trace.out(Trace.Level.INFO, "Customer #" + id + " stayed for: " + (removalTime - arrivalTime));
 
 		// Update total service time and compute mean
 		sum += (removalTime - arrivalTime);
@@ -130,6 +146,30 @@ public class Customer {
 		return creditScore;
 	}
 
+	public boolean isFinanceAccepted() {
+		return financeAccepted;
+	}
+
+	public void setFinanceAccepted(boolean financeAccepted) {
+		this.financeAccepted = financeAccepted;
+	}
+
+	public boolean happyWithTestdrive() {
+		return happyWithTestdrive;
+	}
+
+	public void setHappyWithTestdrive(boolean happyWithTestdrive) {
+		this.happyWithTestdrive = happyWithTestdrive;
+	}
+
+	public boolean isPurchased() {
+		return purchased;
+	}
+
+	public void setPurchased(boolean purchased) {
+		this.purchased = purchased;
+	}
+
 	@Override
 	public String toString() {
 		return "Customer{" +
@@ -140,6 +180,8 @@ public class Customer {
 				", preferredFuelType='" + preferredFuelType + '\'' +
 				", budget=" + budget +
 				", creditScore=" + creditScore +
+				", isFinanceAccepted=" + financeAccepted +
+				", happyWithTestdrive=" + happyWithTestdrive +
 				'}';
 	}
 }

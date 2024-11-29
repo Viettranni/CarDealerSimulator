@@ -28,10 +28,12 @@ public class ClosureServicePoint extends ServicePoint {
         boolean dealClosed = Math.random() > 0.2;  // 80% chance the deal is closed
         if (dealClosed) {
             Trace.out(Trace.Level.INFO, "Customer #" + customer.getId() + " completed the purchase and is leaving.");
+            customer.setPurchased(true);
         } else {
             Trace.out(Trace.Level.WAR, "Customer #" + customer.getId() + " decided not to purchase and is leaving.");
         }
 
         super.endService();
+        Trace.out(Trace.Level.INFO, "queue"+ queue.toString());
     }
 }

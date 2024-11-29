@@ -18,6 +18,11 @@ public class FinanceServicePoint extends ServicePoint {
         if (!isOnQueue()) return;
 
         Customer customer = queue.peek();
+        if (customer == null) {
+            // Handle the case where there's no customer in the queue (shouldn't happen if the check is correct)
+            Trace.out(Trace.Level.WAR, "No customer in the queue to serve.");
+            return;
+        }
         Trace.out(Trace.Level.INFO, "Checking finances for Customer #" + customer.getId());
 
         if (customer.getCreditScore() < 600) {  // Example credit score threshold
@@ -25,7 +30,9 @@ public class FinanceServicePoint extends ServicePoint {
             queue.poll();  // Remove customer
         } else {
             Trace.out(Trace.Level.INFO, "Customer #" + customer.getId() + " approved for financing.");
-            super.beginService();  // Proceed to schedule the next event
+            customer.setFinanceAccepted(true);
+            super.beginService();// Proceed to schedule the next event
+            Trace.out(Trace.Level.INFO, "queue"+ queue.toString());
         }
     }
 }

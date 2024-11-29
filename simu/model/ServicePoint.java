@@ -21,6 +21,10 @@ public class ServicePoint {
 		this.eventTypeScheduled = type;
 	}
 
+	public Customer peekQueue(){
+		return queue.peek();
+    }
+
 	public void addQueue(Customer a) {	// The first customer of the queue is always in service
 		queue.add(a);
 	}

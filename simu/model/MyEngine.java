@@ -28,7 +28,7 @@ public class MyEngine extends Engine {
 	 * Simulate four service points:
 	 * ArrivalServicePoint -> FinanceServicePoint -> TestdriveServicePoint -> ClosureServicePoint
 	 */
-	public MyEngine() {
+	public MyEngine(int arrivalMean, int arrivalVariance, int financeMean, int financeVariance, int testdriveMean, int testdriveVariance, int closureMean, int closureVariance) {
 		servicePoints = new ServicePoint[4]; // Updated for four service points
 
 		if (TEXTDEMO) {
@@ -61,6 +61,10 @@ public class MyEngine extends Engine {
 			}
 
 			ContinuousGenerator serviceTime = null;
+			ContinuousGenerator arrivalServiceTime = null;
+			ContinuousGenerator financeServiceTime = null;
+			ContinuousGenerator testdriveServiceTime = null;
+			ContinuousGenerator closureServiceTime = null;
 			if (FIXEDSERVICETIMES) {
 				// Fixed service times
 				serviceTime = new ContinuousGenerator() {
@@ -82,22 +86,25 @@ public class MyEngine extends Engine {
 				};
 			} else {
 				// Normal distribution for variable service times
-				serviceTime = new Normal(10, 6, Integer.toUnsignedLong(r.nextInt()));
+				arrivalServiceTime = new Normal(arrivalMean, arrivalVariance, Integer.toUnsignedLong(r.nextInt()));
+				financeServiceTime = new Normal(financeMean, financeVariance, Integer.toUnsignedLong(r.nextInt()));
+				testdriveServiceTime = new Normal(testdriveMean, testdriveVariance, Integer.toUnsignedLong(r.nextInt()));
+				closureServiceTime = new Normal(closureMean, closureVariance, Integer.toUnsignedLong(r.nextInt()));
 			}
 
 			// Initialize specialized service points
-			servicePoints[0] = new ArrivalServicePoint(serviceTime, eventList, EventType.DEP1);
-			servicePoints[1] = new FinanceServicePoint(serviceTime, eventList, EventType.DEP2);
-			servicePoints[2] = new TestdriveServicePoint(serviceTime, eventList, EventType.DEP3);
-			servicePoints[3] = new ClosureServicePoint(serviceTime, eventList, EventType.DEP4);
+			servicePoints[0] = new ArrivalServicePoint(arrivalServiceTime, eventList, EventType.DEP1);
+			servicePoints[1] = new FinanceServicePoint(financeServiceTime, eventList, EventType.DEP2);
+			servicePoints[2] = new TestdriveServicePoint(testdriveServiceTime, eventList, EventType.DEP3);
+			servicePoints[3] = new ClosureServicePoint(closureServiceTime, eventList, EventType.DEP4);
 
 			arrivalProcess = new ArrivalProcess(arrivalTime, eventList, EventType.ARR1);
 		} else {
 			// Realistic simulation with variable arrival and service times
-			servicePoints[0] = new ArrivalServicePoint(new Normal(10, 5), eventList, EventType.DEP1);
-			servicePoints[1] = new FinanceServicePoint(new Normal(30, 10), eventList, EventType.DEP2);
-			servicePoints[2] = new TestdriveServicePoint(new Normal(45, 15), eventList, EventType.DEP3);
-			servicePoints[3] = new ClosureServicePoint(new Normal(10, 5), eventList, EventType.DEP4);
+			servicePoints[0] = new ArrivalServicePoint(new Normal(arrivalMean, arrivalVariance), eventList, EventType.DEP1);
+			servicePoints[1] = new FinanceServicePoint(new Normal(financeMean, financeVariance), eventList, EventType.DEP2);
+			servicePoints[2] = new TestdriveServicePoint(new Normal(testdriveMean, testdriveVariance), eventList, EventType.DEP3);
+			servicePoints[3] = new ClosureServicePoint(new Normal(closureMean, closureVariance), eventList, EventType.DEP4);
 
 			arrivalProcess = new ArrivalProcess(new Negexp(15, new Random().nextLong()), eventList, EventType.ARR1);
 		}

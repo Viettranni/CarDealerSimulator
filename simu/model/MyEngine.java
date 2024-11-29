@@ -16,6 +16,16 @@ public class MyEngine extends Engine {
 	private ArrivalProcess arrivalProcess;
 	private ServicePoint[] servicePoints;
 	private ArrayList<Customer> processedCustomers = new ArrayList<>();
+	private int arrivalMean;
+	private int arrivalVariance;
+	private int financeMean;
+	private int financeVariance;
+	private int testdriveMean;
+	private int testdriveVariance;
+	private int closureMean;
+	private int closureVariance;
+	private volatile int simulationSpeed;
+
 
 	public static final boolean TEXTDEMO = true;
 	public static final boolean FIXEDARRIVALTIMES = false;
@@ -28,8 +38,17 @@ public class MyEngine extends Engine {
 	 * Simulate four service points:
 	 * ArrivalServicePoint -> FinanceServicePoint -> TestdriveServicePoint -> ClosureServicePoint
 	 */
-	public MyEngine(int arrivalMean, int arrivalVariance, int financeMean, int financeVariance, int testdriveMean, int testdriveVariance, int closureMean, int closureVariance) {
-		servicePoints = new ServicePoint[4]; // Updated for four service points
+	public MyEngine(int arrivalMean, int arrivalVariance, int financeMean, int financeVariance, int testdriveMean, int testdriveVariance, int closureMean, int closureVariance, int simulationSpeed) {
+		this.arrivalMean = arrivalMean;
+		this.arrivalVariance = arrivalVariance;
+		this.financeMean = financeMean;
+		this.financeVariance = financeVariance;
+		this.testdriveMean = testdriveMean;
+		this.testdriveVariance = testdriveVariance;
+		this.closureMean = closureMean;
+		this.closureVariance = closureVariance;
+		this.simulationSpeed = simulationSpeed;
+		servicePoints = new ServicePoint[4];// Updated for four service points
 
 		if (TEXTDEMO) {
 			// Special setup for text example
@@ -116,8 +135,9 @@ public class MyEngine extends Engine {
 	}
 
 	@Override
-	protected void runEvent(Event t) { // B phase events
+	protected void runEvent(Event t) {// B phase events
 		Customer customer;
+		Trace.out(Trace.Level.INFO, "Current simulation speed " + getSimulationSpeed());
 
 		switch ((EventType) t.getType()) {
 			case ARR1:
@@ -170,6 +190,11 @@ public class MyEngine extends Engine {
 				}
 
 		}
+		try {
+			Thread.sleep(getSimulationSpeed());
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
 	}
 
 	@Override
@@ -212,6 +237,68 @@ public class MyEngine extends Engine {
 					customer.isPurchased()
 			));
 		}
-
 	}
+
+	public int getArrivalMean() {
+		return arrivalMean;
+	}
+
+	public void setArrivalMean(int arrivalMean) {
+		this.arrivalMean = arrivalMean;
+	}
+
+	public int getFinanceMean() {
+		return financeMean;
+	}
+
+	public void setFinanceMean(int financeMean) {
+		this.financeMean = financeMean;
+	}
+
+	public int getTestdriveMean() {
+		return testdriveMean;
+	}
+
+	public void setTestdriveMean(int testdriveMean) {
+		this.testdriveMean = testdriveMean;
+	}
+
+	public int getClosureMean(){
+		return closureMean;
+	}
+
+	public void setClosureMean(int closureMean){
+		this.closureMean = closureMean;
+	}
+
+	public synchronized int getSimulationSpeed(){
+		return simulationSpeed;
+	}
+
+	public synchronized void setSimulationSpeed(int simulationSpeed){
+		this.simulationSpeed = simulationSpeed;
+	}
+
+	public synchronized int slowDownSimulationSpeed(int increment){
+		simulationSpeed += increment;
+		return simulationSpeed;
+	}
+
+	public synchronized int speedUpSimulationSpeed(int decrement){
+		if (simulationSpeed <= 0){
+			simulationSpeed = 0;
+			return simulationSpeed;
+		}
+		simulationSpeed -= decrement;
+
+		return simulationSpeed;
+	}
+
+	/*public synchronized void pause() {
+		paused = !paused;
+	}
+
+	public synchronized boolean isPaused() {
+		return paused;
+	}*/
 }

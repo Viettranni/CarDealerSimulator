@@ -219,10 +219,10 @@ public class Simulator {
 		int closureMean = 0;
 		int closureVariance = 0;
 		int simulationSpeed = 1000;
-		int arrivalServicePoints = 1;
-		int financeServicePoints = 1;
-		int testdriveServicePoints = 1;
-		int closureServicePoints = 1;
+		int arrivalServicePoints = 5;
+		int financeServicePoints = 5;
+		int testdriveServicePoints = 5;
+		int closureServicePoints = 5;
 		ArrayList<String[]> carsToBeCreated = new ArrayList<>();
 
 		createVan(carsToBeCreated, 12);

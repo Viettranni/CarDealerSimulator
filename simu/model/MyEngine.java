@@ -34,7 +34,6 @@ public class MyEngine extends Engine {
 	private int currentServicePointIndex = 0; // Tracks the next free index
 
 
-
 	public static final boolean TEXTDEMO = true;
 	public static final boolean FIXEDARRIVALTIMES = false;
 	public static final boolean FIXEDSERVICETIMES = false;
@@ -83,7 +82,8 @@ public class MyEngine extends Engine {
 					}
 
 					@Override
-					public void setSeed(long seed) {}
+					public void setSeed(long seed) {
+					}
 
 					@Override
 					public long getSeed() {
@@ -91,7 +91,8 @@ public class MyEngine extends Engine {
 					}
 
 					@Override
-					public void reseed() {}
+					public void reseed() {
+					}
 				};
 			} else {
 				// Exponential distribution for variable customer arrival times
@@ -112,7 +113,8 @@ public class MyEngine extends Engine {
 					}
 
 					@Override
-					public void setSeed(long seed) {}
+					public void setSeed(long seed) {
+					}
 
 					@Override
 					public long getSeed() {
@@ -120,7 +122,8 @@ public class MyEngine extends Engine {
 					}
 
 					@Override
-					public void reseed() {}
+					public void reseed() {
+					}
 				};
 			} else {
 				// Normal distribution for variable service times
@@ -160,57 +163,125 @@ public class MyEngine extends Engine {
 	@Override
 	protected void runEvent(Event t) {// B phase events
 		Customer customer;
+		ArrayList<ServicePoint> arrivalServicePoints = getServicePointsByEventType(EventType.DEP1);
+		ArrayList<ServicePoint> financeServicePoints = getServicePointsByEventType(EventType.DEP2);
+		ArrayList<ServicePoint> testdriveServicePoints = getServicePointsByEventType(EventType.DEP3);
+		ArrayList<ServicePoint> closureServicePoints = getServicePointsByEventType(EventType.DEP4);
+		ServicePoint shortestArrivalServicePoint = null;
+		ServicePoint shortestFinanceServicePoint = null;
+		ServicePoint shortestTestdriveServicePoint = null;
+		ServicePoint shortestClosureServicePoint = null;
+		ServicePoint longestArrivalServicePoint = null;
+		ServicePoint longestFinanceServicePoint = null;
+		ServicePoint longestTestdriveServicePoint = null;
+		ServicePoint longestClosureServicePoint = null;
+		Trace.out(Trace.Level.INFO, "ArrivalServicePoints: " + arrivalServicePoints.size());
+		Trace.out(Trace.Level.INFO, "FinanceServicePoints: " + financeServicePoints.size());
+		Trace.out(Trace.Level.INFO, "TestdriveServicePoints: " + testdriveServicePoints.size());
+		Trace.out(Trace.Level.INFO, "ClosureServicePoints: " + closureServicePoints.size());
 		Trace.out(Trace.Level.INFO, "Current simulation speed " + getSimulationSpeed());
 
 		switch ((EventType) t.getType()) {
-			case ARR1:
+			/*case ARR1:
 				servicePoints[0].addQueue(new Customer());
 				arrivalProcess.generateNextEvent();
 				break;
 
 			case DEP1:
-				Trace.out(Trace.Level.INFO, "queue"+ servicePoints[0].queue);
+				Trace.out(Trace.Level.INFO, "queue" + servicePoints[0].queue);
 				customer = servicePoints[0].removeQueue();
 				servicePoints[1].addQueue(customer);
 				break;
 			case DEP2:
-				Trace.out(Trace.Level.INFO, "Finance queue"+ servicePoints[1].queue);
+				Trace.out(Trace.Level.INFO, "Finance queue" + servicePoints[1].queue);
 				customer = servicePoints[1].peekQueue();
-				Trace.out(Trace.Level.INFO, "Finance customer"+ customer);
+				Trace.out(Trace.Level.INFO, "Finance customer" + customer);
 				if (customer.isFinanceAccepted()) {
 					customer = servicePoints[1].removeQueue();
 					servicePoints[2].addQueue(customer);
-					Trace.out(Trace.Level.INFO, "Testdrivequeue addition"+ servicePoints[2].queue);
+					Trace.out(Trace.Level.INFO, "Testdrivequeue addition" + servicePoints[2].queue);
 					break;
 				} else {
 					Trace.out(Trace.Level.WAR, "Customer #" + customer.getId() + " stuck in finance queue.");
 				}
 
 			case DEP3:
-				Trace.out(Trace.Level.INFO, "Testdrive queue"+ servicePoints[2].queue);
+				Trace.out(Trace.Level.INFO, "Testdrive queue" + servicePoints[2].queue);
 				customer = servicePoints[2].peekQueue();
-				Trace.out(Trace.Level.INFO, "Testdrive customer"+ customer + "and Testdrive finance" + customer.isFinanceAccepted());
+				Trace.out(Trace.Level.INFO, "Testdrive customer" + customer + "and Testdrive finance" + customer.isFinanceAccepted());
 				if (customer.happyWithTestdrive()) {
 					customer = servicePoints[2].removeQueue();
 					servicePoints[3].addQueue(customer);
-					Trace.out(Trace.Level.INFO, "Closurequeue addition"+ servicePoints[3].queue);
+					Trace.out(Trace.Level.INFO, "Closurequeue addition" + servicePoints[3].queue);
 					break;
 				} else {
 					Trace.out(Trace.Level.WAR, "Customer #" + customer.getId() + " stuck in Testdrive queue.");
 				}
 
 			case DEP4:
-				Trace.out(Trace.Level.INFO, "Closure queue"+ servicePoints[3]);
+				Trace.out(Trace.Level.INFO, "Closure queue" + servicePoints[3]);
 				customer = servicePoints[3].removeQueue();
-				Trace.out(Trace.Level.INFO, "Closure customer"+ customer);
+				Trace.out(Trace.Level.INFO, "Closure customer" + customer);
 				if (customer != null) {
 					processedCustomers.add(customer);
 					customer.setRemovalTime(Clock.getInstance().getClock());
 					customer.setTotalTime();
 					customer.reportResults();
 					break;
-				}
+				}*/
+			case ARR1:
+				shortestArrivalServicePoint = getShortestQueue(arrivalServicePoints);
+				shortestArrivalServicePoint.addQueue(new Customer());
+				arrivalProcess.generateNextEvent();
+				break;
 
+			case DEP1:
+				for (ServicePoint arrivalPoint : arrivalServicePoints){
+					shortestFinanceServicePoint = getShortestQueue(financeServicePoints);
+					customer = arrivalPoint.peekQueue();
+					if (customer != null){
+						customer = arrivalPoint.removeQueue();
+						shortestFinanceServicePoint.addQueue(customer);
+					}
+				}
+				break;
+			case DEP2:
+				for (ServicePoint financePoint : financeServicePoints) {
+					shortestTestdriveServicePoint = getShortestQueue(testdriveServicePoints);
+					customer = financePoint.peekQueue();
+					if (customer != null) {
+						if (customer.isFinanceAccepted()) {
+							customer = financePoint.removeQueue();
+							shortestTestdriveServicePoint.addQueue(customer);
+						}
+					}
+				}
+				break;
+			case DEP3:
+				for (ServicePoint testdrive : testdriveServicePoints) {
+					shortestClosureServicePoint = getShortestQueue(closureServicePoints);
+					customer = testdrive.peekQueue();
+					if (customer != null) {
+						if (customer.happyWithTestdrive()) {
+							customer = testdrive.removeQueue();
+							shortestClosureServicePoint.addQueue(customer);
+						}
+					}
+				}
+				break;
+
+			case DEP4:
+				for (ServicePoint closurePoint : closureServicePoints) {
+					customer = closurePoint.peekQueue();
+					if (customer != null) {
+						customer = closurePoint.removeQueue();
+						processedCustomers.add(customer);
+						customer.setRemovalTime(Clock.getInstance().getClock());
+						customer.setTotalTime();
+						customer.reportResults();
+						break;
+					}
+				}
 		}
 		try {
 			Thread.sleep(getSimulationSpeed());
@@ -307,29 +378,29 @@ public class MyEngine extends Engine {
 		this.testdriveMean = testdriveMean;
 	}
 
-	public int getClosureMean(){
+	public int getClosureMean() {
 		return closureMean;
 	}
 
-	public void setClosureMean(int closureMean){
+	public void setClosureMean(int closureMean) {
 		this.closureMean = closureMean;
 	}
 
-	public synchronized int getSimulationSpeed(){
+	public synchronized int getSimulationSpeed() {
 		return simulationSpeed;
 	}
 
-	public synchronized void setSimulationSpeed(int simulationSpeed){
+	public synchronized void setSimulationSpeed(int simulationSpeed) {
 		this.simulationSpeed = simulationSpeed;
 	}
 
-	public synchronized int slowDownSimulationSpeed(int increment){
+	public synchronized int slowDownSimulationSpeed(int increment) {
 		simulationSpeed += increment;
 		return simulationSpeed;
 	}
 
-	public synchronized int speedUpSimulationSpeed(int decrement){
-		if (simulationSpeed <= 0){
+	public synchronized int speedUpSimulationSpeed(int decrement) {
+		if (simulationSpeed <= 0) {
 			simulationSpeed = 0;
 			return simulationSpeed;
 		}
@@ -383,7 +454,7 @@ public class MyEngine extends Engine {
 		}
 	}
 
-	private ArrayList<ServicePoint> getServicePointsByEventType(EventType type) {
+	public ArrayList<ServicePoint> getServicePointsByEventType(EventType type) {
 		ArrayList<ServicePoint> filteredPoints = new ArrayList<>();
 		for (ServicePoint p : servicePoints) {
 			if (p.getEventType() == type) {
@@ -394,10 +465,38 @@ public class MyEngine extends Engine {
 	}
 
 	private ServicePoint getShortestQueue(ArrayList<ServicePoint> points) {
-		return points.stream()
-				.min(Comparator.comparingInt(p -> p.getQueue().size()))
-				.orElse(null);
+		if (points == null || points.isEmpty()) {
+			return null; // No points to evaluate
+		}
+
+		ServicePoint shortestServicePoint = points.get(0); // Assume first point is shortest initially
+
+		for (ServicePoint point : points) {
+			if (point.getQueue().size() < shortestServicePoint.getQueue().size()) {
+				shortestServicePoint = point; // Update shortest point
+			}
+		}
+
+		return shortestServicePoint;
 	}
+
+	private ServicePoint getLongestQueue(ArrayList<ServicePoint> points) {
+		if (points == null || points.isEmpty()) {
+			return null; // No points to evaluate
+		}
+
+		ServicePoint longestServicePoint = points.get(0); // Assume first point has the longest queue initially
+
+		for (ServicePoint point : points) {
+			if (point.getQueue().size() > longestServicePoint.getQueue().size()) {
+				longestServicePoint = point; // Update if a longer queue is found
+			}
+		}
+
+		return longestServicePoint;
+	}
+
+
 
 
 

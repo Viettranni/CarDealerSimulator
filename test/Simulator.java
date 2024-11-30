@@ -9,10 +9,137 @@ import simu.framework.Trace.Level;
 import simu.model.MyEngine;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Scanner;
 
 /* Command-line type User Interface */
 public class Simulator {
+
+	public static void createVan(ArrayList<String[]> carsToBeCreated){
+		boolean valid = true;
+		Scanner scanner = new Scanner(System.in);
+		String amountOfCarsToBeCreated = null;
+		String fuelType = null;
+		String carMean = null;
+		String carVariance = null;
+		while (valid) {
+			try {
+				System.out.println("How many Vans you want to create? ");
+				amountOfCarsToBeCreated = scanner.nextLine();
+				System.out.println("Gas (1), Hybrid (2), Electric (3): ");
+				fuelType = scanner.nextLine();
+				System.out.println("Average Van price: ");
+				carMean = scanner.nextLine();
+				System.out.println("Price variance of the Vans: ");
+				carVariance = scanner.nextLine();
+				carsToBeCreated.add(new String[]{"2", amountOfCarsToBeCreated, fuelType, carMean, carVariance});
+				valid = false;
+			} catch (NumberFormatException e) {
+				e.printStackTrace();
+			}
+		}
+	}
+
+	public static void createSUV(ArrayList<String[]> carsToBeCreated){
+		boolean valid = true;
+		Scanner scanner = new Scanner(System.in);
+		String amountOfCarsToBeCreated = null;
+		String fuelType = null;
+		String carMean = null;
+		String carVariance = null;
+		while (valid) {
+			try {
+				System.out.println("How many Vans you want to create? ");
+				amountOfCarsToBeCreated = scanner.nextLine();
+				System.out.println("Gas (1), Hybrid (2), Electric (3): ");
+				fuelType = scanner.nextLine();
+				System.out.println("Average Van price: ");
+				carMean = scanner.nextLine();
+				System.out.println("Price variance of the Vans: ");
+				carVariance = scanner.nextLine();
+				carsToBeCreated.add(new String[]{"1", amountOfCarsToBeCreated, fuelType, carMean, carVariance});
+				valid = false;
+			} catch (NumberFormatException e) {
+				e.printStackTrace();
+			}
+		}
+	}
+
+	public static void createSedan(ArrayList<String[]> carsToBeCreated){
+		boolean valid = true;
+		Scanner scanner = new Scanner(System.in);
+		String amountOfCarsToBeCreated = null;
+		String fuelType = null;
+		String carMean = null;
+		String carVariance = null;
+		while (valid) {
+			try {
+				System.out.println("How many Vans you want to create? ");
+				amountOfCarsToBeCreated = scanner.nextLine();
+				System.out.println("Gas (1), Hybrid (2), Electric (3): ");
+				fuelType = scanner.nextLine();
+				System.out.println("Average Van price: ");
+				carMean = scanner.nextLine();
+				System.out.println("Price variance of the Vans: ");
+				carVariance = scanner.nextLine();
+				carsToBeCreated.add(new String[]{"3", amountOfCarsToBeCreated, fuelType, carMean, carVariance});
+				valid = false;
+			} catch (NumberFormatException e) {
+				e.printStackTrace();
+			}
+		}
+	}
+
+	public static void createSport(ArrayList<String[]> carsToBeCreated){
+		boolean valid = true;
+		Scanner scanner = new Scanner(System.in);
+		String amountOfCarsToBeCreated = null;
+		String fuelType = null;
+		String carMean = null;
+		String carVariance = null;
+		while (valid) {
+			try {
+				System.out.println("How many Vans you want to create? ");
+				amountOfCarsToBeCreated = scanner.nextLine();
+				System.out.println("Gas (1), Hybrid (2), Electric (3): ");
+				fuelType = scanner.nextLine();
+				System.out.println("Average Van price: ");
+				carMean = scanner.nextLine();
+				System.out.println("Price variance of the Vans: ");
+				carVariance = scanner.nextLine();
+				carsToBeCreated.add(new String[]{"4", amountOfCarsToBeCreated, fuelType, carMean, carVariance});
+				valid = false;
+			} catch (NumberFormatException e) {
+				e.printStackTrace();
+			}
+		}
+	}
+
+	public static void createCompact(ArrayList<String[]> carsToBeCreated){
+		boolean valid = true;
+		Scanner scanner = new Scanner(System.in);
+		String amountOfCarsToBeCreated = null;
+		String fuelType = null;
+		String carMean = null;
+		String carVariance = null;
+		while (valid) {
+			try {
+				System.out.println("How many Vans you want to create? ");
+				amountOfCarsToBeCreated = scanner.nextLine();
+				System.out.println("Gas (1), Hybrid (2), Electric (3): ");
+				fuelType = scanner.nextLine();
+				System.out.println("Average Van price: ");
+				carMean = scanner.nextLine();
+				System.out.println("Price variance of the Vans: ");
+				carVariance = scanner.nextLine();
+				carsToBeCreated.add(new String[]{"5", amountOfCarsToBeCreated, fuelType, carMean, carVariance});
+				valid = false;
+			} catch (NumberFormatException e) {
+				e.printStackTrace();
+			}
+		}
+	}
 	public static void main(String[] args) {
 		Trace.setTraceLevel(Level.INFO);
 		/*
@@ -29,6 +156,14 @@ public class Simulator {
 		int closureMean = 0;
 		int closureVariance = 0;
 		int simulationSpeed = 1000;
+		ArrayList<String[]> carsToBeCreated = new ArrayList<>();
+
+		createVan(carsToBeCreated);
+		/*createCompact(carsToBeCreated);
+		createSedan(carsToBeCreated);
+		createSUV(carsToBeCreated);
+		createSport(carsToBeCreated);*/
+
 		while (valid) {
 			try {
 				System.out.println("Enter the average arrival service time: ");
@@ -52,7 +187,8 @@ public class Simulator {
 				System.out.println("Enter a valid number");
 			}
 		}
-		MyEngine m = new MyEngine(arrivalMean, arrivalVariance, financeMean, financeVariance, testdriveMean, testdriveVariance, closureMean, closureVariance, simulationSpeed);
+		System.out.println("Cars: " + Arrays.toString(carsToBeCreated.get(0)));
+		MyEngine m = new MyEngine(arrivalMean, arrivalVariance, financeMean, financeVariance, testdriveMean, testdriveVariance, closureMean, closureVariance, simulationSpeed, carsToBeCreated);
 
 		Thread inputThread = new Thread(() -> {
 			try {

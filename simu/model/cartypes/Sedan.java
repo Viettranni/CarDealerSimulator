@@ -4,7 +4,7 @@ import simu.model.Car;
 
 
 public class Sedan extends Car {
-    public Sedan(double baseProb, double meanPrice, double priceVariance, double basePrice, double coefficient) {
-        super(baseProb, meanPrice, priceVariance, basePrice, coefficient);
+    public Sedan(String fuelType, double meanPrice, double priceVariance) {
+        super("Sedan", fuelType, meanPrice, priceVariance);
     }
 }

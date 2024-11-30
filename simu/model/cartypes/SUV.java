@@ -4,7 +4,7 @@ import simu.model.Car;
 
 
 public class SUV extends Car {
-    public SUV(double baseProb, double meanPrice, double priceVariance, double basePrice, double coefficient) {
-        super(baseProb, meanPrice, priceVariance, basePrice, coefficient);
+    public SUV(String fuelType, double meanPrice, double priceVariance) {
+        super("SUV", fuelType, meanPrice, priceVariance);
     }
 }

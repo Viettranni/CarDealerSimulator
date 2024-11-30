@@ -28,7 +28,7 @@ public class Customer {
 	private static final double BUDGET_MEAN = 30000.0;   // Mean budget: $30,000.
 	private static final double BUDGET_STDDEV = 10000.0; // Standard deviation: $10,000
 	private static final double CREDIT_SCORE_MEAN = 650; // Mean credit score: 650
-	private static final double CREDIT_SCORE_STDDEV = 100; // Standard deviation: 100
+	private static final double CREDIT_SCORE_STDDEV = 100;// Standard deviation: 100
 
 	private Normal budgetNormalDistribution = new Normal(BUDGET_MEAN, BUDGET_STDDEV);
 	private Normal creditNormalDistribution = new Normal(CREDIT_SCORE_MEAN, CREDIT_SCORE_STDDEV);

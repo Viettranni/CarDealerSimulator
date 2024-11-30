@@ -9,13 +9,14 @@ import simu.model.servicepoints.ClosureServicePoint;
 import simu.model.servicepoints.FinanceServicePoint;
 import simu.model.servicepoints.TestdriveServicePoint;
 
-import java.util.ArrayList;
-import java.util.Random;
+import java.util.*;
 
 public class MyEngine extends Engine {
 	private ArrivalProcess arrivalProcess;
 	private ServicePoint[] servicePoints;
 	private ArrayList<Customer> processedCustomers = new ArrayList<>();
+	private CarDealerShop carDealerShop;
+	private ArrayList<String[]> carsToBeCreated;
 	private int arrivalMean;
 	private int arrivalVariance;
 	private int financeMean;
@@ -25,6 +26,7 @@ public class MyEngine extends Engine {
 	private int closureMean;
 	private int closureVariance;
 	private volatile int simulationSpeed;
+
 
 
 	public static final boolean TEXTDEMO = true;
@@ -38,7 +40,9 @@ public class MyEngine extends Engine {
 	 * Simulate four service points:
 	 * ArrivalServicePoint -> FinanceServicePoint -> TestdriveServicePoint -> ClosureServicePoint
 	 */
-	public MyEngine(int arrivalMean, int arrivalVariance, int financeMean, int financeVariance, int testdriveMean, int testdriveVariance, int closureMean, int closureVariance, int simulationSpeed) {
+	public MyEngine(int arrivalMean, int arrivalVariance, int financeMean, int financeVariance, int testdriveMean, int testdriveVariance, int closureMean, int closureVariance, int simulationSpeed, ArrayList<String[]> carsToBeCreated) {
+		this.carDealerShop = new CarDealerShop();
+		this.carsToBeCreated = carsToBeCreated;
 		this.arrivalMean = arrivalMean;
 		this.arrivalVariance = arrivalVariance;
 		this.financeMean = financeMean;
@@ -49,6 +53,9 @@ public class MyEngine extends Engine {
 		this.closureVariance = closureVariance;
 		this.simulationSpeed = simulationSpeed;
 		servicePoints = new ServicePoint[4];// Updated for four service points
+
+		Trace.out(Trace.Level.INFO, "Cars: " + Arrays.toString(carsToBeCreated.get(0)));
+		carsToBeCreated(carsToBeCreated);
 
 		if (TEXTDEMO) {
 			// Special setup for text example
@@ -236,6 +243,26 @@ public class MyEngine extends Engine {
 					customer.happyWithTestdrive(),
 					customer.isPurchased()
 			));
+		}
+		System.out.println("Cars: " + carDealerShop.getCarCollection());
+	}
+
+	public void carsToBeCreated(ArrayList<String[]> carsToBeCreated) {
+		for (String[] car : carsToBeCreated) {
+			Trace.out(Trace.Level.INFO, "Car: " + Arrays.toString(car));
+			Trace.out(Trace.Level.INFO, "Car: " + car[0]);
+			Trace.out(Trace.Level.INFO, "Car: " + car[1]);
+			Trace.out(Trace.Level.INFO, "Car: " + car[2]);
+			Trace.out(Trace.Level.INFO, "Car: " + car[3]);
+			Trace.out(Trace.Level.INFO, "Car: " + car[4]);
+
+			int carType = Integer.parseInt(car[0]);
+			int amount = Integer.parseInt(car[1]);
+			int fuelType = Integer.parseInt(car[2]);
+			double meanPrice = Double.parseDouble(car[3]);
+			double variance = Double.parseDouble(car[4]);
+			carDealerShop.createCar(amount, carType, fuelType, meanPrice, variance);
+			Trace.out(Trace.Level.INFO, "Car: " + carDealerShop.getCarCollection());
 		}
 	}
 

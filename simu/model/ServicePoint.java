@@ -56,4 +56,12 @@ public class ServicePoint {
 	public boolean isOnQueue(){
 		return queue.size() != 0;
 	}
+
+	public EventType getEventType(){
+		return eventTypeScheduled;
+	}
+
+	public LinkedList<Customer> getQueue(){
+		return queue;
+	}
 }

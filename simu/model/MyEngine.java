@@ -26,7 +26,12 @@ public class MyEngine extends Engine {
 	private int closureMean;
 	private int closureVariance;
 	private volatile int simulationSpeed;
-	private int employeesAmount;
+	private int arrivalServicePoints;
+	private int financeServicePoints;
+	private int testdriveServicePoints;
+	private int closureServicePoints;
+	private int totalServicePoints;
+	private int currentServicePointIndex = 0; // Tracks the next free index
 
 
 
@@ -41,7 +46,7 @@ public class MyEngine extends Engine {
 	 * Simulate four service points:
 	 * ArrivalServicePoint -> FinanceServicePoint -> TestdriveServicePoint -> ClosureServicePoint
 	 */
-	public MyEngine(int arrivalMean, int arrivalVariance, int financeMean, int financeVariance, int testdriveMean, int testdriveVariance, int closureMean, int closureVariance, int simulationSpeed, ArrayList<String[]> carsToBeCreated, int employeesAmount) {
+	public MyEngine(int arrivalMean, int arrivalVariance, int financeMean, int financeVariance, int testdriveMean, int testdriveVariance, int closureMean, int closureVariance, int simulationSpeed, ArrayList<String[]> carsToBeCreated, int arrivalServicePoints, int financeServicePoints, int testdriveServicePoints, int closureServicePoints) {
 		this.carDealerShop = new CarDealerShop();
 		this.carsToBeCreated = carsToBeCreated;
 		this.arrivalMean = arrivalMean;
@@ -53,11 +58,14 @@ public class MyEngine extends Engine {
 		this.closureMean = closureMean;
 		this.closureVariance = closureVariance;
 		this.simulationSpeed = simulationSpeed;
-		this.employeesAmount = employeesAmount;
-		servicePoints = new ServicePoint[4];// Updated for four service points
+		this.arrivalServicePoints = arrivalServicePoints;
+		this.financeServicePoints = financeServicePoints;
+		this.testdriveServicePoints = testdriveServicePoints;
+		this.closureServicePoints = closureServicePoints;
+		this.totalServicePoints = arrivalServicePoints + financeServicePoints + testdriveServicePoints + closureServicePoints;
+		servicePoints = new ServicePoint[totalServicePoints];// Updated for four service points
 
 		//Trace.out(Trace.Level.INFO, "Cars: " + Arrays.toString(carsToBeCreated.get(0)));
-		employeesToBeCreated(employeesAmount);
 		carsToBeCreated(carsToBeCreated);
 		Trace.out(Trace.Level.INFO, "Cars at the beginning of the simulation: " + carDealerShop.getCarCollection().size());
 
@@ -122,19 +130,23 @@ public class MyEngine extends Engine {
 				closureServiceTime = new Normal(closureMean, closureVariance, Integer.toUnsignedLong(r.nextInt()));
 			}
 
-			// Initialize specialized service points
+			/*// Initialize specialized service points
 			servicePoints[0] = new ArrivalServicePoint(arrivalServiceTime, eventList, EventType.DEP1);
 			servicePoints[1] = new FinanceServicePoint(financeServiceTime, eventList, EventType.DEP2);
 			servicePoints[2] = new TestdriveServicePoint(testdriveServiceTime, eventList, EventType.DEP3, carDealerShop);
-			servicePoints[3] = new ClosureServicePoint(closureServiceTime, eventList, EventType.DEP4, carDealerShop);
+			servicePoints[3] = new ClosureServicePoint(closureServiceTime, eventList, EventType.DEP4, carDealerShop);*/
+			createArrivalServicePoints(arrivalServicePoints, arrivalServiceTime, eventList);
+			createFinanceServicePoints(financeServicePoints, financeServiceTime, eventList);
+			createTestdriveServicePoints(testdriveServicePoints, testdriveServiceTime, eventList, carDealerShop);
+			createClosureServicePoints(closureServicePoints, closureServiceTime, eventList, carDealerShop);
 
 			arrivalProcess = new ArrivalProcess(arrivalTime, eventList, EventType.ARR1);
 		} else {
-			// Realistic simulation with variable arrival and service times
+			/*// Realistic simulation with variable arrival and service times
 			servicePoints[0] = new ArrivalServicePoint(new Normal(arrivalMean, arrivalVariance), eventList, EventType.DEP1);
 			servicePoints[1] = new FinanceServicePoint(new Normal(financeMean, financeVariance), eventList, EventType.DEP2);
 			servicePoints[2] = new TestdriveServicePoint(new Normal(testdriveMean, testdriveVariance), eventList, EventType.DEP3, carDealerShop);
-			servicePoints[3] = new ClosureServicePoint(new Normal(closureMean, closureVariance), eventList, EventType.DEP4, carDealerShop);
+			servicePoints[3] = new ClosureServicePoint(new Normal(closureMean, closureVariance), eventList, EventType.DEP4, carDealerShop);*/
 
 			arrivalProcess = new ArrivalProcess(new Negexp(15, new Random().nextLong()), eventList, EventType.ARR1);
 		}
@@ -161,7 +173,6 @@ public class MyEngine extends Engine {
 				customer = servicePoints[0].removeQueue();
 				servicePoints[1].addQueue(customer);
 				break;
-
 			case DEP2:
 				Trace.out(Trace.Level.INFO, "Finance queue"+ servicePoints[1].queue);
 				customer = servicePoints[1].peekQueue();
@@ -252,10 +263,6 @@ public class MyEngine extends Engine {
 		System.out.println("Cars sold: " + carDealerShop.getSoldCars().size());
 	}
 
-	private void employeesToBeCreated(int employeesAmount) {
-		carDealerShop.createEmployee(employeesAmount);
-	}
-
 	public void carsToBeCreated(ArrayList<String[]> carsToBeCreated) {
 		for (String[] car : carsToBeCreated) {
 			/*
@@ -330,6 +337,70 @@ public class MyEngine extends Engine {
 
 		return simulationSpeed;
 	}
+
+	public void createArrivalServicePoints(int amount, ContinuousGenerator arrivalServiceTime, EventList eventList) {
+		for (int i = 0; i < amount; i++) {
+			if (currentServicePointIndex < servicePoints.length) {
+				servicePoints[currentServicePointIndex] = new ArrivalServicePoint(arrivalServiceTime, eventList, EventType.DEP1);
+				currentServicePointIndex++; // Move to the next free index
+			} else {
+				throw new IllegalStateException("ServicePoints array is full. Cannot add more service points.");
+			}
+		}
+	}
+
+	public void createFinanceServicePoints(int amount, ContinuousGenerator financeServiceTime, EventList eventList) {
+		for (int i = 0; i < amount; i++) {
+			if (currentServicePointIndex < servicePoints.length) {
+				servicePoints[currentServicePointIndex] = new FinanceServicePoint(financeServiceTime, eventList, EventType.DEP2);
+				currentServicePointIndex++; // Move to the next free index
+			} else {
+				throw new IllegalStateException("ServicePoints array is full. Cannot add more service points.");
+			}
+		}
+	}
+
+
+	public void createTestdriveServicePoints(int amount, ContinuousGenerator testdriveServiceTime, EventList eventList, CarDealerShop carDealerShop) {
+		for (int i = 0; i < amount; i++) {
+			if (currentServicePointIndex < servicePoints.length) {
+				servicePoints[currentServicePointIndex] = new TestdriveServicePoint(testdriveServiceTime, eventList, EventType.DEP3, carDealerShop);
+				currentServicePointIndex++; // Move to the next free index
+			} else {
+				throw new IllegalStateException("ServicePoints array is full. Cannot add more service points.");
+			}
+		}
+	}
+
+	public void createClosureServicePoints(int amount, ContinuousGenerator closureServiceTime, EventList eventList, CarDealerShop carDealerShop) {
+		for (int i = 0; i < amount; i++) {
+			if (currentServicePointIndex < servicePoints.length) {
+				servicePoints[currentServicePointIndex] = new ClosureServicePoint(closureServiceTime, eventList, EventType.DEP4, carDealerShop);
+				currentServicePointIndex++; // Move to the next free index
+			} else {
+				throw new IllegalStateException("ServicePoints array is full. Cannot add more service points.");
+			}
+		}
+	}
+
+	private ArrayList<ServicePoint> getServicePointsByEventType(EventType type) {
+		ArrayList<ServicePoint> filteredPoints = new ArrayList<>();
+		for (ServicePoint p : servicePoints) {
+			if (p.getEventType() == type) {
+				filteredPoints.add(p);
+			}
+		}
+		return filteredPoints;
+	}
+
+	private ServicePoint getShortestQueue(ArrayList<ServicePoint> points) {
+		return points.stream()
+				.min(Comparator.comparingInt(p -> p.getQueue().size()))
+				.orElse(null);
+	}
+
+
+
 
 	/*public synchronized void pause() {
 		paused = !paused;

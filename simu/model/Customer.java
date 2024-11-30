@@ -20,6 +20,7 @@ public class Customer {
 	private int creditScore;
 	private boolean financeAccepted = false;
 	private boolean happyWithTestdrive = false;
+	private Car purchaseCar;
 	private boolean purchased = false;
 
 
@@ -160,6 +161,14 @@ public class Customer {
 
 	public void setHappyWithTestdrive(boolean happyWithTestdrive) {
 		this.happyWithTestdrive = happyWithTestdrive;
+	}
+
+	public Car getPurchaseCar() {
+		return purchaseCar;
+	}
+
+	public void setPurchaseCar(Car car) {
+		this.purchaseCar = car;
 	}
 
 	public boolean isPurchased() {

@@ -3,14 +3,14 @@ package simu.model.servicepoints;
 import eduni.distributions.ContinuousGenerator;
 import simu.framework.EventList;
 import simu.framework.Trace;
-import simu.model.Customer;
-import simu.model.EventType;
-import simu.model.ServicePoint;
+import simu.model.*;
 
 public class TestdriveServicePoint extends ServicePoint {
+    CarDealerShop carDealerShop;
 
-    public TestdriveServicePoint(ContinuousGenerator generator, EventList eventList, EventType type) {
+    public TestdriveServicePoint(ContinuousGenerator generator, EventList eventList, EventType type, CarDealerShop carDealerShop) {
         super(generator, eventList, type);
+        this.carDealerShop = carDealerShop;
     }
 
     /**
@@ -40,8 +40,19 @@ public class TestdriveServicePoint extends ServicePoint {
         Trace.out(Trace.Level.INFO, "Customer #" + customer.getId() + " is requesting to test drive a " + customer.getPreferredCarType());
 
         // Check if the preferred car is available
-        boolean carAvailable = Math.random() > 0.1;  // 90% chance the car is available
+        boolean carAvailable = false;
+        Car testdriveCar = null;
+        for (Car car : carDealerShop.getCarCollection()) {
+            if (car.getCarType().equals(customer.getPreferredCarType())) {
+                carAvailable = true;
+                testdriveCar = car;
+                Trace.out(Trace.Level.INFO, "Car available");
+                break;
+            }
+        }
+        // boolean carAvailable1 = Math.random() > 0.1;// 90% chance the car is available
         if (!carAvailable) {
+            Trace.out(Trace.Level.INFO, "Car not available");
             Trace.out(Trace.Level.WAR, "Customer #" + customer.getId() + "'s preferred car is not available. Returning to queue.");
             customerBackToQueue();  // Put the customer back in the queue
             return;
@@ -60,6 +71,7 @@ public class TestdriveServicePoint extends ServicePoint {
         // Customer liked the car and is ready to proceed
         Trace.out(Trace.Level.INFO, "Customer #" + customer.getId() + " liked the car and will proceed.");
         customer.setHappyWithTestdrive(true);  // Mark the customer as happy with the test drive
+        customer.setPurchaseCar(testdriveCar);
         // Call the base method to handle service reservation and event scheduling
         super.beginService();
     }

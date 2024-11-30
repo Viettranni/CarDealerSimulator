@@ -56,6 +56,7 @@ public class MyEngine extends Engine {
 
 		Trace.out(Trace.Level.INFO, "Cars: " + Arrays.toString(carsToBeCreated.get(0)));
 		carsToBeCreated(carsToBeCreated);
+		Trace.out(Trace.Level.INFO, "Cars at the beginning of the simulation: " + carDealerShop.getCarCollection().size());
 
 		if (TEXTDEMO) {
 			// Special setup for text example
@@ -121,16 +122,16 @@ public class MyEngine extends Engine {
 			// Initialize specialized service points
 			servicePoints[0] = new ArrivalServicePoint(arrivalServiceTime, eventList, EventType.DEP1);
 			servicePoints[1] = new FinanceServicePoint(financeServiceTime, eventList, EventType.DEP2);
-			servicePoints[2] = new TestdriveServicePoint(testdriveServiceTime, eventList, EventType.DEP3);
-			servicePoints[3] = new ClosureServicePoint(closureServiceTime, eventList, EventType.DEP4);
+			servicePoints[2] = new TestdriveServicePoint(testdriveServiceTime, eventList, EventType.DEP3, carDealerShop);
+			servicePoints[3] = new ClosureServicePoint(closureServiceTime, eventList, EventType.DEP4, carDealerShop);
 
 			arrivalProcess = new ArrivalProcess(arrivalTime, eventList, EventType.ARR1);
 		} else {
 			// Realistic simulation with variable arrival and service times
 			servicePoints[0] = new ArrivalServicePoint(new Normal(arrivalMean, arrivalVariance), eventList, EventType.DEP1);
 			servicePoints[1] = new FinanceServicePoint(new Normal(financeMean, financeVariance), eventList, EventType.DEP2);
-			servicePoints[2] = new TestdriveServicePoint(new Normal(testdriveMean, testdriveVariance), eventList, EventType.DEP3);
-			servicePoints[3] = new ClosureServicePoint(new Normal(closureMean, closureVariance), eventList, EventType.DEP4);
+			servicePoints[2] = new TestdriveServicePoint(new Normal(testdriveMean, testdriveVariance), eventList, EventType.DEP3, carDealerShop);
+			servicePoints[3] = new ClosureServicePoint(new Normal(closureMean, closureVariance), eventList, EventType.DEP4, carDealerShop);
 
 			arrivalProcess = new ArrivalProcess(new Negexp(15, new Random().nextLong()), eventList, EventType.ARR1);
 		}
@@ -244,17 +245,19 @@ public class MyEngine extends Engine {
 					customer.isPurchased()
 			));
 		}
-		System.out.println("Cars: " + carDealerShop.getCarCollection());
+		System.out.println("Cars left at the dealershop: " + carDealerShop.getCarCollection().size());
+		System.out.println("Cars sold: " + carDealerShop.getSoldCars().size());
 	}
 
 	public void carsToBeCreated(ArrayList<String[]> carsToBeCreated) {
 		for (String[] car : carsToBeCreated) {
+			/*
 			Trace.out(Trace.Level.INFO, "Car: " + Arrays.toString(car));
 			Trace.out(Trace.Level.INFO, "Car: " + car[0]);
 			Trace.out(Trace.Level.INFO, "Car: " + car[1]);
 			Trace.out(Trace.Level.INFO, "Car: " + car[2]);
 			Trace.out(Trace.Level.INFO, "Car: " + car[3]);
-			Trace.out(Trace.Level.INFO, "Car: " + car[4]);
+			Trace.out(Trace.Level.INFO, "Car: " + car[4]);*/
 
 			int carType = Integer.parseInt(car[0]);
 			int amount = Integer.parseInt(car[1]);
@@ -262,7 +265,7 @@ public class MyEngine extends Engine {
 			double meanPrice = Double.parseDouble(car[3]);
 			double variance = Double.parseDouble(car[4]);
 			carDealerShop.createCar(amount, carType, fuelType, meanPrice, variance);
-			Trace.out(Trace.Level.INFO, "Car: " + carDealerShop.getCarCollection());
+			//Trace.out(Trace.Level.INFO, "Cars: " + carDealerShop.getCarCollection().size());
 		}
 	}
 

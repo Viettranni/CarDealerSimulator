@@ -3,13 +3,13 @@ package simu.model.servicepoints;
 import eduni.distributions.ContinuousGenerator;
 import simu.framework.EventList;
 import simu.framework.Trace;
-import simu.model.EventType;
-import simu.model.ServicePoint;
-import simu.model.Customer;
+import simu.model.*;
 
 public class ClosureServicePoint extends ServicePoint {
-    public ClosureServicePoint(ContinuousGenerator generator, EventList eventList, EventType type) {
+    CarDealerShop carDealerShop;
+    public ClosureServicePoint(ContinuousGenerator generator, EventList eventList, EventType type, CarDealerShop carDealerShop) {
         super(generator, eventList, type);
+        this.carDealerShop = carDealerShop;
     }
 
     @Override
@@ -25,10 +25,13 @@ public class ClosureServicePoint extends ServicePoint {
 
         Trace.out(Trace.Level.INFO, "Customer #" + customer.getId() + " is closing the deal.");
 
-        boolean dealClosed = Math.random() > 0.2;  // 80% chance the deal is closed
+        Car car = customer.getPurchaseCar();
+        double customerPrice = customer.getBudget();
+        boolean dealClosed = Math.random() <= car.calculateSaleProbability(customerPrice);  // 80% chance the deal is closed
         if (dealClosed) {
             Trace.out(Trace.Level.INFO, "Customer #" + customer.getId() + " completed the purchase and is leaving.");
             customer.setPurchased(true);
+            carDealerShop.sellCar(car.getRegisterNumber());
         } else {
             Trace.out(Trace.Level.WAR, "Customer #" + customer.getId() + " decided not to purchase and is leaving.");
         }

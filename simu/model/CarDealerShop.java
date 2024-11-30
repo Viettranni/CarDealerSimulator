@@ -26,6 +26,10 @@ public class CarDealerShop {
         return carCollection;
     }
 
+    public List<Car> getSoldCars() {
+        return soldCars;
+    }
+
     // METHODS
 
     // Adding the car to Car Gallery

@@ -26,6 +26,7 @@ public class MyEngine extends Engine {
 	private int closureMean;
 	private int closureVariance;
 	private volatile int simulationSpeed;
+	private int employeesAmount;
 
 
 
@@ -40,7 +41,7 @@ public class MyEngine extends Engine {
 	 * Simulate four service points:
 	 * ArrivalServicePoint -> FinanceServicePoint -> TestdriveServicePoint -> ClosureServicePoint
 	 */
-	public MyEngine(int arrivalMean, int arrivalVariance, int financeMean, int financeVariance, int testdriveMean, int testdriveVariance, int closureMean, int closureVariance, int simulationSpeed, ArrayList<String[]> carsToBeCreated) {
+	public MyEngine(int arrivalMean, int arrivalVariance, int financeMean, int financeVariance, int testdriveMean, int testdriveVariance, int closureMean, int closureVariance, int simulationSpeed, ArrayList<String[]> carsToBeCreated, int employeesAmount) {
 		this.carDealerShop = new CarDealerShop();
 		this.carsToBeCreated = carsToBeCreated;
 		this.arrivalMean = arrivalMean;
@@ -52,9 +53,11 @@ public class MyEngine extends Engine {
 		this.closureMean = closureMean;
 		this.closureVariance = closureVariance;
 		this.simulationSpeed = simulationSpeed;
+		this.employeesAmount = employeesAmount;
 		servicePoints = new ServicePoint[4];// Updated for four service points
 
-		Trace.out(Trace.Level.INFO, "Cars: " + Arrays.toString(carsToBeCreated.get(0)));
+		//Trace.out(Trace.Level.INFO, "Cars: " + Arrays.toString(carsToBeCreated.get(0)));
+		employeesToBeCreated(employeesAmount);
 		carsToBeCreated(carsToBeCreated);
 		Trace.out(Trace.Level.INFO, "Cars at the beginning of the simulation: " + carDealerShop.getCarCollection().size());
 
@@ -247,6 +250,10 @@ public class MyEngine extends Engine {
 		}
 		System.out.println("Cars left at the dealershop: " + carDealerShop.getCarCollection().size());
 		System.out.println("Cars sold: " + carDealerShop.getSoldCars().size());
+	}
+
+	private void employeesToBeCreated(int employeesAmount) {
+		carDealerShop.createEmployee(employeesAmount);
 	}
 
 	public void carsToBeCreated(ArrayList<String[]> carsToBeCreated) {

@@ -14,10 +14,12 @@ public class CarDealerShop {
     private List<Car> carCollection;
     private List<Car> soldCars;
     private static Set<String> takenRegisterNumbers = new HashSet<>();
+    private static List<Employee> employees;
 
     public CarDealerShop() {
         carCollection = new ArrayList<>();
         soldCars = new ArrayList<>();
+        employees = new ArrayList<>();
     }
 
     // Getters setters
@@ -169,8 +171,28 @@ public class CarDealerShop {
         }
     }
 
+    public void createEmployee(int amount) {
+        Employee employee = null;
+        for (int i = 0; i < amount; i++) {
+            employee = new Employee();
+        }
+        if (employee != null) {
+            addEmployee(employee);
+        }
+    }
 
+    public void addEmployee(Employee employee) {
+        if (employee == null) {
+            System.out.println("Error: Cannot add a null employee.");
+            return;
+        }
+        employees.add(employee);
+        System.out.println("Employee added successfully.");
+    }
 
+    public List<Employee> getEmployees() {
+        return employees;
+    }
 
     // Main method to run the test
     public static void main(String[] args) {

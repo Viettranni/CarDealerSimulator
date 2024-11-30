@@ -218,6 +218,7 @@ public class Simulator {
 		int testdriveVariance = 0;
 		int closureMean = 0;
 		int closureVariance = 0;
+		int employeeAmount = 0;
 		int simulationSpeed = 1000;
 		ArrayList<String[]> carsToBeCreated = new ArrayList<>();
 
@@ -245,13 +246,15 @@ public class Simulator {
 				closureMean = Integer.parseInt(scanner.nextLine());
 				System.out.println("Enter the variance of closure service time: ");
 				closureVariance = Integer.parseInt(scanner.nextLine());
+				System.out.println("Enter the employee amount: ");
+				employeeAmount = Integer.parseInt(scanner.nextLine());
 				valid = false;
 			} catch (NumberFormatException e) {
 				System.out.println("Enter a valid number");
 			}
 		}
 		System.out.println("Cars: " + Arrays.toString(carsToBeCreated.get(0)));
-		MyEngine m = new MyEngine(arrivalMean, arrivalVariance, financeMean, financeVariance, testdriveMean, testdriveVariance, closureMean, closureVariance, simulationSpeed, carsToBeCreated);
+		MyEngine m = new MyEngine(arrivalMean, arrivalVariance, financeMean, financeVariance, testdriveMean, testdriveVariance, closureMean, closureVariance, simulationSpeed, carsToBeCreated, employeeAmount);
 
 		Thread inputThread = new Thread(() -> {
 			try {

@@ -178,7 +178,7 @@ public class Car {
     public double calculateSaleProbability(double customerPrice) {
         // Sales probability formula:
         // saleProbability = basePrice * e^(-coefficient * (customerPrice - basePrice))
-        saleProb = basePrice * Math.exp(-coefficient * (basePrice - customerPrice));
+        saleProb = baseProb * Math.exp(-coefficient * (basePrice - customerPrice));
         return saleProb;
     }
 }

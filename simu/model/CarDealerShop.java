@@ -21,13 +21,13 @@ public class CarDealerShop {
         soldCars = new ArrayList<>();
     }
 
-    // Getters setters
+    // Getters setters -------------------------------------------------------------------------------------------------
 
     public List<Car> getCarCollection() {
         return carCollection;
     }
 
-    // METHODS
+    // METHODS ---------------------------------------------------------------------------------------------------------
 
     // Adding the car to Car Gallery
     public void addCar(Car vehicle) {

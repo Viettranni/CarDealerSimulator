@@ -87,10 +87,22 @@ public class Car {
         this.coefficient = coefficient;
     }
 
-    // Methods
+    // Methods ----------------------------------------------------------------------------------------
+
+    // Calculating Car Type Probability
     public double calculateCarTypeProb() {
         return coefficient * baseProb;
     }
-    
 
+    // Break even price for Vehicle
+    public double getBreakEvenPrice() {
+        return basePrice;
+    }
+    
+    // Calculating the inventory value
+    public double getInventoryValue(int quantity) {
+        return quantity * basePrice;
+    }
+
+    
 }

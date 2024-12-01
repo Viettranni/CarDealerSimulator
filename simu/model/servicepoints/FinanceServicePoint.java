@@ -5,6 +5,7 @@ import simu.framework.EventList;
 import simu.framework.Trace;
 import simu.model.Customer;
 import simu.model.EventType;
+import simu.model.MyEngine;
 import simu.model.ServicePoint;
 
 
@@ -27,7 +28,8 @@ public class FinanceServicePoint extends ServicePoint {
 
         if (customer.getCreditScore() < 600) {  // Example credit score threshold
             Trace.out(Trace.Level.WAR, "Customer #" + customer.getId() + " rejected due to poor credit score.");
-            queue.poll();  // Remove customer
+            customer = queue.poll();// Remove customer
+            MyEngine.addProcessedCustomer(customer); // Add to the processed list
         } else {
             Trace.out(Trace.Level.INFO, "Customer #" + customer.getId() + " approved for financing.");
             customer.setFinanceAccepted(true);

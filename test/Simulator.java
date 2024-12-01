@@ -17,64 +17,63 @@ import java.util.Scanner;
 public class Simulator {
 
 	// AUTOMATIC CREATION USING FOR LOOP
-	public static void createVan(ArrayList<String[]> carsToBeCreated, int numberOfCars) {
-		String fuelType = "1";  // 1 = Gas
+	public static void createVan(ArrayList<String[]> carsToBeCreated, int numberOfCars, int typeOfFuel) {
+		String carType = "2";
+		String amountOfCars = String.valueOf(numberOfCars);
+		String fuelType = String.valueOf(typeOfFuel);
 		String carMean = "30000";  // Example mean price
 		String carVariance = "5000";  // Example price variance
+		// Add each car to the list
+		carsToBeCreated.add(new String[]{"2", amountOfCars, fuelType, carMean, carVariance});
 
-		// Loop to create a specified number of cars
-		for (int i = 0; i < numberOfCars; i++) {
-			// Add each car to the list
-			carsToBeCreated.add(new String[]{"2", String.valueOf(i + 1), fuelType, carMean, carVariance});
-		}
 	}
 
-	public static void createSUV(ArrayList<String[]> carsToBeCreated, int numberOfCars) {
-		String fuelType = "2";  // 2 = Hybrid
+	public static void createSUV(ArrayList<String[]> carsToBeCreated, int numberOfCars, int typeOfFuel) {
+		String carType = "1";
+		String amountOfCars = String.valueOf(numberOfCars);
+		String fuelType = String.valueOf(typeOfFuel);
 		String carMean = "35000";  // Example mean price
 		String carVariance = "6000";  // Example price variance
 
-		// Loop to create a specified number of cars
-		for (int i = 0; i < numberOfCars; i++) {
-			// Add each car to the list
-			carsToBeCreated.add(new String[]{"1", String.valueOf(i + 1), fuelType, carMean, carVariance});
-		}
+		// Add each car to the list
+		carsToBeCreated.add(new String[]{carType, amountOfCars, fuelType, carMean, carVariance});
+
 	}
 
-	public static void createSedan(ArrayList<String[]> carsToBeCreated, int numberOfCars) {
-		String fuelType = "3";  // 3 = Electric
+	public static void createSedan(ArrayList<String[]> carsToBeCreated, int numberOfCars, int typeOfFuel) {
+		String carType = "3";
+		String amountOfCars = String.valueOf(numberOfCars);
+		String fuelType = String.valueOf(typeOfFuel);
 		String carMean = "25000";  // Example mean price
 		String carVariance = "4000";  // Example price variance
 
-		// Loop to create a specified number of cars
-		for (int i = 0; i < numberOfCars; i++) {
-			// Add each car to the list
-			carsToBeCreated.add(new String[]{"3", String.valueOf(i + 1), fuelType, carMean, carVariance});
-		}
+		// Add each car to the list
+		carsToBeCreated.add(new String[]{carType, amountOfCars, fuelType, carMean, carVariance});
+
 	}
 
-	public static void createSport(ArrayList<String[]> carsToBeCreated, int numberOfCars) {
-		String fuelType = "1";  // 1 = Gas
+	public static void createSport(ArrayList<String[]> carsToBeCreated, int numberOfCars, int typeOfFuel) {
+		String carType = "4";
+		String amountOfCars = String.valueOf(numberOfCars);
+		String fuelType = String.valueOf(typeOfFuel);
 		String carMean = "60000";  // Example mean price
 		String carVariance = "10000";  // Example price variance
 
-		// Loop to create a specified number of cars
-		for (int i = 0; i < numberOfCars; i++) {
-			// Add each car to the list
-			carsToBeCreated.add(new String[]{"4", String.valueOf(i + 1), fuelType, carMean, carVariance});
-		}
+		// Add each car to the list
+		carsToBeCreated.add(new String[]{carType, amountOfCars, fuelType, carMean, carVariance});
+
 	}
 
-	public static void createCompact(ArrayList<String[]> carsToBeCreated, int numberOfCars) {
-		String fuelType = "2";  // 2 = Hybrid
+	public static void createCompact(ArrayList<String[]> carsToBeCreated, int numberOfCars, int typeOfFuel) {
+		String carType = "5";
+		String amountOfCars = String.valueOf(numberOfCars);
+		String fuelType = String.valueOf(typeOfFuel);
 		String carMean = "18000";  // Example mean price
 		String carVariance = "3000";  // Example price variance
 
-		// Loop to create a specified number of cars
-		for (int i = 0; i < numberOfCars; i++) {
-			// Add each car to the list
-			carsToBeCreated.add(new String[]{"5", String.valueOf(i + 1), fuelType, carMean, carVariance});
-		}
+		// Add each car to the list
+		carsToBeCreated.add(new String[]{carType, amountOfCars, fuelType, carMean, carVariance});
+
 	}
 
 
@@ -225,11 +224,29 @@ public class Simulator {
 		int closureServicePoints = 5;
 		ArrayList<String[]> carsToBeCreated = new ArrayList<>();
 
-		createVan(carsToBeCreated, 12);
-		createCompact(carsToBeCreated, 15);
-		createSedan(carsToBeCreated, 25);
-		createSUV(carsToBeCreated, 9);
-		createSport(carsToBeCreated, 5);
+		// GAS
+		createVan(carsToBeCreated, 10, 1);
+		createCompact(carsToBeCreated, 10, 1);
+		createSedan(carsToBeCreated, 10, 1);
+		createSUV(carsToBeCreated, 10, 1);
+		createSport(carsToBeCreated, 10, 1);
+
+		// HYBRID
+		createVan(carsToBeCreated, 10, 2);
+		createCompact(carsToBeCreated, 10, 2);
+		createSedan(carsToBeCreated, 10, 2);
+		createSUV(carsToBeCreated, 10, 2);
+		createSport(carsToBeCreated, 10, 2);
+
+		// Electric
+
+		createVan(carsToBeCreated, 10, 3);
+		createCompact(carsToBeCreated, 10, 3);
+		createSedan(carsToBeCreated, 10, 3);
+		createSUV(carsToBeCreated, 10, 3);
+		createSport(carsToBeCreated, 10, 3);
+
+
 
 		while (valid) {
 			try {
@@ -254,7 +271,26 @@ public class Simulator {
 				System.out.println("Enter a valid number");
 			}
 		}
-		System.out.println("Cars: " + Arrays.toString(carsToBeCreated.get(0)));
+		System.out.println("Gas cars:");
+		System.out.println("Vans: " + Arrays.toString(carsToBeCreated.get(0)));
+		System.out.println("Compacts: " + Arrays.toString(carsToBeCreated.get(1)));
+		System.out.println("Sedans: " + Arrays.toString(carsToBeCreated.get(2)));
+		System.out.println("SUVs: " + Arrays.toString(carsToBeCreated.get(3)));
+		System.out.println("Sports: " + Arrays.toString(carsToBeCreated.get(4)));
+
+		System.out.println("Hybrid cars:");
+		System.out.println("Vans: " + Arrays.toString(carsToBeCreated.get(5)));
+		System.out.println("Compacts: " + Arrays.toString(carsToBeCreated.get(6)));
+		System.out.println("Sedans: " + Arrays.toString(carsToBeCreated.get(7)));
+		System.out.println("SUVs: " + Arrays.toString(carsToBeCreated.get(8)));
+		System.out.println("Sports: " + Arrays.toString(carsToBeCreated.get(9)));
+
+		System.out.println("Electric cars:");
+		System.out.println("Vans: " + Arrays.toString(carsToBeCreated.get(10)));
+		System.out.println("Compacts: " + Arrays.toString(carsToBeCreated.get(11)));
+		System.out.println("Sedans: " + Arrays.toString(carsToBeCreated.get(12)));
+		System.out.println("SUVs: " + Arrays.toString(carsToBeCreated.get(13)));
+		System.out.println("Sports: " + Arrays.toString(carsToBeCreated.get(14)));
 		MyEngine m = new MyEngine(arrivalMean, arrivalVariance, financeMean, financeVariance, testdriveMean, testdriveVariance, closureMean, closureVariance, simulationSpeed, carsToBeCreated, arrivalServicePoints, financeServicePoints, testdriveServicePoints, closureServicePoints);
 
 		Thread inputThread = new Thread(() -> {

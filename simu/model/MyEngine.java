@@ -14,7 +14,7 @@ import java.util.*;
 public class MyEngine extends Engine {
 	private ArrivalProcess arrivalProcess;
 	private ServicePoint[] servicePoints;
-	private ArrayList<Customer> processedCustomers = new ArrayList<>();
+	private static ArrayList<Customer> processedCustomers = new ArrayList<>();
 	private CarDealerShop carDealerShop;
 	private ArrayList<String[]> carsToBeCreated;
 	private int arrivalMean;
@@ -31,7 +31,14 @@ public class MyEngine extends Engine {
 	private int testdriveServicePoints;
 	private int closureServicePoints;
 	private int totalServicePoints;
-	private int currentServicePointIndex = 0; // Tracks the next free index
+	private int currentServicePointIndex = 0;// Tracks the next free index
+	private final int seed = 123;
+	ContinuousGenerator serviceTime = null;
+	ContinuousGenerator arrivalServiceTime = null;
+	ContinuousGenerator financeServiceTime = null;
+	ContinuousGenerator testdriveServiceTime = null;
+	ContinuousGenerator closureServiceTime = null;
+	Random r = null;
 
 
 	public static final boolean TEXTDEMO = true;
@@ -43,9 +50,12 @@ public class MyEngine extends Engine {
 	 *
 	 * Demo simulation case:
 	 * Simulate four service points:
-	 * ArrivalServicePoint -> FinanceServicePoint -> TestdriveServicePoint -> ClosureServicePoint
+	 * ArrivalServicePoint -> FinanceServicePoint -> Test-driveServicePoint -> ClosureServicePoint
 	 */
-	public MyEngine(int arrivalMean, int arrivalVariance, int financeMean, int financeVariance, int testdriveMean, int testdriveVariance, int closureMean, int closureVariance, int simulationSpeed, ArrayList<String[]> carsToBeCreated, int arrivalServicePoints, int financeServicePoints, int testdriveServicePoints, int closureServicePoints) {
+	public MyEngine(int arrivalMean, int arrivalVariance, int financeMean, int financeVariance,
+					int testdriveMean, int testdriveVariance, int closureMean, int closureVariance,
+					int simulationSpeed, ArrayList<String[]> carsToBeCreated, int arrivalServicePoints,
+					int financeServicePoints, int testdriveServicePoints, int closureServicePoints) {
 		this.carDealerShop = new CarDealerShop();
 		this.carsToBeCreated = carsToBeCreated;
 		this.arrivalMean = arrivalMean;
@@ -62,15 +72,15 @@ public class MyEngine extends Engine {
 		this.testdriveServicePoints = testdriveServicePoints;
 		this.closureServicePoints = closureServicePoints;
 		this.totalServicePoints = arrivalServicePoints + financeServicePoints + testdriveServicePoints + closureServicePoints;
-		servicePoints = new ServicePoint[totalServicePoints];// Updated for four service points
+		servicePoints = new ServicePoint[totalServicePoints];
 
-		//Trace.out(Trace.Level.INFO, "Cars: " + Arrays.toString(carsToBeCreated.get(0)));
+		// Create cars
 		carsToBeCreated(carsToBeCreated);
 		Trace.out(Trace.Level.INFO, "Cars at the beginning of the simulation: " + carDealerShop.getCarCollection().size());
 
 		if (TEXTDEMO) {
 			// Special setup for text example
-			Random r = new Random();
+			r = new Random();
 
 			ContinuousGenerator arrivalTime = null;
 			if (FIXEDARRIVALTIMES) {
@@ -98,12 +108,6 @@ public class MyEngine extends Engine {
 				// Exponential distribution for variable customer arrival times
 				arrivalTime = new Negexp(10, Integer.toUnsignedLong(r.nextInt()));
 			}
-
-			ContinuousGenerator serviceTime = null;
-			ContinuousGenerator arrivalServiceTime = null;
-			ContinuousGenerator financeServiceTime = null;
-			ContinuousGenerator testdriveServiceTime = null;
-			ContinuousGenerator closureServiceTime = null;
 			if (FIXEDSERVICETIMES) {
 				// Fixed service times
 				serviceTime = new ContinuousGenerator() {
@@ -127,17 +131,11 @@ public class MyEngine extends Engine {
 				};
 			} else {
 				// Normal distribution for variable service times
-				arrivalServiceTime = new Normal(arrivalMean, arrivalVariance, Integer.toUnsignedLong(r.nextInt()));
-				financeServiceTime = new Normal(financeMean, financeVariance, Integer.toUnsignedLong(r.nextInt()));
-				testdriveServiceTime = new Normal(testdriveMean, testdriveVariance, Integer.toUnsignedLong(r.nextInt()));
-				closureServiceTime = new Normal(closureMean, closureVariance, Integer.toUnsignedLong(r.nextInt()));
+				arrivalServiceTime = new Normal(arrivalMean, arrivalVariance, seed);
+				financeServiceTime = new Normal(financeMean, financeVariance, seed);
+				testdriveServiceTime = new Normal(testdriveMean, testdriveVariance, seed);
+				closureServiceTime = new Normal(closureMean, closureVariance, seed);
 			}
-
-			/*// Initialize specialized service points
-			servicePoints[0] = new ArrivalServicePoint(arrivalServiceTime, eventList, EventType.DEP1);
-			servicePoints[1] = new FinanceServicePoint(financeServiceTime, eventList, EventType.DEP2);
-			servicePoints[2] = new TestdriveServicePoint(testdriveServiceTime, eventList, EventType.DEP3, carDealerShop);
-			servicePoints[3] = new ClosureServicePoint(closureServiceTime, eventList, EventType.DEP4, carDealerShop);*/
 			createArrivalServicePoints(arrivalServicePoints, arrivalServiceTime, eventList);
 			createFinanceServicePoints(financeServicePoints, financeServiceTime, eventList);
 			createTestdriveServicePoints(testdriveServicePoints, testdriveServiceTime, eventList, carDealerShop);
@@ -145,11 +143,15 @@ public class MyEngine extends Engine {
 
 			arrivalProcess = new ArrivalProcess(arrivalTime, eventList, EventType.ARR1);
 		} else {
-			/*// Realistic simulation with variable arrival and service times
-			servicePoints[0] = new ArrivalServicePoint(new Normal(arrivalMean, arrivalVariance), eventList, EventType.DEP1);
-			servicePoints[1] = new FinanceServicePoint(new Normal(financeMean, financeVariance), eventList, EventType.DEP2);
-			servicePoints[2] = new TestdriveServicePoint(new Normal(testdriveMean, testdriveVariance), eventList, EventType.DEP3, carDealerShop);
-			servicePoints[3] = new ClosureServicePoint(new Normal(closureMean, closureVariance), eventList, EventType.DEP4, carDealerShop);*/
+			arrivalServiceTime = new Normal(arrivalMean, arrivalVariance, seed);
+			financeServiceTime = new Normal(financeMean, financeVariance, seed);
+			testdriveServiceTime = new Normal(testdriveMean, testdriveVariance, seed);
+			closureServiceTime = new Normal(closureMean, closureVariance, seed);
+			// Realistic simulation with variable arrival and service times
+			createArrivalServicePoints(arrivalServicePoints, arrivalServiceTime, eventList);
+			createFinanceServicePoints(financeServicePoints, financeServiceTime, eventList);
+			createTestdriveServicePoints(testdriveServicePoints, testdriveServiceTime, eventList, carDealerShop);
+			createClosureServicePoints(closureServicePoints, closureServiceTime, eventList, carDealerShop);
 
 			arrivalProcess = new ArrivalProcess(new Negexp(15, new Random().nextLong()), eventList, EventType.ARR1);
 		}
@@ -161,6 +163,7 @@ public class MyEngine extends Engine {
 	}
 
 	@Override
+	// Creates new customers and moves them through each servicePoint if possible
 	protected void runEvent(Event t) {// B phase events
 		Customer customer;
 		ArrayList<ServicePoint> arrivalServicePoints = getServicePointsByEventType(EventType.DEP1);
@@ -182,63 +185,22 @@ public class MyEngine extends Engine {
 		Trace.out(Trace.Level.INFO, "Current simulation speed " + getSimulationSpeed());
 
 		switch ((EventType) t.getType()) {
-			/*case ARR1:
-				servicePoints[0].addQueue(new Customer());
-				arrivalProcess.generateNextEvent();
-				break;
-
-			case DEP1:
-				Trace.out(Trace.Level.INFO, "queue" + servicePoints[0].queue);
-				customer = servicePoints[0].removeQueue();
-				servicePoints[1].addQueue(customer);
-				break;
-			case DEP2:
-				Trace.out(Trace.Level.INFO, "Finance queue" + servicePoints[1].queue);
-				customer = servicePoints[1].peekQueue();
-				Trace.out(Trace.Level.INFO, "Finance customer" + customer);
-				if (customer.isFinanceAccepted()) {
-					customer = servicePoints[1].removeQueue();
-					servicePoints[2].addQueue(customer);
-					Trace.out(Trace.Level.INFO, "Testdrivequeue addition" + servicePoints[2].queue);
-					break;
-				} else {
-					Trace.out(Trace.Level.WAR, "Customer #" + customer.getId() + " stuck in finance queue.");
-				}
-
-			case DEP3:
-				Trace.out(Trace.Level.INFO, "Testdrive queue" + servicePoints[2].queue);
-				customer = servicePoints[2].peekQueue();
-				Trace.out(Trace.Level.INFO, "Testdrive customer" + customer + "and Testdrive finance" + customer.isFinanceAccepted());
-				if (customer.happyWithTestdrive()) {
-					customer = servicePoints[2].removeQueue();
-					servicePoints[3].addQueue(customer);
-					Trace.out(Trace.Level.INFO, "Closurequeue addition" + servicePoints[3].queue);
-					break;
-				} else {
-					Trace.out(Trace.Level.WAR, "Customer #" + customer.getId() + " stuck in Testdrive queue.");
-				}
-
-			case DEP4:
-				Trace.out(Trace.Level.INFO, "Closure queue" + servicePoints[3]);
-				customer = servicePoints[3].removeQueue();
-				Trace.out(Trace.Level.INFO, "Closure customer" + customer);
-				if (customer != null) {
-					processedCustomers.add(customer);
-					customer.setRemovalTime(Clock.getInstance().getClock());
-					customer.setTotalTime();
-					customer.reportResults();
-					break;
-				}*/
 			case ARR1:
+				// Loop through arrivalServicePoints and get the shortest queue. Add the customer there
 				shortestArrivalServicePoint = getShortestQueue(arrivalServicePoints);
 				shortestArrivalServicePoint.addQueue(new Customer());
+				// Generate one arrival event per each customer added to the arrivalServicePoint queue. In this case one
 				arrivalProcess.generateNextEvent();
 				break;
 
 			case DEP1:
+				// Loop through each arrivalServicePoint
 				for (ServicePoint arrivalPoint : arrivalServicePoints){
+					// Get the financeServicePoint with the shortest queue for each iteration
 					shortestFinanceServicePoint = getShortestQueue(financeServicePoints);
+					// Retrieve the customer from there but don't remove it
 					customer = arrivalPoint.peekQueue();
+					// If there is a customer remove it from the arrivalServicePoint and add it to financeServicePoint
 					if (customer != null){
 						customer = arrivalPoint.removeQueue();
 						shortestFinanceServicePoint.addQueue(customer);
@@ -246,9 +208,15 @@ public class MyEngine extends Engine {
 				}
 				break;
 			case DEP2:
+				// Loop through each financeServicePoint
 				for (ServicePoint financePoint : financeServicePoints) {
+					// Get the test-driveServicePoint with the shortest queue for each iteration
 					shortestTestdriveServicePoint = getShortestQueue(testdriveServicePoints);
+					// Retrieve the customer from there but don't remove it
 					customer = financePoint.peekQueue();
+					// If there is a customer
+					// And customer was granted financing
+					// Remove it from the financeServicePoint and add it to test-driveServicePoint
 					if (customer != null) {
 						if (customer.isFinanceAccepted()) {
 							customer = financePoint.removeQueue();
@@ -258,9 +226,15 @@ public class MyEngine extends Engine {
 				}
 				break;
 			case DEP3:
+				// Loop through test-driveServicePoints
 				for (ServicePoint testdrive : testdriveServicePoints) {
+					// Get the closureServicePoint with the shortest queue for each iteration
 					shortestClosureServicePoint = getShortestQueue(closureServicePoints);
+					// Retrieve the customer from there but don't remove it
 					customer = testdrive.peekQueue();
+					// If there is a customer
+					// And customer is happy with his test-drive
+					// Remove it from the test-driveServicePoint and add it to closureServicePoint
 					if (customer != null) {
 						if (customer.happyWithTestdrive()) {
 							customer = testdrive.removeQueue();
@@ -271,8 +245,14 @@ public class MyEngine extends Engine {
 				break;
 
 			case DEP4:
+				// Loop through closureServicePoints
 				for (ServicePoint closurePoint : closureServicePoints) {
+					// Retrieve the customer from there but don't remove it
 					customer = closurePoint.peekQueue();
+					// If there is a customer
+					// Remove it from the closureServicePoint
+					// Add it to the processed list
+					// Set removal time, total time and report results for the customer
 					if (customer != null) {
 						customer = closurePoint.removeQueue();
 						processedCustomers.add(customer);
@@ -283,6 +263,8 @@ public class MyEngine extends Engine {
 					}
 				}
 		}
+		// Delay each iteration of the simulation by 1 second
+		// User can speed up or slow down the simulation from different thread
 		try {
 			Thread.sleep(getSimulationSpeed());
 		} catch (InterruptedException e) {
@@ -291,8 +273,12 @@ public class MyEngine extends Engine {
 	}
 
 	@Override
+	// Checks all the servicePoints in the simulation and begins service is possible
 	protected void tryCEvents() {
+		// Loop through each servicePoint in servicePoints
 		for (ServicePoint point : servicePoints) {
+			// If servicePoint is free and there is a queue
+			// Begin the service
 			if (!point.isReserved() && point.isOnQueue()) {
 				point.beginService();
 			}
@@ -303,18 +289,35 @@ public class MyEngine extends Engine {
 	protected void results() {
 		System.out.println("Simulation ended at " + Clock.getInstance().getClock());
 		System.out.println("Processed Customers: " + processedCustomers.size());
-		// Loop through the processedCustomers list
-		for (Customer customer : processedCustomers) {
-			// Print the header if it's the first customer (you can also print the header just once outside the loop)
-			if (processedCustomers.indexOf(customer) == 0) {
-				System.out.println(String.format(
-						"%-10s %-15s %-15s %-15s %-20s %-15s %-10s %-12s %-18s %-22s %-20s",
-						"ID", "Arrival Time", "Removal Time", "Total time", "Preferred Car Type", "Fuel Type",
-						"Budget", "Credit Score", "Finance Accepted", "Happy with Test-drive", "Purchased a Car"
-				));
-			}
 
-			// Print the formatted customer data
+		// Initialize containers for all car and fuel types
+		Set<String> allCarTypes = new HashSet<>();
+		Set<String> allFuelTypes = new HashSet<>();
+
+		// Collect all unique car and fuel types
+		for (Customer customer : processedCustomers) {
+			allCarTypes.add(customer.getPreferredCarType());
+			allFuelTypes.add(customer.getPreferredFuelType());
+		}
+
+		// Print header and customer data
+		System.out.println(String.format(
+				"%-10s %-15s %-15s %-15s %-20s %-15s %-10s %-12s %-18s %-22s %-20s",
+				"ID", "Arrival Time", "Removal Time", "Total time", "Preferred Car Type", "Fuel Type",
+				"Budget", "Credit Score", "Finance Accepted", "Happy with Test-drive", "Purchased a Car"
+		));
+		double totalArrivalTime = 0, totalRemovalTime = 0, totalTime = 0, totalBudget = 0, totalCreditScore = 0;
+		int totalCustomers = processedCustomers.size();
+		int purchasedCount = 0;
+
+		for (Customer customer : processedCustomers) {
+			totalArrivalTime += customer.getArrivalTime();
+			totalRemovalTime += customer.getRemovalTime();
+			totalTime += customer.getTotalTime();
+			totalBudget += customer.getBudget();
+			totalCreditScore += customer.getCreditScore();
+			if (customer.isPurchased()) purchasedCount++;
+
 			System.out.println(String.format(
 					"%-10d %-15.2f %-15.2f %-15.2f %-20s %-15s %-10.2f %-12d %-18b %-22b %-20b",
 					customer.getId(),
@@ -330,27 +333,127 @@ public class MyEngine extends Engine {
 					customer.isPurchased()
 			));
 		}
+
+		// Print averages
+		System.out.println(String.format(
+				"%-10s %-15.2f %-15.2f %-15.2f %-20s %-15s %-10.2f %-12.2f %-18s %-22s %-20.2f",
+				"AVG",
+				totalArrivalTime / totalCustomers,
+				totalRemovalTime / totalCustomers,
+				totalTime / totalCustomers,
+				"N/A",
+				"N/A",
+				totalBudget / totalCustomers,
+				totalCreditScore / totalCustomers,
+				"1.00",
+				"1.00",
+				purchasedCount / (double) totalCustomers
+		));
+
+		// Initialize maps for sold counts
+		Map<String, Integer> carTypeSoldCounts = new HashMap<>();
+		Map<String, Integer> fuelTypeSoldCounts = new HashMap<>();
+		Map<String, Integer> carFuelTypeSoldCounts = new HashMap<>();
+		int totalSoldCars = 0;
+
+		// Initialize counts to 0 for all car and fuel types
+		for (String carType : allCarTypes) {
+			carTypeSoldCounts.put(carType, 0);
+		}
+		for (String fuelType : allFuelTypes) {
+			fuelTypeSoldCounts.put(fuelType, 0);
+		}
+		for (String carType : allCarTypes) {
+			for (String fuelType : allFuelTypes) {
+				carFuelTypeSoldCounts.put(carType + " - " + fuelType, 0);
+			}
+		}
+
+		// Count sold cars
+		for (Customer customer : processedCustomers) {
+			if (customer.isPurchased()) {
+				totalSoldCars++;
+				String carType = customer.getPreferredCarType();
+				String fuelType = customer.getPreferredFuelType();
+
+				carTypeSoldCounts.put(carType, carTypeSoldCounts.get(carType) + 1);
+				fuelTypeSoldCounts.put(fuelType, fuelTypeSoldCounts.get(fuelType) + 1);
+				carFuelTypeSoldCounts.put(carType + " - " + fuelType, carFuelTypeSoldCounts.get(carType + " - " + fuelType) + 1);
+			}
+		}
+
+		// Print car type preferences
+		System.out.println("\nCar Type Preferences (All Customers):");
+		for (String carType : allCarTypes) {
+			long count = processedCustomers.stream()
+					.filter(customer -> customer.getPreferredCarType().equals(carType))
+					.count();
+			System.out.println(carType + ": " + String.format("%.2f", (count / (double) totalCustomers) * 100) + "%");
+		}
+
+		// Print fuel type preferences
+		System.out.println("\nFuel Type Preferences (All Customers):");
+		for (String fuelType : allFuelTypes) {
+			long count = processedCustomers.stream()
+					.filter(customer -> customer.getPreferredFuelType().equals(fuelType))
+					.count();
+			System.out.println(fuelType + ": " + String.format("%.2f", (count / (double) totalCustomers) * 100) + "%");
+		}
+
+		// Print sold percentages by car type
+		System.out.println("\nCar Type Sold Percentages:");
+		for (String carType : allCarTypes) {
+			int soldCount = carTypeSoldCounts.getOrDefault(carType, 0);
+			System.out.println(carType + ": " + String.format("%.2f", (soldCount / (double) totalSoldCars) * 100) + "%");
+		}
+
+		// Print sold percentages by fuel type
+		System.out.println("\nFuel Type Sold Percentages:");
+		for (String fuelType : allFuelTypes) {
+			int soldCount = fuelTypeSoldCounts.getOrDefault(fuelType, 0);
+			System.out.println(fuelType + ": " + String.format("%.2f", (soldCount / (double) totalSoldCars) * 100) + "%");
+		}
+
+		// Print sold percentages by car-fuel combinations
+		System.out.println("\nCar Type and Fuel Type Combination Sold Percentages:");
+		for (String combination : carFuelTypeSoldCounts.keySet()) {
+			int soldCount = carFuelTypeSoldCounts.get(combination);
+			System.out.println(combination + ": " + String.format("%.2f", (soldCount / (double) totalSoldCars) * 100) + "%");
+		}
+
+		// Print remaining cars and sold cars
 		System.out.println("Cars left at the dealershop: " + carDealerShop.getCarCollection().size());
-		System.out.println("Cars sold: " + carDealerShop.getSoldCars().size());
+		System.out.println("Cars sold: " + totalSoldCars);
 	}
 
-	public void carsToBeCreated(ArrayList<String[]> carsToBeCreated) {
-		for (String[] car : carsToBeCreated) {
-			/*
-			Trace.out(Trace.Level.INFO, "Car: " + Arrays.toString(car));
-			Trace.out(Trace.Level.INFO, "Car: " + car[0]);
-			Trace.out(Trace.Level.INFO, "Car: " + car[1]);
-			Trace.out(Trace.Level.INFO, "Car: " + car[2]);
-			Trace.out(Trace.Level.INFO, "Car: " + car[3]);
-			Trace.out(Trace.Level.INFO, "Car: " + car[4]);*/
 
-			int carType = Integer.parseInt(car[0]);
-			int amount = Integer.parseInt(car[1]);
-			int fuelType = Integer.parseInt(car[2]);
-			double meanPrice = Double.parseDouble(car[3]);
-			double variance = Double.parseDouble(car[4]);
+
+
+
+	// Creates the amount of cars User asks for
+	public void carsToBeCreated(ArrayList<String[]> carsToBeCreated) {
+		int carType;
+		int amount;
+		int fuelType;
+		double meanPrice;
+		double variance;
+		// For each car in carsToBeCreated
+		// Retrieve the carType, amount, fuelType, meanPrice, variance
+		// Calls callDealerShop's method and passes the arguments
+		// callDealerShop creates the cars and adds them to it's collection
+		for (String[] car : carsToBeCreated) {
+			carType = Integer.parseInt(car[0]);
+			amount = Integer.parseInt(car[1]);
+			fuelType = Integer.parseInt(car[2]);
+			meanPrice = Double.parseDouble(car[3]);
+			variance = Double.parseDouble(car[4]);
 			carDealerShop.createCar(amount, carType, fuelType, meanPrice, variance);
-			//Trace.out(Trace.Level.INFO, "Cars: " + carDealerShop.getCarCollection().size());
+		}
+	}
+
+	public static void addProcessedCustomer(Customer customer) {
+		if (customer != null) {
+			processedCustomers.add(customer);
 		}
 	}
 
@@ -408,7 +511,11 @@ public class MyEngine extends Engine {
 
 		return simulationSpeed;
 	}
-
+	// Creates arrivalServicePoints
+	// Populates the servicePoints list by using a global currentServicePointIndex
+	// This makes possible the creation of different servicePoints by different methods
+	// And each servicePoint type is next to its own type
+	// For example (arrivals, finances, test-drives, closures)
 	public void createArrivalServicePoints(int amount, ContinuousGenerator arrivalServiceTime, EventList eventList) {
 		for (int i = 0; i < amount; i++) {
 			if (currentServicePointIndex < servicePoints.length) {
@@ -420,6 +527,7 @@ public class MyEngine extends Engine {
 		}
 	}
 
+	// Same in here for financeServicePoints as in arrivalServicePointCreation
 	public void createFinanceServicePoints(int amount, ContinuousGenerator financeServiceTime, EventList eventList) {
 		for (int i = 0; i < amount; i++) {
 			if (currentServicePointIndex < servicePoints.length) {
@@ -431,7 +539,7 @@ public class MyEngine extends Engine {
 		}
 	}
 
-
+	// Same in here for test-driveServicePoints as in arrivalServicePointCreation
 	public void createTestdriveServicePoints(int amount, ContinuousGenerator testdriveServiceTime, EventList eventList, CarDealerShop carDealerShop) {
 		for (int i = 0; i < amount; i++) {
 			if (currentServicePointIndex < servicePoints.length) {
@@ -443,6 +551,7 @@ public class MyEngine extends Engine {
 		}
 	}
 
+	// Same in here for closureServicePoints as in arrivalServicePointCreation
 	public void createClosureServicePoints(int amount, ContinuousGenerator closureServiceTime, EventList eventList, CarDealerShop carDealerShop) {
 		for (int i = 0; i < amount; i++) {
 			if (currentServicePointIndex < servicePoints.length) {
@@ -454,6 +563,8 @@ public class MyEngine extends Engine {
 		}
 	}
 
+	// Loop through all servicePoints and retrieve the servicePoints with matching eventType
+	// Event Type is passed as an argument
 	public ArrayList<ServicePoint> getServicePointsByEventType(EventType type) {
 		ArrayList<ServicePoint> filteredPoints = new ArrayList<>();
 		for (ServicePoint p : servicePoints) {
@@ -464,6 +575,8 @@ public class MyEngine extends Engine {
 		return filteredPoints;
 	}
 
+	// Get the servicePoint with the shortest queue
+	// ServicePoints are passed as an argument
 	private ServicePoint getShortestQueue(ArrayList<ServicePoint> points) {
 		if (points == null || points.isEmpty()) {
 			return null; // No points to evaluate
@@ -480,6 +593,8 @@ public class MyEngine extends Engine {
 		return shortestServicePoint;
 	}
 
+	// Get the servicePoint with the longest queue
+	// ServicePoints are passed as an argument
 	private ServicePoint getLongestQueue(ArrayList<ServicePoint> points) {
 		if (points == null || points.isEmpty()) {
 			return null; // No points to evaluate

@@ -33,6 +33,8 @@ public class MyEngine extends Engine {
 	private int totalServicePoints;
 	private int currentServicePointIndex = 0;// Tracks the next free index
 	private final int seed = 123;
+	private final double ARRIVALCOEFFICIENT = 100;
+	private double arrivalInterval;
 	ContinuousGenerator serviceTime = null;
 	ContinuousGenerator arrivalServiceTime = null;
 	ContinuousGenerator financeServiceTime = null;
@@ -55,7 +57,7 @@ public class MyEngine extends Engine {
 	public MyEngine(int arrivalMean, int arrivalVariance, int financeMean, int financeVariance,
 					int testdriveMean, int testdriveVariance, int closureMean, int closureVariance,
 					int simulationSpeed, ArrayList<String[]> carsToBeCreated, int arrivalServicePoints,
-					int financeServicePoints, int testdriveServicePoints, int closureServicePoints, int customerArrivalInterval) {
+					int financeServicePoints, int testdriveServicePoints, int closureServicePoints, int arrivalInterval) {
 		this.carDealerShop = new CarDealerShop();
 		this.carsToBeCreated = carsToBeCreated;
 		this.arrivalMean = arrivalMean;
@@ -72,12 +74,14 @@ public class MyEngine extends Engine {
 		this.testdriveServicePoints = testdriveServicePoints;
 		this.closureServicePoints = closureServicePoints;
 		this.totalServicePoints = arrivalServicePoints + financeServicePoints + testdriveServicePoints + closureServicePoints;
+		this.arrivalInterval = arrivalInterval;
 		servicePoints = new ServicePoint[totalServicePoints];
 
 		// Create cars
 		carsToBeCreated(carsToBeCreated);
 		carDealerShop.setMeanCarSalesProbability();
 		double salesProbabilty = carDealerShop.getMeanCarSalesProbability();
+		arrivalInterval = Math.max(1, (int) (arrivalInterval * salesProbabilty));
 		Trace.out(Trace.Level.INFO, "Cars at the beginning of the simulation: " + carDealerShop.getCarCollection().size());
 		Trace.out(Trace.Level.INFO, "SalesProbability: " + salesProbabilty);
 
@@ -109,7 +113,7 @@ public class MyEngine extends Engine {
 				};
 			} else {
 				// Exponential distribution for variable customer arrival times
-				arrivalTime = new Negexp(10, Integer.toUnsignedLong(r.nextInt()));
+				arrivalTime = new Negexp(arrivalInterval, Integer.toUnsignedLong(r.nextInt()));
 			}
 			if (FIXEDSERVICETIMES) {
 				// Fixed service times
@@ -156,7 +160,7 @@ public class MyEngine extends Engine {
 			createTestdriveServicePoints(testdriveServicePoints, testdriveServiceTime, eventList, carDealerShop);
 			createClosureServicePoints(closureServicePoints, closureServiceTime, eventList, carDealerShop);
 
-			arrivalProcess = new ArrivalProcess(new Negexp(15, new Random().nextLong()), eventList, EventType.ARR1);
+			arrivalProcess = new ArrivalProcess(new Negexp(arrivalInterval, new Random().nextLong()), eventList, EventType.ARR1);
 		}
 	}
 
@@ -455,10 +459,11 @@ public class MyEngine extends Engine {
 	}
 
 	public static void addProcessedCustomer(Customer customer) {
-		if (customer != null) {
+		if (customer != null && !processedCustomers.contains(customer)) {
 			processedCustomers.add(customer);
 		}
 	}
+
 
 	public int getArrivalMean() {
 		return arrivalMean;
@@ -626,4 +631,17 @@ public class MyEngine extends Engine {
 	public synchronized boolean isPaused() {
 		return paused;
 	}*/
+	public static Set<Integer> findDuplicateIds() {
+		Set<Integer> seenIds = new HashSet<>();
+		Set<Integer> duplicateIds = new HashSet<>();
+
+		for (Customer customer : processedCustomers) {
+			if (!seenIds.add(customer.getId())) {
+				duplicateIds.add(customer.getId());
+			}
+		}
+
+		return duplicateIds;
+	}
+
 }

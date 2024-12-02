@@ -12,6 +12,9 @@ public class Car {
     private double meanPrice; 
     private double priceVariance;
     private double basePrice;
+    private double sellerPrice;
+    private double carTypeMean;
+    private double carTypeVariance = 10000;
     private double saleProb;
     private volatile double coefficient;
 
@@ -23,7 +26,9 @@ public class Car {
         this.baseProb = carTypeProb * fuelTypeProb;
         this.meanPrice = meanPrice;
         this.priceVariance = priceVariance;
-        this.basePrice = new Normal(meanPrice, priceVariance).sample();
+        this.carTypeMean = setCarTypeMean(carType);
+        this.basePrice = new Normal(carTypeMean, carTypeVariance).sample();
+        this.sellerPrice = new Normal(meanPrice, priceVariance).sample();
         this.coefficient = setCoefficient(carType);
 
         // Generating the unique register number for every Vehicle object
@@ -51,11 +56,14 @@ public class Car {
 
     public double setCarTypeProb(String carType) {
         switch (carType.toLowerCase()) {
-            case "compact", "sport":
-                carTypeProb = 0.1;
+            case "sport":
+                carTypeProb = 0.15;
                 break;
             case "van":
-                carTypeProb = 0.15;
+                carTypeProb = 0.20;
+                break;
+            case "compact":
+                carTypeProb = 0.25;
                 break;
             case "suv":
                 carTypeProb = 0.30;
@@ -64,7 +72,7 @@ public class Car {
                 carTypeProb = 0.35;
                 break;
             default:
-                carTypeProb = 0.20;
+                carTypeProb = 0.24;
                 break;
         }
         return carTypeProb;
@@ -85,10 +93,10 @@ public class Car {
     public double setFuelTypeProb(String fuelType) {
         switch (fuelType.toLowerCase()) {
             case "electric":
-                fuelTypeProb = 0.10;
+                fuelTypeProb = 0.20;
                 break;
             case "hybrid":
-                fuelTypeProb = 0.30;
+                fuelTypeProb = 0.40;
                 break;
             case "gasoline":
                 fuelTypeProb = 0.60;
@@ -117,6 +125,10 @@ public class Car {
         this.meanPrice = meanPrice;
     }
 
+    public double getSellerPrice(){
+        return sellerPrice;
+    }
+
     public double getPriceVariance() {
         return priceVariance;
     }
@@ -132,6 +144,65 @@ public class Car {
     public void setBasePrice(double basePrice) {
         this.basePrice = basePrice;
     }
+
+    public double setCarTypeMean(String carType) {
+        switch (carType.toLowerCase()) {
+            case "compact":
+                carTypeMean = 20000;
+                break;
+            case "van":
+                carTypeMean = 30000;
+                break;
+            case "suv":
+                carTypeMean = 40000;
+                break;
+            case "sedan":
+                carTypeMean = 30000;
+                break;
+            case "sport":
+                carTypeMean = 60000;
+                break;
+            default:
+                carTypeMean = 15000;
+                break;
+        }
+        return carTypeMean;
+    }
+
+    public double getCarTypeMean() {
+        return carTypeMean;
+    }
+
+    public double setCarTypeVariance(String carType) {
+        switch (carType.toLowerCase()) {
+            case "compact":
+                carTypeVariance = 3000; // Compact cars have low variability in price
+                break;
+            case "van":
+                carTypeVariance = 4000; // Vans have moderate variability
+                break;
+            case "suv":
+                carTypeVariance = 5000; // SUVs have moderate-to-high variability
+                break;
+            case "sedan":
+                carTypeVariance = 4000; // Sedans are moderately variable
+                break;
+            case "sport":
+                carTypeVariance = 10000; // Sports cars exhibit high price variability
+                break;
+            default:
+                carTypeVariance = 2000; // Default variance for unknown car types
+                break;
+        }
+        return carTypeVariance;
+    }
+
+
+    public double getCarTypeVariance() {
+        return carTypeVariance;
+    }
+
+
 
     public double getSaleProb() {
         return saleProb;
@@ -151,16 +222,16 @@ public class Car {
                 coefficient = 0.02;
                 break;
             case "suv":
-                coefficient = 0.04;
+                coefficient = 0.03;
                 break;
             case "van":
                 coefficient = 0.06;
                 break;
             case "sedan":
-                coefficient = 0.08;
+                coefficient = 0.05;
                 break;
             case "compact":
-                coefficient = 0.10;
+                coefficient = 0.07;
                 break;
             default:
                 coefficient = 0.05;
@@ -175,10 +246,10 @@ public class Car {
     }
 
     // Method to calculate sale probability
-    public double calculateSaleProbability(double customerPrice) {
+    public double calculateSaleProbability(double sellerPrice) {
         // Sales probability formula:
         // saleProbability = basePrice * e^(-coefficient * (customerPrice - basePrice))
-        saleProb = baseProb * Math.exp(-coefficient * (basePrice - customerPrice));
+        saleProb = baseProb * Math.exp(-coefficient * (sellerPrice - basePrice));
         return saleProb;
     }
 }

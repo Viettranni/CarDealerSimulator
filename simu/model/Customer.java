@@ -22,14 +22,18 @@ public class Customer {
 	private boolean happyWithTestdrive = false;
 	private Car purchaseCar;
 	private boolean purchased = false;
+	private double financeProb;
+	private final double BASEPROB = 0.9;
+	private final double BASECREDITSCORE = 500;
+	private final double COEFFICIENT = 0.05;
 
 
 	// Normal distribution parameters for Budget and Credit Score
 	// Will be user inputs later on
 	private static final double BUDGET_MEAN = 35000.0;   // Mean budget: $30,000.
 	private static final double BUDGET_STDDEV = 15000.0; // Standard deviation: $10,000
-	private static final double CREDIT_SCORE_MEAN = 620; // Mean credit score: 650
-	private static final double CREDIT_SCORE_STDDEV = 100;// Standard deviation: 100
+	private static final double CREDIT_SCORE_MEAN = 650; // Mean credit score: 650
+	private static final double CREDIT_SCORE_STDDEV = 200;// Standard deviation: 100
 
 	private Normal budgetNormalDistribution = new Normal(BUDGET_MEAN, BUDGET_STDDEV);
 	private Normal creditNormalDistribution = new Normal(CREDIT_SCORE_MEAN, CREDIT_SCORE_STDDEV);
@@ -177,6 +181,17 @@ public class Customer {
 
 	public void setPurchased(boolean purchased) {
 		this.purchased = purchased;
+	}
+
+	public double calculateFinanceProbability(double customerCreditScore) {
+		if (customerCreditScore >= BASECREDITSCORE) {
+			return financeProb;
+		} else {
+			// Sales probability formula:
+			// saleProbability = basePrice * e^(-coefficient * (customerPrice - basePrice))
+			financeProb = BASEPROB * Math.exp(-COEFFICIENT * (customerCreditScore - BASECREDITSCORE));
+			return financeProb;
+		}
 	}
 
 	@Override

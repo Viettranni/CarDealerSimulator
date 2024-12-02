@@ -183,6 +183,10 @@ public class Customer {
 		this.purchased = purchased;
 	}
 
+	public double getBaseCreditScore() {
+		return BASECREDITSCORE;
+	}
+
 	public double calculateFinanceProbability(double customerCreditScore) {
 		if (customerCreditScore >= BASECREDITSCORE) {
 			return financeProb;

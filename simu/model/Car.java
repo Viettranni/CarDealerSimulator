@@ -1,6 +1,8 @@
 package simu.model;
 import eduni.distributions.Normal;
 
+import java.util.ArrayList;
+
 
 public class Car {
     private String registerNumber;
@@ -129,6 +131,10 @@ public class Car {
         return sellerPrice;
     }
 
+    public void setSellerPrice(double sellerPrice) {
+        this.sellerPrice = sellerPrice;
+    }
+
     public double getPriceVariance() {
         return priceVariance;
     }
@@ -243,6 +249,17 @@ public class Car {
     // Methods
     public double calculateCarTypeProb() {
         return coefficient * baseProb;
+    }
+
+    public static void createCar(String carType, int sellerCarMean, int sellerCarVariance, ArrayList<String[]> carsToBeCreated, int numberOfCars, int typeOfFuel) {
+        String amountOfCars = String.valueOf(numberOfCars);
+        String fuelType = String.valueOf(typeOfFuel);
+        String carMean = String.valueOf(sellerCarMean);
+        String carVariance = String.valueOf(sellerCarVariance);
+
+        // Add each car to the list
+        carsToBeCreated.add(new String[]{carType, amountOfCars, fuelType, carMean, carVariance});
+
     }
 
     // Method to calculate sale probability

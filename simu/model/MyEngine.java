@@ -464,6 +464,38 @@ public class MyEngine extends Engine {
 		}
 	}
 
+	public ArrivalProcess getArrivalProcess() {
+		return arrivalProcess;
+	}
+
+	public void setArrivalProcess(ArrivalProcess arrivalProcess) {
+		this.arrivalProcess = arrivalProcess;
+	}
+
+	public ServicePoint[] getServicePoints() {
+		return servicePoints;
+	}
+
+	public void setServicePoints(ServicePoint[] servicePoints) {
+		this.servicePoints = servicePoints;
+	}
+
+	public static ArrayList<Customer> getProcessedCustomers() {
+		return processedCustomers;
+	}
+
+	public static void setProcessedCustomers(ArrayList<Customer> processedCustomers) {
+		MyEngine.processedCustomers = processedCustomers;
+	}
+
+	public CarDealerShop getCarDealerShop() {
+		return carDealerShop;
+	}
+
+	public void setCarDealerShop(CarDealerShop carDealerShop) {
+		this.carDealerShop = carDealerShop;
+	}
+
 
 	public int getArrivalMean() {
 		return arrivalMean;
@@ -471,6 +503,14 @@ public class MyEngine extends Engine {
 
 	public void setArrivalMean(int arrivalMean) {
 		this.arrivalMean = arrivalMean;
+	}
+
+	public int getArrivalVariance() {
+		return arrivalVariance;
+	}
+
+	public void setArrivalVariance(int arrivalVariance) {
+		this.arrivalVariance = arrivalVariance;
 	}
 
 	public int getFinanceMean() {
@@ -481,6 +521,14 @@ public class MyEngine extends Engine {
 		this.financeMean = financeMean;
 	}
 
+	public int getFinanceVariance() {
+		return financeVariance;
+	}
+
+	public void setFinanceVariance(int financeVariance) {
+		this.financeVariance = financeVariance;
+	}
+
 	public int getTestdriveMean() {
 		return testdriveMean;
 	}
@@ -489,12 +537,28 @@ public class MyEngine extends Engine {
 		this.testdriveMean = testdriveMean;
 	}
 
+	public int getTestdriveVariance() {
+		return testdriveVariance;
+	}
+
+	public void setTestdriveVariance(int testdriveVariance) {
+		this.testdriveVariance = testdriveVariance;
+	}
+
 	public int getClosureMean() {
 		return closureMean;
 	}
 
 	public void setClosureMean(int closureMean) {
 		this.closureMean = closureMean;
+	}
+
+	public int getClosureVariance() {
+		return closureVariance;
+	}
+
+	public void setClosureVariance(int closureVariance) {
+		this.closureVariance = closureVariance;
 	}
 
 	public synchronized int getSimulationSpeed() {
@@ -535,6 +599,10 @@ public class MyEngine extends Engine {
 		}
 	}
 
+	public int getArrivalServicePoints() {
+		return arrivalServicePoints;
+	}
+
 	// Same in here for financeServicePoints as in arrivalServicePointCreation
 	public void createFinanceServicePoints(int amount, ContinuousGenerator financeServiceTime, EventList eventList) {
 		for (int i = 0; i < amount; i++) {
@@ -545,6 +613,10 @@ public class MyEngine extends Engine {
 				throw new IllegalStateException("ServicePoints array is full. Cannot add more service points.");
 			}
 		}
+	}
+
+	public int getFinanceServicePoints() {
+		return financeServicePoints;
 	}
 
 	// Same in here for test-driveServicePoints as in arrivalServicePointCreation
@@ -559,6 +631,10 @@ public class MyEngine extends Engine {
 		}
 	}
 
+	public int getTestdriveServicePoints() {
+		return testdriveServicePoints;
+	}
+
 	// Same in here for closureServicePoints as in arrivalServicePointCreation
 	public void createClosureServicePoints(int amount, ContinuousGenerator closureServiceTime, EventList eventList, CarDealerShop carDealerShop) {
 		for (int i = 0; i < amount; i++) {
@@ -569,6 +645,66 @@ public class MyEngine extends Engine {
 				throw new IllegalStateException("ServicePoints array is full. Cannot add more service points.");
 			}
 		}
+	}
+
+	public int getClosureServicePoints() {
+		return closureServicePoints;
+	}
+
+	public int getTotalServicePoints() {
+		return totalServicePoints;
+	}
+
+	public void setTotalServicePoints(int totalServicePoints) {
+		this.totalServicePoints = totalServicePoints;
+	}
+
+	public double getArrivalInterval() {
+		return arrivalInterval;
+	}
+
+	public void setArrivalInterval(double arrivalInterval) {
+		this.arrivalInterval = arrivalInterval;
+	}
+
+	public ContinuousGenerator getServiceTime() {
+		return serviceTime;
+	}
+
+	public void setServiceTime(ContinuousGenerator serviceTime) {
+		this.serviceTime = serviceTime;
+	}
+
+	public ContinuousGenerator getArrivalServiceTime() {
+		return arrivalServiceTime;
+	}
+
+	public void setArrivalServiceTime(ContinuousGenerator arrivalServiceTime) {
+		this.arrivalServiceTime = arrivalServiceTime;
+	}
+
+	public ContinuousGenerator getFinanceServiceTime() {
+		return financeServiceTime;
+	}
+
+	public void setFinanceServiceTime(ContinuousGenerator financeServiceTime) {
+		this.financeServiceTime = financeServiceTime;
+	}
+
+	public ContinuousGenerator getTestdriveServiceTime() {
+		return testdriveServiceTime;
+	}
+
+	public void setTestdriveServiceTime(ContinuousGenerator testdriveServiceTime) {
+		this.testdriveServiceTime = testdriveServiceTime;
+	}
+
+	public ContinuousGenerator getClosureServiceTime() {
+		return closureServiceTime;
+	}
+
+	public void setClosureServiceTime(ContinuousGenerator closureServiceTime) {
+		this.closureServiceTime = closureServiceTime;
 	}
 
 	// Loop through all servicePoints and retrieve the servicePoints with matching eventType

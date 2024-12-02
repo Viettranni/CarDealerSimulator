@@ -7,12 +7,12 @@ import java.util.LinkedList;
 // TODO:
 // Service Point functionalities & calculations (+ variables needed) and reporting to be implemented
 public class ServicePoint {
-	private LinkedList<Customer> queue = new LinkedList<>(); // Data Structure used
+	protected LinkedList<Customer> queue = new LinkedList<>(); // Data Structure used
 	private ContinuousGenerator generator;
 	private EventList eventList;
 	private EventType eventTypeScheduled;
 	//Queuestrategy strategy; // option: ordering of the customer
-	private boolean reserved = false;
+    protected boolean reserved = false;
 
 
 	public ServicePoint(ContinuousGenerator generator, EventList eventList, EventType type){
@@ -20,6 +20,10 @@ public class ServicePoint {
 		this.generator = generator;
 		this.eventTypeScheduled = type;
 	}
+
+	public Customer peekQueue(){
+		return queue.peek();
+    }
 
 	public void addQueue(Customer a) {	// The first customer of the queue is always in service
 		queue.add(a);
@@ -38,11 +42,26 @@ public class ServicePoint {
 		eventList.add(new Event(eventTypeScheduled, Clock.getInstance().getClock()+serviceTime));
 	}
 
+	public void endService() {		// Begins a new service, customer is on the queue during the service
+		Trace.out(Trace.Level.INFO, "Starting a new service for the customer #" + queue.peek().getId());
+
+		reserved = true;
+		eventList.add(new Event(eventTypeScheduled, Clock.getInstance().getClock()));
+	}
+
 	public boolean isReserved(){
 		return reserved;
 	}
 
 	public boolean isOnQueue(){
 		return queue.size() != 0;
+	}
+
+	public EventType getEventType(){
+		return eventTypeScheduled;
+	}
+
+	public LinkedList<Customer> getQueue(){
+		return queue;
 	}
 }

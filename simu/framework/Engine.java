@@ -3,8 +3,8 @@ package simu.framework;
 public abstract class Engine {
 	private double simulationTime = 0;	// time when the simulation will be stopped
 	private Clock clock;				// to simplify the code (clock.getClock() instead Clock.getInstance().getClock())
-	protected EventList eventList;		// events to be processed are stored here
-
+	protected EventList eventList;// events to be processed are stored here
+	//protected volatile boolean paused = false;
 	public Engine() {
 		clock = Clock.getInstance();
 		
@@ -21,6 +21,9 @@ public abstract class Engine {
 		initialize(); // creating, e.g., the first event
 
 		while (simulate()) {
+			/*if (paused) {
+				return;
+			}*/
 			Trace.out(Trace.Level.INFO, "\nA-phase: time is " + currentTime());
 			clock.setClock(currentTime());
 			
@@ -56,4 +59,9 @@ public abstract class Engine {
 	protected abstract void initialize(); 		// Defined in simu.model-package's class who is inheriting the Engine class
 
 	protected abstract void results(); 			// Defined in simu.model-package's class who is inheriting the Engine class
+
+	/*
+	protected abstract void pause();
+
+	protected abstract boolean isPaused();*/
 }

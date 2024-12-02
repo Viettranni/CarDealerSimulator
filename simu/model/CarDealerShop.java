@@ -4,8 +4,7 @@ import java.util.List;
 import java.util.Random;
 import java.util.Set;
 
-import simu.model.cartypes.SUV;
-import simu.model.cartypes.Van;
+import simu.model.cartypes.*;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -15,10 +14,12 @@ public class CarDealerShop {
     private List<Car> carCollection;
     private List<Car> soldCars;
     private static Set<String> takenRegisterNumbers = new HashSet<>();
+    private static double meanCarSalesProbability;
 
     public CarDealerShop() {
         carCollection = new ArrayList<>();
         soldCars = new ArrayList<>();
+        meanCarSalesProbability = 0.0;
     }
 
     // Getters setters -------------------------------------------------------------------------------------------------
@@ -27,7 +28,11 @@ public class CarDealerShop {
         return carCollection;
     }
 
-    // METHODS ---------------------------------------------------------------------------------------------------------
+    public List<Car> getSoldCars() {
+        return soldCars;
+    }
+
+    // METHODS
 
     // Adding the car to Car Gallery
     public void addCar(Car vehicle) {
@@ -113,7 +118,72 @@ public class CarDealerShop {
         return takenRegisterNumbers.contains(registerNumber);
     }
 
+    public void setMeanCarSalesProbability() {
+        double total = 0;
+        double sum = 0;
+        for (Car car : carCollection) {
+            total++;
+            sum += car.getBaseProb();
+        }
+        meanCarSalesProbability = sum / total;
+    }
 
+    public double getMeanCarSalesProbability() {
+        return meanCarSalesProbability;
+    }
+
+    // REMEMBER TO LATER CHANGE THIS TO FIT THE UI AND CONTROLLER
+    public void createCar(int amount, int carType, int fuelType, double meanPrice, double priceVariance) {
+        String actualFuelType = null;
+
+        // Set the actual fuel type based on the input fuelType
+        switch (fuelType) {
+            case 1:
+                actualFuelType = "gas";
+                break;
+            case 2:
+                actualFuelType = "hybrid";
+                break;
+            case 3:
+                actualFuelType = "electric";
+                break;
+            default:
+                actualFuelType = "gas"; // Default to "gas" if an invalid fuelType is provided
+                break;
+        }
+
+        // Loop to create the specified amount of cars
+        for (int i = 0; i < amount; i++) {
+            Car car = null;  // Create a new car object in each iteration
+
+            // Create the car based on carType
+            switch (carType) {
+                case 1:
+                    car = new SUV(actualFuelType, meanPrice, priceVariance);
+                    break;
+                case 2:
+                    car = new Van(actualFuelType, meanPrice, priceVariance);
+                    break;
+                case 3:
+                    car = new Sedan(actualFuelType, meanPrice, priceVariance);
+                    break;
+                case 4:
+                    car = new Sport(actualFuelType, meanPrice, priceVariance);
+                    break;
+                case 5:
+                    car = new Compact(actualFuelType, meanPrice, priceVariance);
+                    break;
+                default:
+                    System.out.println("Invalid car type");
+                    System.out.println("Cartype" + carType);
+                    break;
+            }
+
+            if (car != null) {
+                addCar(car);  // Add the newly created car to the collection
+            }
+        }
+    }
 
     // Main method to run the test
     public static void main(String[] args) {
@@ -121,11 +191,11 @@ public class CarDealerShop {
         CarDealerShop shop = new CarDealerShop();
 
         // Creating a Van object with sample values
-        Van van = new Van(0.7, 30000, 4000, 25000, 1.2);
+        Van van = new Van("gas", 20000, 5000);
         shop.addCar(van);  // Add van to the shop collection
 
         // Creating an SUV object with sample values
-        SUV suv = new SUV(0.8, 35000, 5000, 28000, 1.3);
+        SUV suv = new SUV("electric", 35000, 10000);
         shop.addCar(suv);  // Add SUV to the shop collection
 
         // Output the register numbers to verify that they were generated

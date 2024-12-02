@@ -27,7 +27,8 @@ public class ClosureServicePoint extends ServicePoint {
 
         Car car = customer.getPurchaseCar();
         double customerPrice = customer.getBudget();
-        boolean dealClosed = Math.random() <= car.calculateSaleProbability(customerPrice);
+        double carPrice = car.getSellerPrice();
+        boolean dealClosed = Math.random() <= car.calculateSaleProbability(carPrice);
         if (dealClosed) {
             Trace.out(Trace.Level.INFO, "Customer #" + customer.getId() + " completed the purchase and is leaving.");
             customer.setPurchased(true);

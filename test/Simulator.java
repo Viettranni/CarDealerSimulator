@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Scanner;
+import java.util.Set;
 
 /* Command-line type User Interface */
 public class Simulator {
@@ -32,7 +33,7 @@ public class Simulator {
 		String carType = "1";
 		String amountOfCars = String.valueOf(numberOfCars);
 		String fuelType = String.valueOf(typeOfFuel);
-		String carMean = "35000";  // Example mean price
+		String carMean = "40000";  // Example mean price
 		String carVariance = "6000";  // Example price variance
 
 		// Add each car to the list
@@ -44,7 +45,7 @@ public class Simulator {
 		String carType = "3";
 		String amountOfCars = String.valueOf(numberOfCars);
 		String fuelType = String.valueOf(typeOfFuel);
-		String carMean = "25000";  // Example mean price
+		String carMean = "30000";  // Example mean price
 		String carVariance = "4000";  // Example price variance
 
 		// Add each car to the list
@@ -56,7 +57,7 @@ public class Simulator {
 		String carType = "4";
 		String amountOfCars = String.valueOf(numberOfCars);
 		String fuelType = String.valueOf(typeOfFuel);
-		String carMean = "50000";  // Example mean price
+		String carMean = "60000";  // Example mean price
 		String carVariance = "10000";  // Example price variance
 
 		// Add each car to the list
@@ -68,7 +69,7 @@ public class Simulator {
 		String carType = "5";
 		String amountOfCars = String.valueOf(numberOfCars);
 		String fuelType = String.valueOf(typeOfFuel);
-		String carMean = "18000";  // Example mean price
+		String carMean = "20000";  // Example mean price
 		String carVariance = "3000";  // Example price variance
 
 		// Add each car to the list
@@ -291,7 +292,7 @@ public class Simulator {
 		System.out.println("Sedans: " + Arrays.toString(carsToBeCreated.get(12)));
 		System.out.println("SUVs: " + Arrays.toString(carsToBeCreated.get(13)));
 		System.out.println("Sports: " + Arrays.toString(carsToBeCreated.get(14)));
-		MyEngine m = new MyEngine(arrivalMean, arrivalVariance, financeMean, financeVariance, testdriveMean, testdriveVariance, closureMean, closureVariance, simulationSpeed, carsToBeCreated, arrivalServicePoints, financeServicePoints, testdriveServicePoints, closureServicePoints, 10);
+		MyEngine m = new MyEngine(arrivalMean, arrivalVariance, financeMean, financeVariance, testdriveMean, testdriveVariance, closureMean, closureVariance, simulationSpeed, carsToBeCreated, arrivalServicePoints, financeServicePoints, testdriveServicePoints, closureServicePoints, 200);
 
 		Thread inputThread = new Thread(() -> {
 			try {
@@ -321,7 +322,16 @@ public class Simulator {
 		});
 		inputThread.start();
 
-		m.setSimulationTime(1000);
+		m.setSimulationTime(1440);
 		m.run();
+		// Example usage of the findDuplicateIds method
+		Set<Integer> duplicateIds = MyEngine.findDuplicateIds();
+
+		if (!duplicateIds.isEmpty()) {
+			System.out.println("Duplicate IDs detected: " + duplicateIds);
+		} else {
+			System.out.println("No duplicate IDs found.");
+		}
+
 	}
 }

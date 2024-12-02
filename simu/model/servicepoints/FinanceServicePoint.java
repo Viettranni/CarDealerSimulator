@@ -26,8 +26,9 @@ public class FinanceServicePoint extends ServicePoint {
             return;
         }
         Trace.out(Trace.Level.INFO, "Checking finances for Customer #" + customer.getId());
-
-        if (customer.getCreditScore() < 600) {  // Example credit score threshold
+        double customerCreditScore = customer.getCreditScore();
+        boolean financeAccepted = Math.random() < customer.calculateFinanceProbability(customerCreditScore);
+        if (financeAccepted) {  // Example credit score threshold
             Trace.out(Trace.Level.WAR, "Customer #" + customer.getId() + " rejected due to poor credit score.");
             customer = queue.poll();//// Remove customer
             if (customer != null) {

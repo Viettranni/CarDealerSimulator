@@ -98,11 +98,4 @@ public class Car {
     public double getBreakEvenPrice() {
         return basePrice;
     }
-    
-    // Calculating the inventory value
-    public double getInventoryValue(int quantity) {
-        return quantity * basePrice;
-    }
-
-    
 }

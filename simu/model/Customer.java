@@ -28,7 +28,7 @@ public class Customer {
 	// Will be user inputs later on
 	private static final double BUDGET_MEAN = 35000.0;   // Mean budget: $30,000.
 	private static final double BUDGET_STDDEV = 15000.0; // Standard deviation: $10,000
-	private static final double CREDIT_SCORE_MEAN = 650; // Mean credit score: 650
+	private static final double CREDIT_SCORE_MEAN = 620; // Mean credit score: 650
 	private static final double CREDIT_SCORE_STDDEV = 100;// Standard deviation: 100
 
 	private Normal budgetNormalDistribution = new Normal(BUDGET_MEAN, BUDGET_STDDEV);
@@ -80,11 +80,11 @@ public class Customer {
 	private String assignFuelType() {
 		double rand = Math.random();
 		if (rand < 0.5) {
-			return "Gas";
+			return "gas";
 		} else if (rand < 0.8) {
-			return "Hybrid";
+			return "hybrid";
 		} else {
-			return "Electric";
+			return "electric";
 		}
 	}
 

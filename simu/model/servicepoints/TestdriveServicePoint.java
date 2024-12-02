@@ -1,6 +1,7 @@
 package simu.model.servicepoints;
 
 import eduni.distributions.ContinuousGenerator;
+import simu.framework.Clock;
 import simu.framework.EventList;
 import simu.framework.Trace;
 import simu.model.*;
@@ -43,7 +44,7 @@ public class TestdriveServicePoint extends ServicePoint {
         boolean carAvailable = false;
         Car testdriveCar = null;
         for (Car car : carDealerShop.getCarCollection()) {
-            if (car.getCarType().equals(customer.getPreferredCarType())) {
+            if (car.getCarType().equals(customer.getPreferredCarType()) && car.getFuelType().equals(customer.getPreferredFuelType())) {
                 carAvailable = true;
                 testdriveCar = car;
                 Trace.out(Trace.Level.INFO, "Car available");
@@ -64,7 +65,15 @@ public class TestdriveServicePoint extends ServicePoint {
         boolean likesCar = Math.random() > 0.2;  // 80% chance they like the car
         if (!likesCar) {
             Trace.out(Trace.Level.INFO, "Customer #" + customer.getId() + " did not like the car. Returning to queue for another test drive.");
-            customerBackToQueue();  // Return the customer to the queue
+            if (Math.random() > 0.65) {
+                customerBackToQueue();  // Return the customer to the queue
+            } else {
+                if (customer != null) {
+                    customer.setRemovalTime(Clock.getInstance().getClock());
+                    customer.setTotalTime();
+                    MyEngine.addProcessedCustomer(customer); // Add to the processed list
+                }
+            }
             return;
         }
 

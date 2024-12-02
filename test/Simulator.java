@@ -56,7 +56,7 @@ public class Simulator {
 		String carType = "4";
 		String amountOfCars = String.valueOf(numberOfCars);
 		String fuelType = String.valueOf(typeOfFuel);
-		String carMean = "60000";  // Example mean price
+		String carMean = "50000";  // Example mean price
 		String carVariance = "10000";  // Example price variance
 
 		// Add each car to the list
@@ -291,7 +291,7 @@ public class Simulator {
 		System.out.println("Sedans: " + Arrays.toString(carsToBeCreated.get(12)));
 		System.out.println("SUVs: " + Arrays.toString(carsToBeCreated.get(13)));
 		System.out.println("Sports: " + Arrays.toString(carsToBeCreated.get(14)));
-		MyEngine m = new MyEngine(arrivalMean, arrivalVariance, financeMean, financeVariance, testdriveMean, testdriveVariance, closureMean, closureVariance, simulationSpeed, carsToBeCreated, arrivalServicePoints, financeServicePoints, testdriveServicePoints, closureServicePoints);
+		MyEngine m = new MyEngine(arrivalMean, arrivalVariance, financeMean, financeVariance, testdriveMean, testdriveVariance, closureMean, closureVariance, simulationSpeed, carsToBeCreated, arrivalServicePoints, financeServicePoints, testdriveServicePoints, closureServicePoints, 10);
 
 		Thread inputThread = new Thread(() -> {
 			try {

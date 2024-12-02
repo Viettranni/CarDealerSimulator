@@ -1,6 +1,7 @@
 package simu.model.servicepoints;
 
 import eduni.distributions.ContinuousGenerator;
+import simu.framework.Clock;
 import simu.framework.EventList;
 import simu.framework.Trace;
 import simu.model.Customer;
@@ -28,8 +29,12 @@ public class FinanceServicePoint extends ServicePoint {
 
         if (customer.getCreditScore() < 600) {  // Example credit score threshold
             Trace.out(Trace.Level.WAR, "Customer #" + customer.getId() + " rejected due to poor credit score.");
-            customer = queue.poll();// Remove customer
-            MyEngine.addProcessedCustomer(customer); // Add to the processed list
+            customer = queue.poll();//// Remove customer
+            if (customer != null) {
+                customer.setRemovalTime(Clock.getInstance().getClock());
+                customer.setTotalTime();
+                MyEngine.addProcessedCustomer(customer); // Add to the processed list
+            }
         } else {
             Trace.out(Trace.Level.INFO, "Customer #" + customer.getId() + " approved for financing.");
             customer.setFinanceAccepted(true);

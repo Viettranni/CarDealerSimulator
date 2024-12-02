@@ -55,7 +55,7 @@ public class MyEngine extends Engine {
 	public MyEngine(int arrivalMean, int arrivalVariance, int financeMean, int financeVariance,
 					int testdriveMean, int testdriveVariance, int closureMean, int closureVariance,
 					int simulationSpeed, ArrayList<String[]> carsToBeCreated, int arrivalServicePoints,
-					int financeServicePoints, int testdriveServicePoints, int closureServicePoints) {
+					int financeServicePoints, int testdriveServicePoints, int closureServicePoints, int customerArrivalInterval) {
 		this.carDealerShop = new CarDealerShop();
 		this.carsToBeCreated = carsToBeCreated;
 		this.arrivalMean = arrivalMean;
@@ -76,7 +76,10 @@ public class MyEngine extends Engine {
 
 		// Create cars
 		carsToBeCreated(carsToBeCreated);
+		carDealerShop.setMeanCarSalesProbability();
+		double salesProbabilty = carDealerShop.getMeanCarSalesProbability();
 		Trace.out(Trace.Level.INFO, "Cars at the beginning of the simulation: " + carDealerShop.getCarCollection().size());
+		Trace.out(Trace.Level.INFO, "SalesProbability: " + salesProbabilty);
 
 		if (TEXTDEMO) {
 			// Special setup for text example

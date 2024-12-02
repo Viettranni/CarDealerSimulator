@@ -14,10 +14,12 @@ public class CarDealerShop {
     private List<Car> carCollection;
     private List<Car> soldCars;
     private static Set<String> takenRegisterNumbers = new HashSet<>();
+    private static double meanCarSalesProbability;
 
     public CarDealerShop() {
         carCollection = new ArrayList<>();
         soldCars = new ArrayList<>();
+        meanCarSalesProbability = 0.0;
     }
 
     // Getters setters
@@ -114,6 +116,20 @@ public class CarDealerShop {
     // Check if a register number has already been taken
     public static boolean isRegisterNumberTaken(String registerNumber) {
         return takenRegisterNumbers.contains(registerNumber);
+    }
+
+    public void setMeanCarSalesProbability() {
+        double total = 0;
+        double sum = 0;
+        for (Car car : carCollection) {
+            total++;
+            sum += car.getBaseProb();
+        }
+        meanCarSalesProbability = sum / total;
+    }
+
+    public double getMeanCarSalesProbability() {
+        return meanCarSalesProbability;
     }
 
     // REMEMBER TO LATER CHANGE THIS TO FIT THE UI AND CONTROLLER

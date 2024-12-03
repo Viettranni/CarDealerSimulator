@@ -26,6 +26,7 @@ public class Customer {
 	private final double BASEPROB = 0.9;
 	private final double BASECREDITSCORE = 500;
 	private final double COEFFICIENT = 0.05;
+	private int testDriveCount = 0;
 
 
 	// Normal distribution parameters for Budget and Credit Score
@@ -185,6 +186,14 @@ public class Customer {
 
 	public double getBaseCreditScore() {
 		return BASECREDITSCORE;
+	}
+
+	public void increaseTestDriveCount() {
+		testDriveCount++;
+	}
+
+	public int getTestDriveCount() {
+		return testDriveCount;
 	}
 
 	public double calculateFinanceProbability(double customerCreditScore) {

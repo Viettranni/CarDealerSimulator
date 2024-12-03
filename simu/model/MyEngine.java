@@ -54,6 +54,12 @@ public class MyEngine extends Engine {
 	 * Simulate four service points:
 	 * ArrivalServicePoint -> FinanceServicePoint -> Test-driveServicePoint -> ClosureServicePoint
 	 */
+
+	public MyEngine() {
+		r = new Random();
+		this.carDealerShop = new CarDealerShop();
+
+	}
 	public MyEngine(int arrivalMean, int arrivalVariance, int financeMean, int financeVariance,
 					int testdriveMean, int testdriveVariance, int closureMean, int closureVariance,
 					int simulationSpeed, ArrayList<String[]> carsToBeCreated, int arrivalServicePoints,
@@ -81,7 +87,7 @@ public class MyEngine extends Engine {
 		carsToBeCreated(carsToBeCreated);
 		carDealerShop.setMeanCarSalesProbability();
 		double salesProbabilty = carDealerShop.getMeanCarSalesProbability();
-		arrivalInterval = Math.max(1, (int) (arrivalInterval * salesProbabilty));
+		arrivalInterval = Math.max(1, (int) (ARRIVALCOEFFICIENT * salesProbabilty));
 		Trace.out(Trace.Level.INFO, "Cars at the beginning of the simulation: " + carDealerShop.getCarCollection().size());
 		Trace.out(Trace.Level.INFO, "SalesProbability: " + salesProbabilty);
 
@@ -456,6 +462,7 @@ public class MyEngine extends Engine {
 			variance = Double.parseDouble(car[4]);
 			carDealerShop.createCar(amount, carType, fuelType, meanPrice, variance);
 		}
+		Trace.out(Trace.Level.INFO, "Cars at the beginning of the simulation: " + carDealerShop.getCarCollection().size());
 	}
 
 	public static void addProcessedCustomer(Customer customer) {
@@ -464,20 +471,27 @@ public class MyEngine extends Engine {
 		}
 	}
 
+	public EventList getEventList() {
+		return eventList;
+	}
+
 	public ArrivalProcess getArrivalProcess() {
 		return arrivalProcess;
 	}
 
-	public void setArrivalProcess(ArrivalProcess arrivalProcess) {
-		this.arrivalProcess = arrivalProcess;
+	public void setArrivalProcess(double arrivalInterval, EventList eventList) {
+		Random r = new Random();
+		ContinuousGenerator arrivalTime = new Negexp(arrivalInterval, Integer.toUnsignedLong(r.nextInt()));
+		this.arrivalProcess = new ArrivalProcess(arrivalTime, eventList, EventType.ARR1);
+		Trace.out(Trace.Level.INFO, "arrivalTime: " + arrivalTime.sample() + " arrivalinterval: " + arrivalInterval + " eventlist: " + eventList + "eventype: " + EventType.ARR1 );
 	}
 
 	public ServicePoint[] getServicePoints() {
 		return servicePoints;
 	}
 
-	public void setServicePoints(ServicePoint[] servicePoints) {
-		this.servicePoints = servicePoints;
+	public void setServicePoints(int totalServicePoints) {
+		this.servicePoints = new ServicePoint[totalServicePoints];
 	}
 
 	public static ArrayList<Customer> getProcessedCustomers() {
@@ -561,6 +575,14 @@ public class MyEngine extends Engine {
 		this.closureVariance = closureVariance;
 	}
 
+	public void setCarsToBeCreated(ArrayList<String[]> carsToBeCreated) {
+		this.carsToBeCreated = carsToBeCreated;
+	}
+
+	public ArrayList<String[]> getCarsToBeCreated() {
+		return carsToBeCreated;
+	}
+
 	public synchronized int getSimulationSpeed() {
 		return simulationSpeed;
 	}
@@ -599,6 +621,10 @@ public class MyEngine extends Engine {
 		}
 	}
 
+	public void setArrivalServicePoints(int arrivalServicePoints) {
+		this.arrivalServicePoints = arrivalServicePoints;
+	}
+
 	public int getArrivalServicePoints() {
 		return arrivalServicePoints;
 	}
@@ -613,6 +639,10 @@ public class MyEngine extends Engine {
 				throw new IllegalStateException("ServicePoints array is full. Cannot add more service points.");
 			}
 		}
+	}
+
+	public void setFinanceServicePoints(int financeServicePoints) {
+		this.financeServicePoints = financeServicePoints;
 	}
 
 	public int getFinanceServicePoints() {
@@ -631,6 +661,10 @@ public class MyEngine extends Engine {
 		}
 	}
 
+	public void setTestdriveServicePoints(int testdriveServicePoints) {
+		this.testdriveServicePoints = testdriveServicePoints;
+	}
+
 	public int getTestdriveServicePoints() {
 		return testdriveServicePoints;
 	}
@@ -647,6 +681,10 @@ public class MyEngine extends Engine {
 		}
 	}
 
+	public void setClosureServicePoints(int closureServicePoints) {
+		this.closureServicePoints = closureServicePoints;
+	}
+
 	public int getClosureServicePoints() {
 		return closureServicePoints;
 	}
@@ -655,16 +693,17 @@ public class MyEngine extends Engine {
 		return totalServicePoints;
 	}
 
-	public void setTotalServicePoints(int totalServicePoints) {
-		this.totalServicePoints = totalServicePoints;
+	public void setTotalServicePoints(int arrivalServicePoints, int financeServicePoints, int testdriveServicePoints, int closureServicePoints) {
+		this.totalServicePoints = arrivalServicePoints + financeServicePoints + testdriveServicePoints + closureServicePoints;
 	}
 
 	public double getArrivalInterval() {
 		return arrivalInterval;
 	}
 
-	public void setArrivalInterval(double arrivalInterval) {
-		this.arrivalInterval = arrivalInterval;
+	public void setArrivalInterval(double salesProbabilty) {
+		this.arrivalInterval = Math.max(1, (int) (ARRIVALCOEFFICIENT * salesProbabilty));
+		Trace.out(Trace.Level.INFO, "SalesProbability: " + salesProbabilty);
 	}
 
 	public ContinuousGenerator getServiceTime() {
@@ -679,32 +718,32 @@ public class MyEngine extends Engine {
 		return arrivalServiceTime;
 	}
 
-	public void setArrivalServiceTime(ContinuousGenerator arrivalServiceTime) {
-		this.arrivalServiceTime = arrivalServiceTime;
+	public void setArrivalServiceTime(int arrivalMean, int arrivalVariance) {
+		this.arrivalServiceTime = new Normal(arrivalMean, arrivalVariance, seed);
 	}
 
 	public ContinuousGenerator getFinanceServiceTime() {
 		return financeServiceTime;
 	}
 
-	public void setFinanceServiceTime(ContinuousGenerator financeServiceTime) {
-		this.financeServiceTime = financeServiceTime;
+	public void setFinanceServiceTime(int financeMean, int financeVariance) {
+		this.financeServiceTime = new Normal(financeMean, financeVariance, seed);
 	}
 
 	public ContinuousGenerator getTestdriveServiceTime() {
 		return testdriveServiceTime;
 	}
 
-	public void setTestdriveServiceTime(ContinuousGenerator testdriveServiceTime) {
-		this.testdriveServiceTime = testdriveServiceTime;
+	public void setTestdriveServiceTime(int testdriveMean, int testdriveVariance) {
+		this.testdriveServiceTime = new Normal(testdriveMean, testdriveVariance, seed);
 	}
 
 	public ContinuousGenerator getClosureServiceTime() {
 		return closureServiceTime;
 	}
 
-	public void setClosureServiceTime(ContinuousGenerator closureServiceTime) {
-		this.closureServiceTime = closureServiceTime;
+	public void setClosureServiceTime(int closureMean, int closureVariance) {
+		this.closureServiceTime = new Normal(closureMean, closureVariance, seed);
 	}
 
 	// Loop through all servicePoints and retrieve the servicePoints with matching eventType

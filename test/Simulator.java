@@ -32,6 +32,7 @@ public class Simulator {
 		int testdriveVariance = 0;
 		int closureMean = 0;
 		int closureVariance = 0;
+		int arrivalInterval = 200;
 		int simulationSpeed = 1000;
 		int arrivalServicePoints = 5;
 		int financeServicePoints = 5;
@@ -118,7 +119,9 @@ public class Simulator {
 		System.out.println("Sedans: " + Arrays.toString(carsToBeCreated.get(12)));
 		System.out.println("SUVs: " + Arrays.toString(carsToBeCreated.get(13)));
 		System.out.println("Sports: " + Arrays.toString(carsToBeCreated.get(14)));
+
 		MyEngine m = new MyEngine(arrivalMean, arrivalVariance, financeMean, financeVariance, testdriveMean, testdriveVariance, closureMean, closureVariance, simulationSpeed, carsToBeCreated, arrivalServicePoints, financeServicePoints, testdriveServicePoints, closureServicePoints, 200);
+
 
 		Thread inputThread = new Thread(() -> {
 			try {

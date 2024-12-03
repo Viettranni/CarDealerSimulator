@@ -3,205 +3,19 @@ package test;
 import eduni.distributions.ContinuousGenerator;
 import eduni.distributions.Negexp;
 import eduni.distributions.Normal;
-import simu.framework.Engine;
 import simu.framework.Trace;
 import simu.framework.Trace.Level;
+import simu.model.Car;
 import simu.model.MyEngine;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Scanner;
+import java.util.Set;
 
 /* Command-line type User Interface */
 public class Simulator {
-
-	// AUTOMATIC CREATION USING FOR LOOP
-	public static void createVan(ArrayList<String[]> carsToBeCreated, int numberOfCars, int typeOfFuel) {
-		String carType = "2";
-		String amountOfCars = String.valueOf(numberOfCars);
-		String fuelType = String.valueOf(typeOfFuel);
-		String carMean = "30000";  // Example mean price
-		String carVariance = "5000";  // Example price variance
-		// Add each car to the list
-		carsToBeCreated.add(new String[]{"2", amountOfCars, fuelType, carMean, carVariance});
-
-	}
-
-	public static void createSUV(ArrayList<String[]> carsToBeCreated, int numberOfCars, int typeOfFuel) {
-		String carType = "1";
-		String amountOfCars = String.valueOf(numberOfCars);
-		String fuelType = String.valueOf(typeOfFuel);
-		String carMean = "35000";  // Example mean price
-		String carVariance = "6000";  // Example price variance
-
-		// Add each car to the list
-		carsToBeCreated.add(new String[]{carType, amountOfCars, fuelType, carMean, carVariance});
-
-	}
-
-	public static void createSedan(ArrayList<String[]> carsToBeCreated, int numberOfCars, int typeOfFuel) {
-		String carType = "3";
-		String amountOfCars = String.valueOf(numberOfCars);
-		String fuelType = String.valueOf(typeOfFuel);
-		String carMean = "25000";  // Example mean price
-		String carVariance = "4000";  // Example price variance
-
-		// Add each car to the list
-		carsToBeCreated.add(new String[]{carType, amountOfCars, fuelType, carMean, carVariance});
-
-	}
-
-	public static void createSport(ArrayList<String[]> carsToBeCreated, int numberOfCars, int typeOfFuel) {
-		String carType = "4";
-		String amountOfCars = String.valueOf(numberOfCars);
-		String fuelType = String.valueOf(typeOfFuel);
-		String carMean = "50000";  // Example mean price
-		String carVariance = "10000";  // Example price variance
-
-		// Add each car to the list
-		carsToBeCreated.add(new String[]{carType, amountOfCars, fuelType, carMean, carVariance});
-
-	}
-
-	public static void createCompact(ArrayList<String[]> carsToBeCreated, int numberOfCars, int typeOfFuel) {
-		String carType = "5";
-		String amountOfCars = String.valueOf(numberOfCars);
-		String fuelType = String.valueOf(typeOfFuel);
-		String carMean = "18000";  // Example mean price
-		String carVariance = "3000";  // Example price variance
-
-		// Add each car to the list
-		carsToBeCreated.add(new String[]{carType, amountOfCars, fuelType, carMean, carVariance});
-
-	}
-
-
-	// USER INPUT USING SCANNER
-	public static void createVan(ArrayList<String[]> carsToBeCreated){
-		boolean valid = true;
-		Scanner scanner = new Scanner(System.in);
-		String amountOfCarsToBeCreated = null;
-		String fuelType = null;
-		String carMean = null;
-		String carVariance = null;
-		while (valid) {
-			try {
-				System.out.println("How many Vans you want to create? ");
-				amountOfCarsToBeCreated = scanner.nextLine();
-				System.out.println("Gas (1), Hybrid (2), Electric (3): ");
-				fuelType = scanner.nextLine();
-				System.out.println("Average Van price: ");
-				carMean = scanner.nextLine();
-				System.out.println("Price variance of the Vans: ");
-				carVariance = scanner.nextLine();
-				carsToBeCreated.add(new String[]{"2", amountOfCarsToBeCreated, fuelType, carMean, carVariance});
-				valid = false;
-			} catch (NumberFormatException e) {
-				e.printStackTrace();
-			}
-		}
-	}
-
-	public static void createSUV(ArrayList<String[]> carsToBeCreated){
-		boolean valid = true;
-		Scanner scanner = new Scanner(System.in);
-		String amountOfCarsToBeCreated = null;
-		String fuelType = null;
-		String carMean = null;
-		String carVariance = null;
-		while (valid) {
-			try {
-				System.out.println("How many SUV you want to create? ");
-				amountOfCarsToBeCreated = scanner.nextLine();
-				System.out.println("Gas (1), Hybrid (2), Electric (3): ");
-				fuelType = scanner.nextLine();
-				System.out.println("Average SUV price: ");
-				carMean = scanner.nextLine();
-				System.out.println("Price variance of the SUV: ");
-				carVariance = scanner.nextLine();
-				carsToBeCreated.add(new String[]{"1", amountOfCarsToBeCreated, fuelType, carMean, carVariance});
-				valid = false;
-			} catch (NumberFormatException e) {
-				e.printStackTrace();
-			}
-		}
-	}
-
-	public static void createSedan(ArrayList<String[]> carsToBeCreated){
-		boolean valid = true;
-		Scanner scanner = new Scanner(System.in);
-		String amountOfCarsToBeCreated = null;
-		String fuelType = null;
-		String carMean = null;
-		String carVariance = null;
-		while (valid) {
-			try {
-				System.out.println("How many Sedans you want to create? ");
-				amountOfCarsToBeCreated = scanner.nextLine();
-				System.out.println("Gas (1), Hybrid (2), Electric (3): ");
-				fuelType = scanner.nextLine();
-				System.out.println("Average Sedan price: ");
-				carMean = scanner.nextLine();
-				System.out.println("Price variance of the Sedans: ");
-				carVariance = scanner.nextLine();
-				carsToBeCreated.add(new String[]{"3", amountOfCarsToBeCreated, fuelType, carMean, carVariance});
-				valid = false;
-			} catch (NumberFormatException e) {
-				e.printStackTrace();
-			}
-		}
-	}
-
-	public static void createSport(ArrayList<String[]> carsToBeCreated){
-		boolean valid = true;
-		Scanner scanner = new Scanner(System.in);
-		String amountOfCarsToBeCreated = null;
-		String fuelType = null;
-		String carMean = null;
-		String carVariance = null;
-		while (valid) {
-			try {
-				System.out.println("How many Sport cars you want to create? ");
-				amountOfCarsToBeCreated = scanner.nextLine();
-				System.out.println("Gas (1), Hybrid (2), Electric (3): ");
-				fuelType = scanner.nextLine();
-				System.out.println("Average Sport car price: ");
-				carMean = scanner.nextLine();
-				System.out.println("Price variance of the Sport cars: ");
-				carVariance = scanner.nextLine();
-				carsToBeCreated.add(new String[]{"4", amountOfCarsToBeCreated, fuelType, carMean, carVariance});
-				valid = false;
-			} catch (NumberFormatException e) {
-				e.printStackTrace();
-			}
-		}
-	}
-
-	public static void createCompact(ArrayList<String[]> carsToBeCreated){
-		boolean valid = true;
-		Scanner scanner = new Scanner(System.in);
-		String amountOfCarsToBeCreated = null;
-		String fuelType = null;
-		String carMean = null;
-		String carVariance = null;
-		while (valid) {
-			try {
-				System.out.println("How many Compact you want to create? ");
-				amountOfCarsToBeCreated = scanner.nextLine();
-				System.out.println("Gas (1), Hybrid (2), Electric (3): ");
-				fuelType = scanner.nextLine();
-				System.out.println("Average Compact price: ");
-				carMean = scanner.nextLine();
-				System.out.println("Price variance of the Compact: ");
-				carVariance = scanner.nextLine();
-				carsToBeCreated.add(new String[]{"5", amountOfCarsToBeCreated, fuelType, carMean, carVariance});
-				valid = false;
-			} catch (NumberFormatException e) {
-				e.printStackTrace();
-			}
-		}
-	}
 	public static void main(String[] args) {
 		Trace.setTraceLevel(Level.INFO);
 		/*
@@ -217,34 +31,47 @@ public class Simulator {
 		int testdriveVariance = 0;
 		int closureMean = 0;
 		int closureVariance = 0;
+		int arrivalInterval = 200;
 		int simulationSpeed = 1000;
 		int arrivalServicePoints = 5;
 		int financeServicePoints = 5;
 		int testdriveServicePoints = 5;
 		int closureServicePoints = 5;
+		int vanMean = 30000;
+		int vanVariance = 5000;
+		int suvMean = 40000;
+		int suvVariance = 6000;
+		int sedanMean = 30000;
+		int sedanVariance = 4000;
+		int sportMean = 60000;
+		int sportVariance = 10000;
+		int compactMean = 20000;
+		int compactVariance = 3000;
 		ArrayList<String[]> carsToBeCreated = new ArrayList<>();
 
 		// GAS
-		createVan(carsToBeCreated, 10, 1);
-		createCompact(carsToBeCreated, 10, 1);
-		createSedan(carsToBeCreated, 10, 1);
-		createSUV(carsToBeCreated, 10, 1);
-		createSport(carsToBeCreated, 10, 1);
+
+		Car.createCar("1",  suvMean, suvVariance, carsToBeCreated, 10, 1);
+		Car.createCar("2",  vanMean, vanVariance,carsToBeCreated, 10, 1);
+		Car.createCar("3", sedanMean, sedanVariance, carsToBeCreated, 10, 1);
+		Car.createCar("4", sportMean, sportVariance,carsToBeCreated, 10, 1);
+		Car.createCar("5", compactMean, compactVariance, carsToBeCreated, 10, 1);
+
 
 		// HYBRID
-		createVan(carsToBeCreated, 10, 2);
-		createCompact(carsToBeCreated, 10, 2);
-		createSedan(carsToBeCreated, 10, 2);
-		createSUV(carsToBeCreated, 10, 2);
-		createSport(carsToBeCreated, 10, 2);
+		Car.createCar("1",  suvMean, suvVariance, carsToBeCreated, 10, 2);
+		Car.createCar("2",  vanMean, vanVariance,carsToBeCreated, 10, 2);
+		Car.createCar("3", sedanMean, sedanVariance, carsToBeCreated, 10, 2);
+		Car.createCar("4", sportMean, sportVariance,carsToBeCreated, 10, 2);
+		Car.createCar("5", compactMean, compactVariance, carsToBeCreated, 10, 2);
+
 
 		// Electric
-
-		createVan(carsToBeCreated, 10, 3);
-		createCompact(carsToBeCreated, 10, 3);
-		createSedan(carsToBeCreated, 10, 3);
-		createSUV(carsToBeCreated, 10, 3);
-		createSport(carsToBeCreated, 10, 3);
+		Car.createCar("1",  suvMean, suvVariance, carsToBeCreated, 10, 3);
+		Car.createCar("2",  vanMean, vanVariance,carsToBeCreated, 10, 3);
+		Car.createCar("3", sedanMean, sedanVariance, carsToBeCreated, 10, 3);
+		Car.createCar("4", sportMean, sportVariance,carsToBeCreated, 10, 3);
+		Car.createCar("5", compactMean, compactVariance, carsToBeCreated, 10, 3);
 
 
 
@@ -291,7 +118,9 @@ public class Simulator {
 		System.out.println("Sedans: " + Arrays.toString(carsToBeCreated.get(12)));
 		System.out.println("SUVs: " + Arrays.toString(carsToBeCreated.get(13)));
 		System.out.println("Sports: " + Arrays.toString(carsToBeCreated.get(14)));
-		MyEngine m = new MyEngine(arrivalMean, arrivalVariance, financeMean, financeVariance, testdriveMean, testdriveVariance, closureMean, closureVariance, simulationSpeed, carsToBeCreated, arrivalServicePoints, financeServicePoints, testdriveServicePoints, closureServicePoints, 10);
+
+		MyEngine m = new MyEngine(arrivalMean, arrivalVariance, financeMean, financeVariance, testdriveMean, testdriveVariance, closureMean, closureVariance, simulationSpeed, carsToBeCreated, arrivalServicePoints, financeServicePoints, testdriveServicePoints, closureServicePoints, 200);
+
 
 		Thread inputThread = new Thread(() -> {
 			try {
@@ -321,7 +150,16 @@ public class Simulator {
 		});
 		inputThread.start();
 
-		m.setSimulationTime(1000);
+		m.setSimulationTime(1440);
 		m.run();
+		// Example usage of the findDuplicateIds method
+		Set<Integer> duplicateIds = MyEngine.findDuplicateIds();
+
+		if (!duplicateIds.isEmpty()) {
+			System.out.println("Duplicate IDs detected: " + duplicateIds);
+		} else {
+			System.out.println("No duplicate IDs found.");
+		}
+
 	}
 }

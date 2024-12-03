@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.Font?>
+
+<HBox prefHeight="713.0" prefWidth="1279.0" spacing="10" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="simu.controller.SaedTestController">
+    <padding>
+        <Insets bottom="20" left="20" right="20" top="20" />
+    </padding>
+    <ScrollPane prefHeight="1127.0" prefWidth="514.0">
+        <VBox prefHeight="1301.0" prefWidth="483.0">
+            <Label style="-fx-font-size: 24px; -fx-font-weight: bold;" text="LosSantosCustoms Simulator" />
+            <Label style="-fx-font-size: 14px;" text="Configure your car sales dealer simulation">
+                <VBox.margin>
+                    <Insets bottom="10.0" />
+                </VBox.margin>
+            </Label>
+            <GridPane hgap="10.0" prefHeight="399.0" prefWidth="483.0" vgap="10.0">
+                <columnConstraints>
+                    <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                    <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                </columnConstraints>
+                <rowConstraints>
+                    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                </rowConstraints>
+                <TitledPane text="Customer Arrival">
+                    <VBox spacing="5">
+                        <Label text="Mean (minutes)" />
+                        <Slider fx:id="arrivalMeanSlider" max="60" min="1" value="10" />
+                        <Label fx:id="arrivalMeanLabel" text="10 minutes" />
+                        <Label text="Variance" />
+                        <Slider fx:id="arrivalVarianceSlider" max="10" min="0" value="2" />
+                        <Label fx:id="arrivalVarianceLabel" text="2" />
+                    </VBox>
+                </TitledPane>
+                <TitledPane text="Finance Process" GridPane.columnIndex="1">
+                    <VBox spacing="5">
+                        <Label text="Mean (minutes)" />
+                        <Slider fx:id="financeMeanSlider" max="60" min="1" value="15" />
+                        <Label fx:id="financeMeanLabel" text="15 minutes" />
+                        <Label text="Variance" />
+                        <Slider fx:id="financeVarianceSlider" max="10" min="0" value="3" />
+                        <Label fx:id="financeVarianceLabel" text="3" />
+                    </VBox>
+                </TitledPane>
+                <TitledPane text="Sale Closure" GridPane.columnIndex="1" GridPane.rowIndex="1">
+                    <VBox spacing="5">
+                        <Label text="Mean (minutes)" />
+                        <Slider fx:id="closureMeanSlider" max="60" min="1" value="30" />
+                        <Label fx:id="closureMeanLabel" text="30 minutes" />
+                        <Label text="Variance" />
+                        <Slider fx:id="closureVarianceSlider" max="10" min="0" value="10" />
+                        <Label fx:id="closureVarianceLabel" text="10" />
+                    </VBox>
+                </TitledPane>
+                <TitledPane text="Test Drive" GridPane.rowIndex="1">
+                    <VBox spacing="5">
+                        <Label text="Mean (minutes)" />
+                        <Slider fx:id="testDriveMeanSlider" max="60" min="1" value="30" />
+                        <Label fx:id="testDriveMeanLabel" text="30 minutes" />
+                        <Label text="Variance" />
+                        <Slider fx:id="testDriveVarianceSlider" max="10" min="0" value="10" />
+                        <Label fx:id="testDriveVarianceLabel" text="10" />
+                    </VBox>
+                </TitledPane>
+            </GridPane>
+            <VBox prefHeight="97.0" prefWidth="483.0">
+                <Label text="Service points configuration:" style="-fx-font-size: 13px;" />
+                <GridPane prefHeight="53.0" prefWidth="483.0">
+                    <columnConstraints>
+                        <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                        <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                        <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                    </columnConstraints>
+                    <rowConstraints>
+                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                    </rowConstraints>
+                    <Label text="Arrival" GridPane.columnIndex="0" GridPane.rowIndex="0" />
+                    <Spinner fx:id="arrivalServicePoints" min="1" max="10" initialValue="1" GridPane.columnIndex="0" GridPane.rowIndex="1" />
+                    <Label text="Finance" GridPane.columnIndex="1" GridPane.rowIndex="0" />
+                    <Spinner fx:id="financeServicePoints" min="1" max="10" initialValue="1" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                    <Label text="Closure" GridPane.columnIndex="2" GridPane.rowIndex="0" />
+                    <Spinner fx:id="closureServicePoints" min="1" max="10" initialValue="1" GridPane.columnIndex="2" GridPane.rowIndex="1" />
+                </GridPane>
+            </VBox>
+            <TitledPane text="Cars to be Created">
+                <VBox spacing="10">
+                    <GridPane hgap="10" vgap="10">
+                        <TextField fx:id="carModel" promptText="Car Model" GridPane.columnIndex="0" GridPane.rowIndex="0" />
+                        <ComboBox fx:id="carType" promptText="Select car type" GridPane.columnIndex="1" GridPane.rowIndex="0" />
+                        <TextField fx:id="basePrice" promptText="Base Price" GridPane.columnIndex="0" GridPane.rowIndex="1" />
+                        <VBox spacing="5" GridPane.columnIndex="1" GridPane.rowIndex="1">
+                            <Label text="Price Adjustment" />
+                            <Slider fx:id="priceAdjustmentSlider" max="10" min="-10" value="0" />
+                            <Label fx:id="adjustedPriceLabel" text="Adjusted Price: $0" />
+                        </VBox>
+                    </GridPane>
+                    <Button text="Add Car" onAction="#handleAddCar" />
+                    <TableView fx:id="carTable">
+                        <columns>
+                            <TableColumn fx:id="carModelColumn" text="Car Model" />
+                            <TableColumn fx:id="carTypeColumn" text="Type" />
+                            <TableColumn fx:id="carPriceColumn" text="Price" />
+                            <TableColumn fx:id="carActionColumn" text="Action" />
+                        </columns>
+                    </TableView>
+                </VBox>
+            </TitledPane>
+            <VBox spacing="5">
+                <padding>
+                    <Insets top="10" />
+                </padding>
+                <Label text="Simulation Speed (x real-time)" />
+                <Slider fx:id="simulationSpeedSlider" max="10" min="1" value="1" />
+                <Label fx:id="simulationSpeedLabel" text="1x" />
+            </VBox>
+            <Button text="Start Simulation" onAction="#handleStartSimulation" maxWidth="Infinity">
+                <VBox.margin>
+                    <Insets top="10.0" />
+                </VBox.margin>
+            </Button>
+        </VBox>
+    </ScrollPane>
+    <VBox maxWidth="705.0" prefHeight="1355.0" prefWidth="705.0" spacing="10">
+        <Label text="Console Log" style="-fx-font-size: 18px; -fx-font-weight: bold;" />
+        <TextArea fx:id="consoleLog" editable="false" prefHeight="600" wrapText="true" />
+    </VBox>
+</HBox>

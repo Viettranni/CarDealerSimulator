@@ -439,10 +439,6 @@ public class MyEngine extends Engine {
 		System.out.println("Cars sold: " + totalSoldCars);
 	}
 
-
-
-
-
 	// Creates the amount of cars User asks for
 	public void carsToBeCreated(ArrayList<String[]> carsToBeCreated) {
 		int carType;
@@ -495,6 +491,10 @@ public class MyEngine extends Engine {
 	}
 
 	public static ArrayList<Customer> getProcessedCustomers() {
+		return processedCustomers;
+	}
+
+	public ArrayList<Customer> getProcessedCustomer(){
 		return processedCustomers;
 	}
 

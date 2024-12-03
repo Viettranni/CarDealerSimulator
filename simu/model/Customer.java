@@ -26,7 +26,7 @@ public class Customer {
 	private final double BASEPROB = 0.9;
 	private final double BASECREDITSCORE = 500;
 	private final double COEFFICIENT = 0.05;
-	private int testDriveCount = 0;
+	private int testDriveCount;
 
 
 	// Normal distribution parameters for Budget and Credit Score
@@ -63,6 +63,7 @@ public class Customer {
 		this.happyWithTestdrive = false;
 		this.financeAccepted = false;
 		this.purchased = false;
+		this.testDriveCount = 1;
 	}
 
 	// Method to assign a random car type based on predefined probabilities (discrete distribution)
@@ -198,7 +199,7 @@ public class Customer {
 
 	public double calculateFinanceProbability(double customerCreditScore) {
 		if (customerCreditScore >= BASECREDITSCORE) {
-			return financeProb;
+			return BASEPROB;
 		} else {
 			// Sales probability formula:
 			// saleProbability = basePrice * e^(-coefficient * (customerPrice - basePrice))

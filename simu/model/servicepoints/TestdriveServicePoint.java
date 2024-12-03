@@ -64,15 +64,10 @@ public class TestdriveServicePoint extends ServicePoint {
         // Determine if the customer likes the car
         boolean likesCar = Math.random() > 0.2;  // 80% chance they like the car
         if (!likesCar) {
-            if (customer.getTestDriveCount() >= 3){
-                Trace.out(Trace.Level.INFO, "Customer #" + customer.getId() + " had three testdrives and wasn't happy with" +
-                        "the test drive. Customer #" + customer.getId() + " leaves now.");
-                queue.poll();
-                MyEngine.addProcessedCustomer(customer);
-            }
-            Trace.out(Trace.Level.INFO, "Customer #" + customer.getId() + " did not like the car. Returning to queue for another test drive.");
             if (Math.random() > 0.65) {
-                customerBackToQueue();  // Return the customer to the queue
+                Trace.out(Trace.Level.INFO, "Customer #" + customer.getId() + " did not like the car. Returning to queue for another test drive.");
+                customerBackToQueue();// Return the customer to the queue
+                customer.increaseTestDriveCount();
             } else {
                 if (customer != null) {
                     customer.setRemovalTime(Clock.getInstance().getClock());
@@ -82,12 +77,18 @@ public class TestdriveServicePoint extends ServicePoint {
             }
             return;
         }
-
-        // Customer liked the car and is ready to proceed
-        Trace.out(Trace.Level.INFO, "Customer #" + customer.getId() + " liked the car and will proceed.");
-        customer.setHappyWithTestdrive(true);  // Mark the customer as happy with the test drive
-        customer.setPurchaseCar(testdriveCar);
-        // Call the base method to handle service reservation and event scheduling
-        super.beginService();
+        if (customer.getTestDriveCount() >= 3){
+            Trace.out(Trace.Level.INFO, "Customer #" + customer.getId() + " had three testdrives and wasn't happy with " +
+                    "the test drives. Customer #" + customer.getId() + " leaves now.");
+            queue.poll();
+            MyEngine.addProcessedCustomer(customer);
+        } else {
+            // Customer liked the car and is ready to proceed
+            Trace.out(Trace.Level.INFO, "Customer #" + customer.getId() + " liked the car and will proceed.");
+            customer.setHappyWithTestdrive(true);  // Mark the customer as happy with the test drive
+            customer.setPurchaseCar(testdriveCar);
+            // Call the base method to handle service reservation and event scheduling
+            super.beginService();
+        }
     }
 }

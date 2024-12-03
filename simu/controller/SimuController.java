@@ -50,7 +50,7 @@ public class SimuController {
     }
 
     public SimuController() {
-
+        myEngine = new MyEngine();
     }
 
     public void initializeSimulation(int arrivalMean, int arrivalVariance, int financeMean, int financeVariance,
@@ -176,6 +176,10 @@ public class SimuController {
         myEngine.slowDownSimulationSpeed(amount);
     }
 
+    public int getSimulationSpeed() {
+        return myEngine.getSimulationSpeed();
+    }
+
     public void createCar(String carType, int sellerCarMean, int sellerCarVariance, ArrayList<String[]> carsToBeCreated, int numberOfCars, int typeOfFuel){
         Car.createCar(carType, sellerCarMean, sellerCarVariance, carsToBeCreated, numberOfCars, typeOfFuel);
     }
@@ -227,7 +231,9 @@ public class SimuController {
     }
 
     public void setArrivalMean(int arrivalMean) {
-        this.arrivalMean = arrivalMean;
+        myEngine.setArrivalMean(arrivalMean);
+        this.arrivalMean = myEngine.getArrivalMean();
+        System.out.println("Arrival Mean set to: " + myEngine.getArrivalMean());
     }
 
     public int getArrivalVariance() {
@@ -235,7 +241,8 @@ public class SimuController {
     }
 
     public void setArrivalVariance(int arrivalVariance) {
-        this.arrivalVariance = arrivalVariance;
+        myEngine.setArrivalVariance(arrivalVariance);
+        System.out.println("Arrival Variance set to: " + myEngine.getArrivalVariance());
     }
 
     public int getFinanceMean() {
@@ -243,7 +250,8 @@ public class SimuController {
     }
 
     public void setFinanceMean(int financeMean) {
-        this.financeMean = financeMean;
+        myEngine.setFinanceMean(financeMean);
+        System.out.println("Finance Mean set to: " + myEngine.getFinanceMean());
     }
 
     public int getFinanceVariance() {
@@ -251,7 +259,8 @@ public class SimuController {
     }
 
     public void setFinanceVariance(int financeVariance) {
-        this.financeVariance = financeVariance;
+        myEngine.setFinanceVariance(financeVariance);
+        System.out.println("Finance Variance set to: " + myEngine.getFinanceVariance());
     }
 
     public int getTestdriveMean() {
@@ -259,7 +268,8 @@ public class SimuController {
     }
 
     public void setTestdriveMean(int testdriveMean) {
-        this.testdriveMean = testdriveMean;
+        myEngine.setTestdriveMean(testdriveMean);
+        System.out.println("Test-drive Mean set to: " + myEngine.getTestdriveMean());
     }
 
     public int getTestdriveVariance() {
@@ -267,7 +277,8 @@ public class SimuController {
     }
 
     public void setTestdriveVariance(int testdriveVariance) {
-        this.testdriveVariance = testdriveVariance;
+        myEngine.setTestdriveVariance(testdriveVariance);
+        System.out.println("Test-drive Variance set to: " + myEngine.getTestdriveVariance());
     }
 
     public int getClosureMean() {
@@ -275,7 +286,9 @@ public class SimuController {
     }
 
     public void setClosureMean(int closureMean) {
-        this.closureMean = closureMean;
+        myEngine.setClosureMean(closureMean);
+        System.out.println("Closure Mean set to: " + myEngine.getClosureMean());
+
     }
 
     public int getClosureVariance() {
@@ -283,15 +296,13 @@ public class SimuController {
     }
 
     public void setClosureVariance(int closureVariance) {
-        this.closureVariance = closureVariance;
-    }
-
-    public int getSimulationSpeed() {
-        return simulationSpeed;
+        myEngine.setClosureVariance(closureVariance);
+        System.out.println("Closure Variance set to: " + myEngine.getClosureVariance());
     }
 
     public void setSimulationSpeed(int simulationSpeed) {
-        this.simulationSpeed = simulationSpeed;
+        myEngine.setSimulationSpeed(simulationSpeed);
+        System.out.println("Simulation Speed set to: " + myEngine.getSimulationSpeed());
     }
 
     public int getArrivalServicePoints() {
@@ -299,7 +310,8 @@ public class SimuController {
     }
 
     public void setArrivalServicePoints(int arrivalServicePoints) {
-        this.arrivalServicePoints = arrivalServicePoints;
+        myEngine.setArrivalServicePoints(arrivalServicePoints);
+        System.out.println("Arrival Service Points set to: " + myEngine.getArrivalServicePoints());
     }
 
     public int getFinanceServicePoints() {
@@ -307,7 +319,8 @@ public class SimuController {
     }
 
     public void setFinanceServicePoints(int financeServicePoints) {
-        this.financeServicePoints = financeServicePoints;
+        myEngine.setFinanceServicePoints(financeServicePoints);
+        System.out.println("Finance Service Points set to: " + myEngine.getFinanceServicePoints());
     }
 
     public int getTestdriveServicePoints() {
@@ -315,7 +328,8 @@ public class SimuController {
     }
 
     public void setTestdriveServicePoints(int testdriveServicePoints) {
-        this.testdriveServicePoints = testdriveServicePoints;
+        myEngine.setTestdriveServicePoints(testdriveServicePoints);
+        System.out.println("Test-drive Service Points set to: " + myEngine.getTestdriveServicePoints());
     }
 
     public int getClosureServicePoints() {
@@ -323,101 +337,24 @@ public class SimuController {
     }
 
     public void setClosureServicePoints(int closureServicePoints) {
-        this.closureServicePoints = closureServicePoints;
+        myEngine.setClosureServicePoints(closureServicePoints);
+        System.out.println("Closure Service Points set to: " + myEngine.getClosureServicePoints());
     }
 
-    public int getVanMean() {
-        return vanMean;
-    }
-
-    public void setVanMean(int vanMean) {
-        this.vanMean = vanMean;
-    }
-
-    public int getVanVariance() {
-        return vanVariance;
-    }
-
-    public void setVanVariance(int vanVariance) {
-        this.vanVariance = vanVariance;
-    }
-
-    public int getSuvMean() {
-        return suvMean;
-    }
-
-    public void setSuvMean(int suvMean) {
-        this.suvMean = suvMean;
-    }
-
-    public int getSuvVariance() {
-        return suvVariance;
-    }
-
-    public void setSuvVariance(int suvVariance) {
-        this.suvVariance = suvVariance;
-    }
-
-    public int getSedanMean() {
-        return sedanMean;
-    }
-
-    public void setSedanMean(int sedanMean) {
-        this.sedanMean = sedanMean;
-    }
-
-    public int getSedanVariance() {
-        return sedanVariance;
-    }
-
-    public void setSedanVariance(int sedanVariance) {
-        this.sedanVariance = sedanVariance;
-    }
-
-    public int getSportMean() {
-        return sportMean;
-    }
-
-    public void setSportMean(int sportMean) {
-        this.sportMean = sportMean;
-    }
-
-    public int getSportVariance() {
-        return sportVariance;
-    }
-
-    public void setSportVariance(int sportVariance) {
-        this.sportVariance = sportVariance;
-    }
-
-    public int getCompactMean() {
-        return compactMean;
-    }
-
-    public void setCompactMean(int compactMean) {
-        this.compactMean = compactMean;
-    }
-
-    public int getCompactVariance() {
-        return compactVariance;
-    }
-
-    public void setCompactVariance(int compactVariance) {
-        this.compactVariance = compactVariance;
+    public void setCarsToBeCreated(ArrayList<String[]> carsToBeCreated) {
+        myEngine.carsToBeCreated(carsToBeCreated);
+        System.out.println("Cars to be created: " + myEngine.getCarDealerShop().getCarCollection().size());
     }
 
     public ArrayList<String[]> getCarsToBeCreated() {
         return carsToBeCreated;
     }
 
-    public void setCarsToBeCreated(ArrayList<String[]> carsToBeCreated) {
-        this.carsToBeCreated = carsToBeCreated;
-    }
-
     public static void main(String[] args) {
         Trace.setTraceLevel(Trace.Level.INFO);
-        MyEngine m = new MyEngine();
-        SimuController simuController = new SimuController(m);
+        //MyEngine m = new MyEngine();
+        SimuController simuController = new SimuController();
+        MyEngine m = simuController.getMyEngine();
 
         Scanner scanner = new Scanner(System.in);
         boolean valid = true;
@@ -513,12 +450,14 @@ public class SimuController {
                     int key = System.in.read(); // Capture user input
                     switch (key) {
                         case 'w': // Increase speed
-                            m.speedUpSimulationSpeed(100); // Reduce sleep time (faster simulation)
-                            Trace.out(Trace.Level.INFO, "Speed increased to: " + m.getSimulationSpeed());
+                            //m.speedUpSimulationSpeed(100); // Reduce sleep time (faster simulation)
+                            simuController.speedUpSimulation(100);
+                            Trace.out(Trace.Level.INFO, "Speed increased to: " + simuController.getSimulationSpeed());
                             break;
                         case 's': // Decrease speed
-                            m.slowDownSimulationSpeed(100); // Increase sleep time (slower simulation)
-                            Trace.out(Trace.Level.INFO, "Speed decreased to: " + m.getSimulationSpeed());
+                            //m.slowDownSimulationSpeed(100); // Increase sleep time (slower simulation)
+                            simuController.slowdownSimulation(100);
+                            Trace.out(Trace.Level.INFO, "Speed decreased to: " + simuController.getSimulationSpeed());
                             break;
                         case 'q': // Stop the program
                             Trace.out(Trace.Level.INFO, "Stopping the simulation...");

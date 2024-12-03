@@ -64,6 +64,12 @@ public class TestdriveServicePoint extends ServicePoint {
         // Determine if the customer likes the car
         boolean likesCar = Math.random() > 0.2;  // 80% chance they like the car
         if (!likesCar) {
+            if (customer.getTestDriveCount() >= 3){
+                Trace.out(Trace.Level.INFO, "Customer #" + customer.getId() + " had three testdrives and wasn't happy with" +
+                        "the test drive. Customer #" + customer.getId() + " leaves now.");
+                queue.poll();
+                MyEngine.addProcessedCustomer(customer);
+            }
             Trace.out(Trace.Level.INFO, "Customer #" + customer.getId() + " did not like the car. Returning to queue for another test drive.");
             if (Math.random() > 0.65) {
                 customerBackToQueue();  // Return the customer to the queue

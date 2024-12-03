@@ -3,7 +3,6 @@ package test;
 import eduni.distributions.ContinuousGenerator;
 import eduni.distributions.Negexp;
 import eduni.distributions.Normal;
-import simu.framework.Engine;
 import simu.framework.Trace;
 import simu.framework.Trace.Level;
 import simu.model.Car;

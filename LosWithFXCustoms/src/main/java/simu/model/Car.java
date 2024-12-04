@@ -15,8 +15,6 @@ public class Car {
     private double priceVariance;
     private double basePrice;
     private double sellerPrice;
-    private double carTypeMean;
-    private double carTypeVariance = 10000;
     private double saleProb;
     private volatile double coefficient;
 
@@ -28,8 +26,7 @@ public class Car {
         this.baseProb = carTypeProb * fuelTypeProb;
         this.meanPrice = meanPrice;
         this.priceVariance = priceVariance;
-        this.carTypeMean = setCarTypeMean(carType);
-        this.basePrice = new Normal(carTypeMean, carTypeVariance).sample();
+        this.basePrice = setBasePrice(carType);
         this.sellerPrice = new Normal(meanPrice, priceVariance).sample();
         this.coefficient = setCoefficient(carType);
 
@@ -151,64 +148,29 @@ public class Car {
         this.basePrice = basePrice;
     }
 
-    public double setCarTypeMean(String carType) {
+    public double setBasePrice(String carType) {
         switch (carType.toLowerCase()) {
             case "compact":
-                carTypeMean = 20000;
+                basePrice = 20000;
                 break;
             case "van":
-                carTypeMean = 30000;
+                basePrice = 30000;
                 break;
             case "suv":
-                carTypeMean = 40000;
+                basePrice = 40000;
                 break;
             case "sedan":
-                carTypeMean = 30000;
+                basePrice = 30000;
                 break;
             case "sport":
-                carTypeMean = 60000;
+                basePrice = 60000;
                 break;
             default:
-                carTypeMean = 15000;
+                basePrice = 15000;
                 break;
         }
-        return carTypeMean;
+        return basePrice;
     }
-
-    public double getCarTypeMean() {
-        return carTypeMean;
-    }
-
-    public double setCarTypeVariance(String carType) {
-        switch (carType.toLowerCase()) {
-            case "compact":
-                carTypeVariance = 3000; // Compact cars have low variability in price
-                break;
-            case "van":
-                carTypeVariance = 4000; // Vans have moderate variability
-                break;
-            case "suv":
-                carTypeVariance = 5000; // SUVs have moderate-to-high variability
-                break;
-            case "sedan":
-                carTypeVariance = 4000; // Sedans are moderately variable
-                break;
-            case "sport":
-                carTypeVariance = 10000; // Sports cars exhibit high price variability
-                break;
-            default:
-                carTypeVariance = 2000; // Default variance for unknown car types
-                break;
-        }
-        return carTypeVariance;
-    }
-
-
-    public double getCarTypeVariance() {
-        return carTypeVariance;
-    }
-
-
 
     public double getSaleProb() {
         return saleProb;

@@ -13,7 +13,7 @@ import java.util.Scanner;
 import java.util.Set;
 
 
-public class SimuController {
+public class SimuController implements Runnable {
     // Instance variables
     private MyEngine myEngine;
     private Car car;
@@ -47,7 +47,10 @@ public class SimuController {
     private int compactVariance;
     private final int ARRIVALINTERVALMULTIPLIER = 200;
     private int simulationTime;
+    private boolean simulationInitialized = false;
+    private String statusMessage;
     private ArrayList<String[]> carsToBeCreated;
+    private boolean simulationComplete = false;
 
 
     // Parameterless constructor (does not initialize fields)
@@ -179,19 +182,43 @@ public class SimuController {
 
 
         System.out.println(Clock.getInstance().getClock());
+        simulationInitialized = true;
+        statusMessage = "Simulation Initialized.";
+        System.out.println("Simulation Initialized.");
     }
 
 
-
+    // Thread's run method delegates to startSimulation
+    @Override
+    public void run() {
+        if (!simulationInitialized) {
+            System.err.println("Simulation not initialized. Please initialize the simulation before starting it.");
+            return;
+        }
+        if (simulationTime <= 0) {
+            System.err.println("Simulation time is not set or invalid. Set a valid simulation time before starting.");
+            return;
+        }
+        startSimulation(simulationTime);
+    }
 
     public void startSimulation(int simulationTime) {
         this.simulationTime = simulationTime;
         myEngine.setSimulationTime(simulationTime);
         myEngine.run();
+        simulationComplete = true;
     }
 
     public int getSimulationTime() {
         return simulationTime;
+    }
+
+    public void setSimulationTime(int simulationTime) {
+        this.simulationTime = simulationTime;
+    }
+
+    public boolean isSimulationComplete() {
+        return simulationComplete;
     }
 
     public void createCars(ArrayList<String[]> carsToBeCreated) {
@@ -211,6 +238,7 @@ public class SimuController {
         );
         myEngine.setSimulationTime(simulationTime);
         myEngine.run();
+        simulationComplete = true;
     }
 
 

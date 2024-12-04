@@ -50,6 +50,7 @@ public class SaedTestController {
     @FXML private Label simulationSpeedLabel;
     @FXML private TextArea consoleLog;
     private SimuController simuController;
+    private Thread simulationThread;
 
     private ObservableList<Car> cars = FXCollections.observableArrayList();
 
@@ -126,18 +127,6 @@ public class SaedTestController {
         priceAdjustmentSlider.setValue(0);
     }
 
-    private void redirectConsoleToTextArea() {
-        PrintStream ps = new PrintStream(new OutputStream() {
-            @Override
-            public void write(int b) throws IOException {
-                consoleLog.appendText(String.valueOf((char) b));
-            }
-        });
-        System.setOut(ps);
-        System.setErr(ps);
-    }
-
-
     @FXML
     private void handleStartSimulation() {
         // Implement simulation logic here
@@ -153,7 +142,7 @@ public class SaedTestController {
         int closureMean = (int) closureMeanSlider.getValue();
         int closureVariance = (int) closureVarianceSlider.getValue();
         int simulationTime = 1440;
-        int simulationSpeed = 0;
+        int simulationSpeed = 20;
         int arrivalServicePoint = arrivalServicePoints.getValue();
         int financeServicePoint = financeServicePoints.getValue();
         int testdriveServicePoint = 5;
@@ -202,8 +191,32 @@ public class SaedTestController {
                                             ,carsToBeCreated, arrivalServicePoint, financeServicePoint,
                                             testdriveServicePoint, closureServicePoint);
 
-        simuController.startSimulation(simulationTime);
-        results();
+        simuController.setSimulationTime(simulationTime);
+        simulationThread = new Thread(simuController);
+        simulationThread.start();
+        // Monitor simulation progress in a separate thread
+        new Thread(() -> {
+            int carsSoldBefore = 0;
+            while (!simuController.isSimulationComplete()) {
+                try {
+                    int carsSold = simuController.getMyEngine().getCarDealerShop().getSoldCars().size();
+                    if (carsSoldBefore != carsSold) {
+                       carsSoldBefore = carsSold;
+                       Platform.runLater(() -> consoleLog.appendText("Cars sold: " + carsSold + "\n"));
+                    }
+                    Thread.sleep(200); // Throttle updates
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                    Platform.runLater(() -> consoleLog.appendText("Simulation interrupted.\n"));
+                    return; // Exit the loop gracefully
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    Platform.runLater(() -> consoleLog.appendText("Error: " + e.getMessage() + "\n"));
+                    return; // Handle unexpected exceptions
+                }
+            }
+            results();
+        }).start();
     }
 
     public void results() {

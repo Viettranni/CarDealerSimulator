@@ -2,9 +2,11 @@ package simu.controller;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
-        import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import java.text.NumberFormat;
+import java.util.Locale;
 
 public class v0_controller {
 
@@ -27,26 +29,30 @@ public class v0_controller {
     @FXML private Spinner<Integer> arrivalServicePoints;
     @FXML private Spinner<Integer> financeServicePoints;
     @FXML private Spinner<Integer> closureServicePoints;
-    @FXML private TextField carModel;
     @FXML private ComboBox<String> carType;
-    @FXML private TextField basePrice;
+    @FXML private ComboBox<String> engineType;
+    @FXML private Label basePriceLabel;
     @FXML private Slider priceAdjustmentSlider;
     @FXML private Label adjustedPriceLabel;
+    @FXML private Spinner<Integer> carQuantitySpinner;
     @FXML private TableView<Car> carTable;
-    @FXML private TableColumn<Car, String> carModelColumn;
     @FXML private TableColumn<Car, String> carTypeColumn;
+    @FXML private TableColumn<Car, String> engineTypeColumn;
     @FXML private TableColumn<Car, Double> carPriceColumn;
+    @FXML private TableColumn<Car, Integer> carQuantityColumn;
     @FXML private TableColumn<Car, Button> carActionColumn;
     @FXML private Slider simulationSpeedSlider;
     @FXML private Label simulationSpeedLabel;
     @FXML private TextArea consoleLog;
 
     private ObservableList<Car> cars = FXCollections.observableArrayList();
+    private NumberFormat currencyFormat = NumberFormat.getCurrencyInstance(Locale.US);
 
     @FXML
     public void initialize() {
         setupSliders();
         setupCarTypes();
+        setupEngineTypes();
         setupCarTable();
         setupPriceAdjustment();
     }
@@ -69,13 +75,19 @@ public class v0_controller {
     }
 
     private void setupCarTypes() {
-        carType.getItems().addAll("Van", "Compact", "Sedan", "SUV", "Sports");
+        carType.getItems().addAll("Compact", "Van", "SUV", "Sedan", "Sport");
+        carType.getSelectionModel().selectedItemProperty().addListener((obs, oldVal, newVal) -> updateBasePrice());
+    }
+
+    private void setupEngineTypes() {
+        engineType.getItems().addAll("Electric", "Hybrid", "Gasoline");
     }
 
     private void setupCarTable() {
-        carModelColumn.setCellValueFactory(new PropertyValueFactory<>("model"));
         carTypeColumn.setCellValueFactory(new PropertyValueFactory<>("type"));
+        engineTypeColumn.setCellValueFactory(new PropertyValueFactory<>("engineType"));
         carPriceColumn.setCellValueFactory(new PropertyValueFactory<>("price"));
+        carQuantityColumn.setCellValueFactory(new PropertyValueFactory<>("quantity"));
         carActionColumn.setCellFactory(param -> new TableCell<>() {
             private final Button deleteButton = new Button("Delete");
 
@@ -97,30 +109,67 @@ public class v0_controller {
     }
 
     private void setupPriceAdjustment() {
-        priceAdjustmentSlider.valueProperty().addListener((obs, oldVal, newVal) -> {
-            double basePrice = Double.parseDouble(this.basePrice.getText());
-            double adjustedPrice = basePrice * (1 + newVal.doubleValue() / 100);
-            adjustedPriceLabel.setText(String.format("Adjusted Price: $%.2f", adjustedPrice));
-        });
+        priceAdjustmentSlider.setMin(-20);
+        priceAdjustmentSlider.setMax(20);
+        priceAdjustmentSlider.setValue(0);
+        priceAdjustmentSlider.valueProperty().addListener((obs, oldVal, newVal) -> updateAdjustedPrice());
+    }
+
+    private void updateBasePrice() {
+        String selectedType = carType.getValue();
+        double basePrice = getBasePrice(selectedType);
+        basePriceLabel.setText("Base Price: " + currencyFormat.format(basePrice));
+        updateAdjustedPrice();
+    }
+
+    private void updateAdjustedPrice() {
+        String selectedType = carType.getValue();
+        if (selectedType != null) {
+            double basePrice = getBasePrice(selectedType);
+            double adjustmentPercentage = priceAdjustmentSlider.getValue() / 100.0;
+            double adjustedPrice = basePrice * (1 + adjustmentPercentage);
+            adjustedPriceLabel.setText("Adjusted Price: " + currencyFormat.format(adjustedPrice));
+        }
+    }
+
+    private double getBasePrice(String carType) {
+        switch (carType) {
+            case "Compact": return 20000;
+            case "Van": return 30000;
+            case "SUV": return 40000;
+            case "Sedan": return 30000;
+            case "Sport": return 60000;
+            default: return 0;
+        }
     }
 
     @FXML
-    private void handleAddCar() {
-        String model = carModel.getText();
-        String type = carType.getValue();
-        double price = Double.parseDouble(basePrice.getText()) * (1 + priceAdjustmentSlider.getValue() / 100);
-        cars.add(new Car(model, type, price));
-        carModel.clear();
-        carType.getSelectionModel().clearSelection();
-        basePrice.clear();
-        priceAdjustmentSlider.setValue(0);
+    private void handleAddCars() {
+        String selectedType = carType.getValue();
+        String selectedEngineType = engineType.getValue();
+        if (selectedType != null && selectedEngineType != null) {
+            double basePrice = getBasePrice(selectedType);
+            double adjustmentPercentage = priceAdjustmentSlider.getValue() / 100.0;
+            double adjustedPrice = basePrice * (1 + adjustmentPercentage);
+            int quantity = carQuantitySpinner.getValue();
+
+            cars.add(new Car(selectedType, selectedEngineType, adjustedPrice, quantity));
+
+            // Reset inputs
+            carType.getSelectionModel().clearSelection();
+            engineType.getSelectionModel().clearSelection();
+            priceAdjustmentSlider.setValue(0);
+            carQuantitySpinner.getValueFactory().setValue(1);
+            basePriceLabel.setText("Base Price: $0");
+            adjustedPriceLabel.setText("Adjusted Price: $0");
+        }
     }
 
     @FXML
     private void handleStartSimulation() {
-        // Implement simulation logic here
+        consoleLog.clear();
         consoleLog.appendText("Simulation started with the following parameters:\n");
-        consoleLog.appendText(String.format("Arrival Mean: %.1f, Variance:Arrival Mean: %.1f, Variance: %.1f\n", arrivalMeanSlider.getValue(), arrivalVarianceSlider.getValue()));
+        consoleLog.appendText(String.format("Arrival Mean: %.1f, Variance: %.1f\n", arrivalMeanSlider.getValue(), arrivalVarianceSlider.getValue()));
         consoleLog.appendText(String.format("Finance Mean: %.1f, Variance: %.1f\n", financeMeanSlider.getValue(), financeVarianceSlider.getValue()));
         consoleLog.appendText(String.format("Closure Mean: %.1f, Variance: %.1f\n", closureMeanSlider.getValue(), closureVarianceSlider.getValue()));
         consoleLog.appendText(String.format("Test Drive Mean: %.1f, Variance: %.1f\n", testDriveMeanSlider.getValue(), testDriveVarianceSlider.getValue()));
@@ -129,23 +178,27 @@ public class v0_controller {
         consoleLog.appendText(String.format("Simulation Speed: %.1fx\n", simulationSpeedSlider.getValue()));
         consoleLog.appendText("Cars in simulation:\n");
         for (Car car : cars) {
-            consoleLog.appendText(String.format("- %s (%s): $%.2f\n", car.getModel(), car.getType(), car.getPrice()));
+            consoleLog.appendText(String.format("- %s (%s): %s x%d\n",
+                    car.getType(), car.getEngineType(), currencyFormat.format(car.getPrice()), car.getQuantity()));
         }
     }
 
     public static class Car {
-        private final String model;
         private final String type;
+        private final String engineType;
         private final double price;
+        private final int quantity;
 
-        public Car(String model, String type, double price) {
-            this.model = model;
+        public Car(String type, String engineType, double price, int quantity) {
             this.type = type;
+            this.engineType = engineType;
             this.price = price;
+            this.quantity = quantity;
         }
 
-        public String getModel() { return model; }
         public String getType() { return type; }
+        public String getEngineType() { return engineType; }
         public double getPrice() { return price; }
+        public int getQuantity() { return quantity; }
     }
 }

@@ -270,11 +270,13 @@ public class SimuController implements Runnable {
         return carsDao.getAllTableNames();
     }
 
-    public void populateCarsToBeCreated(String tableName, ArrayList<String[]> carsToBeCreated) {
+    public ArrayList<String[]> populateCarsToBeCreated(String tableName) {
         ArrayList<String> tableNames = getTableNames();
+        ArrayList<String[]> carsToBeCreated = new ArrayList<>();
         if (tableNames.contains(tableName)) {
             carsToBeCreated = carsDao.populateCarsToBeAdded(tableName);
         }
+        return carsToBeCreated;
     }
 
 

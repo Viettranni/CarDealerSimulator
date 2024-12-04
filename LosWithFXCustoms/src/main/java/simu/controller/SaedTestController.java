@@ -184,7 +184,7 @@ public class SaedTestController {
         for (int i = 1; i < 4; i++) {
             simuController.createCar(10 ,"5", i,  suvMean, suvVariance, carsToBeCreated);
         }*/
-        simuController.createCar(10 ,"Suv", "gas",  suvMean, suvVariance, carsToBeCreated);
+        /*simuController.createCar(10 ,"Suv", "gas",  suvMean, suvVariance, carsToBeCreated);
         simuController.createCar(10 ,"SUV", "hybrid",  suvMean, suvVariance, carsToBeCreated);
         simuController.createCar(10 ,"suv", "electric",  suvMean, suvVariance, carsToBeCreated);
         simuController.createCar(10 ,"Van", "gas",  suvMean, suvVariance, carsToBeCreated);
@@ -198,7 +198,23 @@ public class SaedTestController {
         simuController.createCar(10 ,"sport", "electric",  suvMean, suvVariance, carsToBeCreated);
         simuController.createCar(10 ,"Compact", "gas",  suvMean, suvVariance, carsToBeCreated);
         simuController.createCar(10 ,"COMPACT", "hybrid",  suvMean, suvVariance, carsToBeCreated);
-        simuController.createCar(10 ,"compact", "electric",  suvMean, suvVariance, carsToBeCreated);
+        simuController.createCar(10 ,"compact", "electric",  suvMean, suvVariance, carsToBeCreated);*/
+        ArrayList<String[]> cars = new ArrayList<>();
+        ArrayList<String> tableNames = simuController.getTableNames();
+        cars = simuController.populateCarsToBeCreated(tableNames.get(2));
+
+        for (String[] car : cars) {
+            int amount = Integer.parseInt(car[0]);
+            String carType = car[1];
+            String fuelType = car[2];
+            int meanPrice = (int) Double.parseDouble(car[3]);
+            int priceVariance = (int) Double.parseDouble(car[4]);
+            int basePrice = (int) Double.parseDouble(car[5]);
+
+            simuController.createCar(amount, carType,fuelType, meanPrice, priceVariance, carsToBeCreated);
+        }
+
+
 
         simuController.initializeSimulation(arrivalMean, arrivalVariance, financeMean, financeVariance, testdriveMean,
                                             testdriveVariance, closureMean, closureVariance, simulationSpeed

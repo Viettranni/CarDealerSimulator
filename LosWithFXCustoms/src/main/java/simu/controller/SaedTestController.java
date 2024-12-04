@@ -49,7 +49,7 @@ public class SaedTestController {
     @FXML private Slider simulationSpeedSlider;
     @FXML private Label simulationSpeedLabel;
     @FXML private TextArea consoleLog;
-    private SimuController simuController;
+    private SimuController simuController = new SimuController();
     private Thread simulationThread;
     ArrayList<String[]> carsToBeCreated;
 
@@ -80,9 +80,8 @@ public class SaedTestController {
                 label.setText(String.format("%.1f%s", newVal.doubleValue(), suffix)));
     }
 
-    private void setupCarTypes() {
-        carType.getItems().addAll("Van", "Compact", "Sedan", "SUV", "Sports");
-    }
+    private void setupCarTypes() {carType.getItems().addAll("Van", "Compact", "Sedan", "SUV", "Sports");}
+    //private void setupCarTypes() {carType.getItems().addAll(simuController.getTableNames());}
 
     private void setupCarTable() {
         carModelColumn.setCellValueFactory(new PropertyValueFactory<>("fuel type"));
@@ -132,7 +131,6 @@ public class SaedTestController {
     private void handleStartSimulation() {
         // Implement simulation logic here
         Trace.setTraceLevel(Trace.Level.INFO);
-        simuController = new SimuController();
 
         int arrivalMean = (int)arrivalMeanSlider.getValue();
         int arrivalVariance = (int) arrivalVarianceSlider.getValue();

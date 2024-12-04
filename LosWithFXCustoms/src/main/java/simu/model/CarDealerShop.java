@@ -133,44 +133,27 @@ public class CarDealerShop {
     }
 
     // REMEMBER TO LATER CHANGE THIS TO FIT THE UI AND CONTROLLER
-    public void createCar(int amount, int carType, int fuelType, double meanPrice, double priceVariance) {
-        String actualFuelType = null;
-
-        // Set the actual fuel type based on the input fuelType
-        switch (fuelType) {
-            case 1:
-                actualFuelType = "gas";
-                break;
-            case 2:
-                actualFuelType = "hybrid";
-                break;
-            case 3:
-                actualFuelType = "electric";
-                break;
-            default:
-                actualFuelType = "gas"; // Default to "gas" if an invalid fuelType is provided
-                break;
-        }
-
+    public void createCar(int amount, String carType, String fuelType, double meanPrice, double priceVariance) {
+        String actualFuelType = fuelType.toLowerCase();
         // Loop to create the specified amount of cars
         for (int i = 0; i < amount; i++) {
             Car car = null;  // Create a new car object in each iteration
 
             // Create the car based on carType
-            switch (carType) {
-                case 1:
+            switch (carType.toLowerCase()) {
+                case "suv":
                     car = new SUV(actualFuelType, meanPrice, priceVariance);
                     break;
-                case 2:
+                case "van":
                     car = new Van(actualFuelType, meanPrice, priceVariance);
                     break;
-                case 3:
+                case "sedan":
                     car = new Sedan(actualFuelType, meanPrice, priceVariance);
                     break;
-                case 4:
+                case "sport":
                     car = new Sport(actualFuelType, meanPrice, priceVariance);
                     break;
-                case 5:
+                case "compact":
                     car = new Compact(actualFuelType, meanPrice, priceVariance);
                     break;
                 default:

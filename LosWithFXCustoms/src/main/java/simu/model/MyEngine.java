@@ -441,9 +441,9 @@ public class MyEngine extends Engine {
 
 	// Creates the amount of cars User asks for
 	public void carsToBeCreated(ArrayList<String[]> carsToBeCreated) {
-		int carType;
+		String carType;
 		int amount;
-		int fuelType;
+		String fuelType;
 		double meanPrice;
 		double variance;
 		// For each car in carsToBeCreated
@@ -451,9 +451,9 @@ public class MyEngine extends Engine {
 		// Calls callDealerShop's method and passes the arguments
 		// callDealerShop creates the cars and adds them to it's collection
 		for (String[] car : carsToBeCreated) {
-			carType = Integer.parseInt(car[0]);
-			amount = Integer.parseInt(car[1]);
-			fuelType = Integer.parseInt(car[2]);
+			amount = Integer.parseInt(car[0]);
+			carType = car[1];
+			fuelType = car[2];
 			meanPrice = Double.parseDouble(car[3]);
 			variance = Double.parseDouble(car[4]);
 			carDealerShop.createCar(amount, carType, fuelType, meanPrice, variance);

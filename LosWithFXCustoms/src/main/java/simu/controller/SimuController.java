@@ -1,6 +1,7 @@
 package simu.controller;
 
 
+import simu.dao.CarsDao;
 import simu.framework.Clock;
 import simu.framework.Trace;
 import simu.model.*;
@@ -17,6 +18,7 @@ public class SimuController implements Runnable {
     // Instance variables
     private MyEngine myEngine;
     private Car car;
+    private CarsDao carsDao;
 
 
     // Means and variances
@@ -56,11 +58,13 @@ public class SimuController implements Runnable {
     // Parameterless constructor (does not initialize fields)
     public SimuController(MyEngine engine) {
         myEngine = engine;
+        carsDao = new CarsDao();
     }
 
 
     public SimuController() {
         myEngine = new MyEngine();
+        carsDao = new CarsDao();
     }
 
 
@@ -257,9 +261,22 @@ public class SimuController implements Runnable {
     }
 
 
-    public void createCar(String carType, int sellerCarMean, int sellerCarVariance, ArrayList<String[]> carsToBeCreated, int numberOfCars, int typeOfFuel){
-        Car.createCar(carType, sellerCarMean, sellerCarVariance, carsToBeCreated, numberOfCars, typeOfFuel);
+    // int amount, int carType, int fuelType, double meanPrice, double priceVariance
+    public void createCar( int numberOfCars, String carType, String typeOfFuel, int sellerCarMean, int sellerCarVariance, ArrayList<String[]> carsToBeCreated){
+        Car.createCar(numberOfCars, carType, typeOfFuel, sellerCarMean, sellerCarVariance, carsToBeCreated);
     }
+
+    public ArrayList<String> getTableNames() {
+        return carsDao.getAllTableNames();
+    }
+
+    public void populateCarsToBeCreated(String tableName, ArrayList<String[]> carsToBeCreated) {
+        ArrayList<String> tableNames = getTableNames();
+        if (tableNames.contains(tableName)) {
+            carsToBeCreated = carsDao.populateCarsToBeAdded(tableName);
+        }
+    }
+
 
 
     // Getters and Setters for all instance variables
@@ -469,7 +486,7 @@ public class SimuController implements Runnable {
 
 
 
-    public static void main(String[] args) {
+    /*public static void main(String[] args) {
         Trace.setTraceLevel(Trace.Level.INFO);
         //MyEngine m = new MyEngine();
         SimuController simuController = new SimuController();
@@ -503,22 +520,22 @@ public class SimuController implements Runnable {
         int compactMean = 20000;
         int compactVariance = 3000;
         ArrayList<String[]> carsToBeCreated = new ArrayList<>();
+        // int amount, int carType, int fuelType, double meanPrice, double priceVariance
         for (int i = 1; i < 4; i++) {
-            simuController.createCar("1",  suvMean, suvVariance, carsToBeCreated, 10, i);
+            simuController.createCar(10 ,"1", i,  suvMean, suvVariance, carsToBeCreated);
         }
         for (int i = 1; i < 4; i++) {
-            simuController.createCar("2",  vanMean, vanVariance, carsToBeCreated, 10, i);
+            simuController.createCar(10 ,"2", i,  suvMean, suvVariance, carsToBeCreated);
         }
         for (int i = 1; i < 4; i++) {
-            simuController.createCar("3",  sedanMean, sedanVariance, carsToBeCreated, 10, i);
+            simuController.createCar(10 ,"3", i,  suvMean, suvVariance, carsToBeCreated);
         }
         for (int i = 0; i < 4; i++) {
-            simuController.createCar("4", sportMean, sportVariance, carsToBeCreated, 10, i);
+            simuController.createCar(10 ,"4", i,  suvMean, suvVariance, carsToBeCreated);
         }
 
-
         for (int i = 1; i < 4; i++) {
-            simuController.createCar("5",  compactMean, compactVariance, carsToBeCreated, 10, i);
+            simuController.createCar(10 ,"5", i,  suvMean, suvVariance, carsToBeCreated);
         }
 
 
@@ -614,5 +631,5 @@ public class SimuController implements Runnable {
         } else {
             System.out.println("No duplicate IDs found.");
         }
-    }
+    }*/
 }

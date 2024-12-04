@@ -213,14 +213,14 @@ public class Car {
         return coefficient * baseProb;
     }
 
-    public static void createCar(String carType, int sellerCarMean, int sellerCarVariance, ArrayList<String[]> carsToBeCreated, int numberOfCars, int typeOfFuel) {
+    // int amount, int carType, int fuelType, double meanPrice, double priceVariance
+    public static void createCar( int numberOfCars, String carType, String fuelType, int sellerCarMean, int sellerCarVariance, ArrayList<String[]> carsToBeCreated) {
         String amountOfCars = String.valueOf(numberOfCars);
-        String fuelType = String.valueOf(typeOfFuel);
         String carMean = String.valueOf(sellerCarMean);
         String carVariance = String.valueOf(sellerCarVariance);
 
         // Add each car to the list
-        carsToBeCreated.add(new String[]{carType, amountOfCars, fuelType, carMean, carVariance});
+        carsToBeCreated.add(new String[]{amountOfCars, carType, fuelType, carMean, carVariance});
 
     }
 

@@ -51,6 +51,7 @@ public class SaedTestController {
     @FXML private TextArea consoleLog;
     private SimuController simuController;
     private Thread simulationThread;
+    ArrayList<String[]> carsToBeCreated;
 
     private ObservableList<Car> cars = FXCollections.observableArrayList();
 
@@ -142,7 +143,7 @@ public class SaedTestController {
         int closureMean = (int) closureMeanSlider.getValue();
         int closureVariance = (int) closureVarianceSlider.getValue();
         int simulationTime = 1440;
-        int simulationSpeed = 20;
+        int simulationSpeed = 10;
         int arrivalServicePoint = arrivalServicePoints.getValue();
         int financeServicePoint = financeServicePoints.getValue();
         int testdriveServicePoint = 5;
@@ -157,7 +158,7 @@ public class SaedTestController {
         int sportVariance = 10000;
         int compactMean = 20000;
         int compactVariance = 3000;
-        ArrayList<String[]> carsToBeCreated = new ArrayList<>();
+        carsToBeCreated = new ArrayList<>();
         consoleLog.appendText("Simulation initialized with the following values:");
         consoleLog.appendText("\nArrival mean: " + arrivalMean + "\nArrival Variance: " + arrivalVariance);
         consoleLog.appendText("\nFinance mean: " + financeMean + "\nFinance Variance: " + financeVariance);
@@ -168,23 +169,38 @@ public class SaedTestController {
         consoleLog.appendText("\nTest drive service points: " + testdriveServicePoint);
         consoleLog.appendText("\nClosure service points: " + closureServicePoint + "\n");
 
+        /*// int amount, int carType, int fuelType, double meanPrice, double priceVariance
         for (int i = 1; i < 4; i++) {
-            simuController.createCar("1",  suvMean, suvVariance, carsToBeCreated, 10, i);
+            simuController.createCar(1 ,"1", i,  suvMean, suvVariance, carsToBeCreated);
         }
         for (int i = 1; i < 4; i++) {
-            simuController.createCar("2",  vanMean, vanVariance, carsToBeCreated, 10, i);
+            simuController.createCar(1 ,"2", i,  suvMean, suvVariance, carsToBeCreated);
         }
         for (int i = 1; i < 4; i++) {
-            simuController.createCar("3",  sedanMean, sedanVariance, carsToBeCreated, 10, i);
+            simuController.createCar(1 ,"3", i,  suvMean, suvVariance, carsToBeCreated);
         }
         for (int i = 0; i < 4; i++) {
-            simuController.createCar("4", sportMean, sportVariance, carsToBeCreated, 10, i);
+            simuController.createCar(1 ,"4", i,  suvMean, suvVariance, carsToBeCreated);
         }
-
 
         for (int i = 1; i < 4; i++) {
-            simuController.createCar("5",  compactMean, compactVariance, carsToBeCreated, 10, i);
-        }
+            simuController.createCar(10 ,"5", i,  suvMean, suvVariance, carsToBeCreated);
+        }*/
+        simuController.createCar(10 ,"Suv", "gas",  suvMean, suvVariance, carsToBeCreated);
+        simuController.createCar(10 ,"SUV", "hybrid",  suvMean, suvVariance, carsToBeCreated);
+        simuController.createCar(10 ,"suv", "electric",  suvMean, suvVariance, carsToBeCreated);
+        simuController.createCar(10 ,"Van", "gas",  suvMean, suvVariance, carsToBeCreated);
+        simuController.createCar(10 ,"VAN", "hybrid",  suvMean, suvVariance, carsToBeCreated);
+        simuController.createCar(10 ,"van", "electric",  suvMean, suvVariance, carsToBeCreated);
+        simuController.createCar(10 ,"Sedan", "gas",  suvMean, suvVariance, carsToBeCreated);
+        simuController.createCar(10 ,"SEDAN", "hybrid",  suvMean, suvVariance, carsToBeCreated);
+        simuController.createCar(10 ,"sedan", "electric",  suvMean, suvVariance, carsToBeCreated);
+        simuController.createCar(10 ,"Sport", "gas",  suvMean, suvVariance, carsToBeCreated);
+        simuController.createCar(10 ,"SPORT", "hybrid",  suvMean, suvVariance, carsToBeCreated);
+        simuController.createCar(10 ,"sport", "electric",  suvMean, suvVariance, carsToBeCreated);
+        simuController.createCar(10 ,"Compact", "gas",  suvMean, suvVariance, carsToBeCreated);
+        simuController.createCar(10 ,"COMPACT", "hybrid",  suvMean, suvVariance, carsToBeCreated);
+        simuController.createCar(10 ,"compact", "electric",  suvMean, suvVariance, carsToBeCreated);
 
         simuController.initializeSimulation(arrivalMean, arrivalVariance, financeMean, financeVariance, testdriveMean,
                                             testdriveVariance, closureMean, closureVariance, simulationSpeed

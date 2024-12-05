@@ -6,6 +6,7 @@ import javafx.scene.control.*;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.control.cell.TextFieldTableCell;
+import javafx.scene.layout.HBox;
 import javafx.scene.text.Font;
 import simu.framework.Clock;
 import simu.framework.Trace;
@@ -15,7 +16,10 @@ import simu.model.Customer;
 import java.util.*;
 
 public class SaedTestController {
-
+    public TextField dealerShipName;
+    @FXML private TextField meanPrice;
+    @FXML private TextField priceVariance;
+    @FXML private TextField amountOfCars;
     @FXML private Slider arrivalMeanSlider;
     @FXML private Label arrivalMeanLabel;
     @FXML private Slider arrivalVarianceSlider;
@@ -35,20 +39,19 @@ public class SaedTestController {
     @FXML private Spinner<Integer> arrivalServicePoints;
     @FXML private Spinner<Integer> financeServicePoints;
     @FXML private Spinner<Integer> closureServicePoints;
-    @FXML private TextField carModel;
     @FXML private ComboBox<String> carType;
+    @FXML private ComboBox<String> fuelType;
+    @FXML private ComboBox<String> carSets;
     @FXML private TextField basePrice;
     @FXML private Slider priceAdjustmentSlider;
     @FXML private Label adjustedPriceLabel;
-    /*@FXML private TableView<Car> carTable;
-    @FXML private TableColumn<Car, String> carModelColumn;
-    @FXML private TableColumn<Car, String> carTypeColumn;
-    @FXML private TableColumn<Car, Double> carPriceColumn;
-    @FXML private TableColumn<Car, Button> carActionColumn;*/
     @FXML private TableView<String[]> carTable;
-    @FXML private TableColumn<String[], String> carModelColumn;
+    @FXML private TableColumn<String[], String> carAmountColumn;
     @FXML private TableColumn<String[], String> carTypeColumn;
-    @FXML private TableColumn<String[], String> carPriceColumn;
+    @FXML private TableColumn<String[], String> carFuelTypeColumn;
+    @FXML private TableColumn<String[], String> carMeanPriceColumnn;
+    @FXML private TableColumn<String[], String> carPriceVarianceColumn;
+    @FXML private TableColumn<String[], Button> carActionColumn;
     @FXML private Slider simulationSpeedSlider;
     @FXML private Label simulationSpeedLabel;
     @FXML private TextArea consoleLog;
@@ -58,16 +61,20 @@ public class SaedTestController {
     private String tableName;
     ArrayList<String[]> carsToBeCreated = new ArrayList<>();
     int simulationSpeed;
+    String dataBaseTableName;
 
     private ObservableList<Car> cars = FXCollections.observableArrayList();
 
     @FXML
     public void initialize() {
         setupSliders();
-        setupCarTypes();
-        setupCarTable();
-        setupPriceAdjustment();
         setupCarTypeListener();
+        setupCarSetsListener();
+        setupCarTypes();
+        setUpFuelTypes();
+        setupCarSets();
+        setupCarTable();
+        //setupPriceAdjustment();
     }
 
     private void setupSliders() {
@@ -88,31 +95,79 @@ public class SaedTestController {
     }
 
     private void setupCarTypeListener() {
-        // Add a listener to carType (ComboBox)
+        // Add a listener to carSets (ComboBox)
         carType.valueProperty().addListener((observable, oldValue, newValue) -> {
             // Only update if the value actually changed
+            HashMap<String, Double> basePrices = simuController.getBasePrices();
             if (newValue != null && !newValue.equals(oldValue)) {
-                getCarsFromDb();  // Fetch the new cars based on the selected car type
-                populateTable();  // Update the table with the new data
+                basePrice.setText(String.valueOf(basePrices.get(newValue.toLowerCase())));
             }
         });
     }
 
-    //private void setupCarTypes() {carType.getItems().addAll("Van", "Compact", "Sedan", "SUV", "Sports");}
+    private void setupCarSetsListener() {
+        // Add a listener to carSets (ComboBox)
+        carSets.valueProperty().addListener((observable, oldValue, newValue) -> {
+            // Only update if the value actually changed
+            if (newValue != null && !newValue.equals(oldValue)) {
+                getCarsFromDb();  // Fetch the new cars based on the selected car type
+                populateTable();  // Update the table with the new data
+                consoleLog.appendText("Car combinations to be created: " + carsToBeCreated.size() + "\n");
+            }
+        });
+    }
+
+    private void setupCarTypes() {carType.getItems().addAll("Van", "Compact", "Sedan", "SUV", "Sport");}
+
+    private void setUpFuelTypes() {fuelType.getItems().addAll("Gas", "Hybrid", "Electric");}
 
     // THIS WILL BE CHANGED LATER
-    private void setupCarTypes() {carType.getItems().addAll(simuController.getTableNames());}
+    private void setupCarSets() {carSets.getItems().addAll(simuController.getTableNames());}
 
     // THIS WILL BE CHANGED LATER
     private void setupCarTable() {
         // Set cell value factories to point to specific columns in the data
-        carModelColumn.setCellValueFactory(param -> new ReadOnlyStringWrapper(param.getValue()[1])); // Car Model (index 0)
-        carTypeColumn.setCellValueFactory(param -> new ReadOnlyStringWrapper(param.getValue()[2])); // Car Type (index 1)
-        carPriceColumn.setCellValueFactory(param -> new ReadOnlyStringWrapper(param.getValue()[3])); // Mean Price (index 3)
+        carAmountColumn.setCellValueFactory(param -> new ReadOnlyStringWrapper(param.getValue()[0])); // Car Amount (index 0)
+        carTypeColumn.setCellValueFactory(param -> new ReadOnlyStringWrapper(param.getValue()[1])); // Car Type (index 1)
+        carFuelTypeColumn.setCellValueFactory(param -> new ReadOnlyStringWrapper(param.getValue()[2])); // Fuel Type (index 2)
+        carMeanPriceColumnn.setCellValueFactory(param -> new ReadOnlyStringWrapper(param.getValue()[3])); // Mean Price (index 3)
+        carPriceVarianceColumn.setCellValueFactory(param -> new ReadOnlyStringWrapper(param.getValue()[4])); // Price variance (index 4)
+        // Add delete button to the action column
+        // Add delete button to the action column
+        carActionColumn.setCellFactory(param -> new TableCell<>() {
+            private final Button deleteButton = new Button("Delete");
+
+            {
+                // Configure delete button
+                deleteButton.setOnAction(event -> {
+                    int selectedIndex = getIndex(); // Get current row index
+                    if (selectedIndex >= 0) {
+                        // Remove row from the table
+                        String[] removedRow = carTable.getItems().remove(selectedIndex);
+
+                        // Remove from the underlying ArrayList
+                        carsToBeCreated.remove(removedRow);
+                        consoleLog.appendText("Car combinations to be created: " + carsToBeCreated.size() + "\n");
+                    }
+                });
+            }
+
+            @Override
+            protected void updateItem(Button item, boolean empty) {
+                super.updateItem(item, empty);
+
+                if (empty) {
+                    setGraphic(null); // Clear cell content for empty rows
+                } else {
+                    setGraphic(deleteButton); // Show delete button
+                }
+            }
+        });
 
         // Load data from the database and populate the table
         getCarsFromDb();  // Call the method to fetch data
         populateTable();  // Populate TableView with fetched data
+        consoleLog.appendText("Car combinations to be created: " + carsToBeCreated.size() + "\n");
     }
 
 
@@ -137,21 +192,30 @@ public class SaedTestController {
 
     @FXML
     private void handleAddCar() {
-        String model = carModel.getText();
+        String amount = amountOfCars.getText();
         String type = carType.getValue();
-        double price = Double.parseDouble(basePrice.getText()) * (1 + priceAdjustmentSlider.getValue() / 100);
-        cars.add(new Car(model, type, price));
-        carModel.clear();
-        carType.getSelectionModel().clearSelection();
-        basePrice.clear();
-        priceAdjustmentSlider.setValue(0);
+        String carFuelType = fuelType.getValue();
+        String carMeanPrice = meanPrice.getText();
+        String carPriceVariance = priceVariance.getText();
+        String carBasePrice = basePrice.getText();
+        consoleLog.appendText("Amount: " + amount + "\n" + "CarType: " + type + "\n" + "CarFuelType: " + carFuelType + "\n"
+                        + "Car mean price: " + carMeanPrice + "\n" + "Car price variance: " + carPriceVariance);
+        if (!amount.isEmpty() && !type.isEmpty() && !carFuelType.isEmpty() && !carMeanPrice.isEmpty() && !carPriceVariance.isEmpty()) {
+            carsToBeCreated.add(new String[]{amount, type, carFuelType, carMeanPrice, carPriceVariance, carBasePrice});
+            populateTable();
+            consoleLog.appendText("Car combinations to be created: " + carsToBeCreated.size() + "\n");
+            dataBaseTableName = dealerShipName.getText();
+        }
+        amountOfCars.clear();
+        meanPrice.clear();
+        priceVariance.clear();
     }
 
     @FXML
     private void handleStartSimulation() {
         // Implement simulation logic here
         Trace.setTraceLevel(Trace.Level.INFO);
-
+        carTable.getItems().clear(); // Clear the table view
         int arrivalMean = (int)arrivalMeanSlider.getValue();
         int arrivalVariance = (int) arrivalVarianceSlider.getValue();
         int financeMean = (int) financeMeanSlider.getValue();
@@ -176,7 +240,6 @@ public class SaedTestController {
         int sportVariance = 10000;
         int compactMean = 20000;
         int compactVariance = 3000;
-        carsToBeCreated = new ArrayList<>();
         consoleLog.appendText("Simulation initialized with the following values:");
         consoleLog.appendText("\nArrival mean: " + arrivalMean + "\nArrival Variance: " + arrivalVariance);
         consoleLog.appendText("\nFinance mean: " + financeMean + "\nFinance Variance: " + financeVariance);
@@ -187,7 +250,10 @@ public class SaedTestController {
         consoleLog.appendText("\nTest drive service points: " + testdriveServicePoint);
         consoleLog.appendText("\nClosure service points: " + closureServicePoint + "\n");
 
-        createCarsFromDb();
+        //createCars();
+        //createCarsFromDb();
+        simuController.creatTable(dataBaseTableName);
+        simuController.addCarsToTable(dataBaseTableName, carsToBeCreated);
 
         simuController.initializeSimulation(arrivalMean, arrivalVariance, financeMean, financeVariance, testdriveMean,
                                             testdriveVariance, closureMean, closureVariance, simulationSpeed
@@ -257,35 +323,53 @@ public class SaedTestController {
         }).start();
     }
 
+    public void createCars() {
+        // Create a copy of carsToBeCreated to avoid concurrent modification
+        List<String[]> carCopy = new ArrayList<>(carsToBeCreated);
+
+        for (String[] car : carCopy) {
+            String amount = car[0];
+            String carType = car[1];
+            String fuelType = car[2];
+            String meanPrice = car[3];
+            String priceVariance = car[4];
+
+            // Add the car data to the list
+            carsToBeCreated.add(new String[]{amount, carType, fuelType, meanPrice, priceVariance});
+        }
+    }
+
     public void createCarsFromDb(){
         ArrayList<String[]> cars;
         ArrayList<String> tableNames = simuController.getTableNames();
-        //tableName = tableNames.get(2);
-        tableName = carType.getValue();
-        cars = simuController.populateCarsToBeCreated(tableName);
+        tableName = tableNames.get(2);
+        //tableName = carSets.getValue();
+        cars = simuController.getCarsToBeCreated(tableName);
 
         for (String[] car : cars) {
-            int amount = Integer.parseInt(car[0]);
+            String amount = car[0];
             String carType = car[1];
             String fuelType = car[2];
-            int meanPrice = (int) Double.parseDouble(car[3]);
-            int priceVariance = (int) Double.parseDouble(car[4]);
-            int basePrice = (int) Double.parseDouble(car[5]);
+            String meanPrice = car[3];
+            String priceVariance = car[4];
+            String basePrice = car[5];
 
-            simuController.createCar(amount, carType,fuelType, meanPrice, priceVariance, carsToBeCreated, basePrice);
+            // Add the car data to the list
+            carsToBeCreated.add(new String[]{amount, carType, fuelType, meanPrice, priceVariance, basePrice});
         }
     }
+
 
     public void getCarsFromDb() {
         // Clear previous data in the table
         carsToBeCreated.clear();
 
         // Get the selected table name from carType ComboBox
-        String tableName = carType.getValue(); // THIS WILL BE CHANGED LATER
+        String tableName = carSets.getValue(); // THIS WILL BE CHANGED LATER
 
         if (tableName != null) {
             // Fetch the new data based on the selected car type
-            ArrayList<String[]> cars = simuController.populateCarsToBeCreated(tableName);
+            ArrayList<String[]> cars = simuController.getCarsToBeCreated(tableName);
 
             // Populate the carsToBeCreated list with the new data
             for (String[] car : cars) {

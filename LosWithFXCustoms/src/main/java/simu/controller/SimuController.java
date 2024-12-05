@@ -8,10 +8,7 @@ import simu.model.*;
 
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Scanner;
-import java.util.Set;
+import java.util.*;
 
 
 public class SimuController implements Runnable {
@@ -312,6 +309,9 @@ public class SimuController implements Runnable {
         return myEngine.getSimulationSpeed();
     }
 
+    public HashMap<String, Double> getBasePrices() {
+        return Car.getBasePrices();
+    }
 
     // int amount, int carType, int fuelType, double meanPrice, double priceVariance
     public void createCar( int numberOfCars, String carType, String typeOfFuel, int sellerCarMean, int sellerCarVariance, ArrayList<String[]> carsToBeCreated){
@@ -322,18 +322,33 @@ public class SimuController implements Runnable {
         Car.createCar(numberOfCars, carType, typeOfFuel, sellerCarMean, sellerCarVariance, carsToBeCreated, basePrice);
     }
 
+    public void creatTable(String tableName) {
+        carsDao.createTable(tableName);
+    }
+
     public ArrayList<String> getTableNames() {
         return carsDao.getAllTableNames();
     }
 
-    public ArrayList<String[]> populateCarsToBeCreated(String tableName) {
+    public void deleteTable(String tableName) {
+        carsDao.deleteTable(tableName);
+    }
+
+
+
+    public void addCarsToTable(String tableName, ArrayList<String[]> carsToBeCreated) {
+        carsDao.addCarsToTable(tableName, carsToBeCreated);
+    }
+
+    public ArrayList<String[]> getCarsToBeCreated(String tableName) {
         ArrayList<String> tableNames = getTableNames();
         ArrayList<String[]> carsToBeCreated = new ArrayList<>();
         if (tableNames.contains(tableName)) {
-            carsToBeCreated = carsDao.populateCarsToBeAdded(tableName);
+            carsToBeCreated = carsDao.getCarsToBeAdded(tableName);
         }
         return carsToBeCreated;
     }
+
 
 
 

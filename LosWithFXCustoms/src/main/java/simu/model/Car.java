@@ -2,6 +2,7 @@ package simu.model;
 import eduni.distributions.Normal;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 
 public class Car {
@@ -17,6 +18,13 @@ public class Car {
     private double sellerPrice;
     private double saleProb;
     private volatile double coefficient;
+    private static final HashMap<String, Double> basePrices = new HashMap<>() {{
+        put("suv", 40000.0);
+        put("sedan", 30000.0);
+        put("van", 30000.0);
+        put("compact", 20000.0);
+        put("sport", 60000.0);
+    }};
 
     public Car(String carType, String fuelType, double meanPrice, double priceVariance) {
         this.carType = carType;
@@ -158,6 +166,10 @@ public class Car {
 
     public double getBasePrice() {
         return basePrice;
+    }
+
+    public static HashMap<String, Double> getBasePrices(){
+        return basePrices;
     }
 
     public void setBasePrice(double basePrice) {

@@ -168,6 +168,41 @@ public class CarDealerShop {
         }
     }
 
+    public void createCar(int amount, String carType, String fuelType, double meanPrice, double priceVariance, double basePrice) {
+        String actualFuelType = fuelType.toLowerCase();
+        // Loop to create the specified amount of cars
+        for (int i = 0; i < amount; i++) {
+            Car car = null;  // Create a new car object in each iteration
+
+            // Create the car based on carType
+            switch (carType.toLowerCase()) {
+                case "suv":
+                    car = new SUV(actualFuelType, meanPrice, priceVariance, basePrice);
+                    break;
+                case "van":
+                    car = new Van(actualFuelType, meanPrice, priceVariance, basePrice);
+                    break;
+                case "sedan":
+                    car = new Sedan(actualFuelType, meanPrice, priceVariance, basePrice);
+                    break;
+                case "sport":
+                    car = new Sport(actualFuelType, meanPrice, priceVariance, basePrice);
+                    break;
+                case "compact":
+                    car = new Compact(actualFuelType, meanPrice, priceVariance, basePrice);
+                    break;
+                default:
+                    System.out.println("Invalid car type");
+                    System.out.println("Cartype" + carType);
+                    break;
+            }
+
+            if (car != null) {
+                addCar(car);  // Add the newly created car to the collection
+            }
+        }
+    }
+
     // Main method to run the test
     public static void main(String[] args) {
         // Create a CarDealerShop instance

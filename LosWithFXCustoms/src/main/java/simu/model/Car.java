@@ -34,6 +34,22 @@ public class Car {
         this.registerNumber = CarDealerShop.generateUniqueRegisterNumber();
     }
 
+    public Car(String carType, String fuelType, double meanPrice, double priceVariance, double basePrice) {
+        this.carType = carType;
+        this.carTypeProb = setCarTypeProb(carType);
+        this.fuelType = fuelType;
+        this.fuelTypeProb = setFuelTypeProb(fuelType);
+        this.baseProb = carTypeProb * fuelTypeProb;
+        this.meanPrice = meanPrice;
+        this.priceVariance = priceVariance;
+        this.basePrice = basePrice;
+        this.sellerPrice = new Normal(meanPrice, priceVariance).sample();
+        this.coefficient = setCoefficient(carType);
+
+        // Generating the unique register number for every Vehicle object
+        this.registerNumber = CarDealerShop.generateUniqueRegisterNumber();
+    }
+
     // Getters and Setters
     public String getRegisterNumber() {
         return registerNumber;
@@ -213,7 +229,6 @@ public class Car {
         return coefficient * baseProb;
     }
 
-    // int amount, int carType, int fuelType, double meanPrice, double priceVariance
     public static void createCar( int numberOfCars, String carType, String fuelType, int sellerCarMean, int sellerCarVariance, ArrayList<String[]> carsToBeCreated) {
         String amountOfCars = String.valueOf(numberOfCars);
         String carMean = String.valueOf(sellerCarMean);
@@ -221,13 +236,21 @@ public class Car {
 
         // Add each car to the list
         carsToBeCreated.add(new String[]{amountOfCars, carType, fuelType, carMean, carVariance});
+    }
+    public static void createCar( int numberOfCars, String carType, String fuelType, int sellerCarMean, int sellerCarVariance, ArrayList<String[]> carsToBeCreated, double basePrice) {
+        String amountOfCars = String.valueOf(numberOfCars);
+        String carMean = String.valueOf(sellerCarMean);
+        String carVariance = String.valueOf(sellerCarVariance);
+        String carBasePrice = String.valueOf(basePrice);
 
+        // Add each car to the list
+        carsToBeCreated.add(new String[]{amountOfCars, carType, fuelType, carMean, carVariance, carBasePrice});
     }
 
     // Method to calculate sale probability
     public double calculateSaleProbability(double sellerPrice) {
         // Sales probability formula:
-        // saleProbability = basePrice * e^(-coefficient * (customerPrice - basePrice))
+        // saleProbability = basePrice * e^(-coefficient * (sellerPrice - basePrice))
         saleProb = baseProb * Math.exp(-coefficient * (sellerPrice - basePrice));
         return saleProb;
     }

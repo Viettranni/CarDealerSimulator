@@ -6,4 +6,8 @@ public class Sport extends Car {
     public Sport(String fuelType, double meanPrice, double priceVariance) {
         super("Sport", fuelType, meanPrice, priceVariance);
     }
+
+    public Sport(String fuelType, double meanPrice, double priceVariance, double basePrice) {
+        super("Van", fuelType, meanPrice, priceVariance, basePrice);
+    }
 }

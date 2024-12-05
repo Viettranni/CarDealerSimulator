@@ -31,7 +31,7 @@ public class MyEngine extends Engine {
 	private int testdriveServicePoints;
 	private int closureServicePoints;
 	private int totalServicePoints;
-	private int currentServicePointIndex = 0;// Tracks the next free index
+	private int currentServicePointIndex;// Tracks the next free index
 	private final int seed = 123;
 	private final double ARRIVALCOEFFICIENT = 100;
 	private double arrivalInterval;
@@ -58,7 +58,7 @@ public class MyEngine extends Engine {
 	public MyEngine() {
 		r = new Random();
 		this.carDealerShop = new CarDealerShop();
-
+		currentServicePointIndex = 0;
 	}
 	public MyEngine(int arrivalMean, int arrivalVariance, int financeMean, int financeVariance,
 					int testdriveMean, int testdriveVariance, int closureMean, int closureVariance,
@@ -82,6 +82,7 @@ public class MyEngine extends Engine {
 		this.totalServicePoints = arrivalServicePoints + financeServicePoints + testdriveServicePoints + closureServicePoints;
 		this.arrivalInterval = arrivalInterval;
 		servicePoints = new ServicePoint[totalServicePoints];
+		currentServicePointIndex = 0;
 
 		// Create cars
 		carsToBeCreated(carsToBeCreated);
@@ -446,17 +447,29 @@ public class MyEngine extends Engine {
 		String fuelType;
 		double meanPrice;
 		double variance;
+		double basePrice;
 		// For each car in carsToBeCreated
 		// Retrieve the carType, amount, fuelType, meanPrice, variance
 		// Calls callDealerShop's method and passes the arguments
 		// callDealerShop creates the cars and adds them to it's collection
 		for (String[] car : carsToBeCreated) {
-			amount = Integer.parseInt(car[0]);
-			carType = car[1];
-			fuelType = car[2];
-			meanPrice = Double.parseDouble(car[3]);
-			variance = Double.parseDouble(car[4]);
-			carDealerShop.createCar(amount, carType, fuelType, meanPrice, variance);
+			if (car.length >= 6) {
+				amount = Integer.parseInt(car[0]);
+				carType = car[1];
+				fuelType = car[2];
+				meanPrice = Double.parseDouble(car[3]);
+				variance = Double.parseDouble(car[4]);
+				basePrice = Double.parseDouble(car[5]);
+				carDealerShop.createCar(amount, carType, fuelType, meanPrice, variance, basePrice);
+
+			} else {
+				amount = Integer.parseInt(car[0]);
+				carType = car[1];
+				fuelType = car[2];
+				meanPrice = Double.parseDouble(car[3]);
+				variance = Double.parseDouble(car[4]);
+				carDealerShop.createCar(amount, carType, fuelType, meanPrice, variance);
+			}
 		}
 		Trace.out(Trace.Level.INFO, "Cars at the beginning of the simulation: " + carDealerShop.getCarCollection().size());
 	}
@@ -619,6 +632,14 @@ public class MyEngine extends Engine {
 				throw new IllegalStateException("ServicePoints array is full. Cannot add more service points.");
 			}
 		}
+	}
+
+	public void setCurrentServicePointIndex(int amount){
+		currentServicePointIndex = amount;
+	}
+
+	public int getCurrentServicePointIndex() {
+		return currentServicePointIndex;
 	}
 
 	public void setArrivalServicePoints(int arrivalServicePoints) {

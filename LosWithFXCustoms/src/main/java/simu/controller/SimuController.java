@@ -73,6 +73,7 @@ public class SimuController implements Runnable {
                                      int simulationSpeed, ArrayList<String[]> carsToBeCreated, int arrivalServicePoints,
                                      int financeServicePoints, int testdriveServicePoints, int closureServicePoints)
     {
+        resetSimulation();
         myEngine.setArrivalMean(arrivalMean);
         System.out.println("Arrival Mean set to: " + myEngine.getArrivalMean());
 
@@ -107,8 +108,6 @@ public class SimuController implements Runnable {
 
         myEngine.setSimulationSpeed(simulationSpeed);
         System.out.println("Simulation Speed set to: " + myEngine.getSimulationSpeed());
-
-
 
 
         myEngine.carsToBeCreated(carsToBeCreated);
@@ -191,6 +190,59 @@ public class SimuController implements Runnable {
         System.out.println("Simulation Initialized.");
     }
 
+    public void resetSimulation() {
+        // Reset simulation speed
+        myEngine.setSimulationSpeed(1); // Default speed to 1
+        System.out.println("Simulation Speed reset to default (1).");
+
+        // Reset cars to be created
+        myEngine.carsToBeCreated(new ArrayList<>());
+        System.out.println("Cars to be created reset to an empty list.");
+
+        // Reset service points
+        myEngine.setArrivalServicePoints(0);
+        myEngine.setFinanceServicePoints(0);
+        myEngine.setTestdriveServicePoints(0);
+        myEngine.setClosureServicePoints(0);
+        System.out.println("All service points reset to 0.");
+
+        myEngine.setTotalServicePoints(0, 0, 0, 0);
+        myEngine.setServicePoints(0);
+        myEngine.setCurrentServicePointIndex(0);
+        System.out.println("Total service points reset to 0.");
+
+        // Clear existing service points
+        myEngine.setArrivalServicePoints(0);
+        myEngine.setFinanceServicePoints(0);
+        myEngine.setTestdriveServicePoints(0);
+        myEngine.setClosureServicePoints(0);
+        System.out.println("All service points cleared.");
+
+        // Reset car dealer shop and sales probability
+        myEngine.getCarDealerShop().getCarCollection().clear();
+        myEngine.getCarDealerShop().getSoldCars().clear();
+        System.out.println("Car dealer shop reset: car collection cleared, sales probability reset.");
+
+        // Reset arrival interval and process
+        myEngine.setArrivalInterval(0);
+        myEngine.getProcessedCustomer().clear();
+        System.out.println("Arrival interval and process reset.");
+
+        // Reset the event list
+        System.out.println("Event list cleared.");
+
+        // Reset simulation clock
+        Clock.getInstance().setClock(0);
+        System.out.println("Clock reset to initial state.");
+
+        // Update status
+        simulationComplete = false;
+        simulationInitialized = false;
+        statusMessage = "Simulation Reset.";
+        System.out.println("Simulation Reset.");
+    }
+
+
 
     // Thread's run method delegates to startSimulation
     @Override
@@ -264,6 +316,10 @@ public class SimuController implements Runnable {
     // int amount, int carType, int fuelType, double meanPrice, double priceVariance
     public void createCar( int numberOfCars, String carType, String typeOfFuel, int sellerCarMean, int sellerCarVariance, ArrayList<String[]> carsToBeCreated){
         Car.createCar(numberOfCars, carType, typeOfFuel, sellerCarMean, sellerCarVariance, carsToBeCreated);
+    }
+
+    public void createCar( int numberOfCars, String carType, String typeOfFuel, int sellerCarMean, int sellerCarVariance, ArrayList<String[]> carsToBeCreated, double basePrice){
+        Car.createCar(numberOfCars, carType, typeOfFuel, sellerCarMean, sellerCarVariance, carsToBeCreated, basePrice);
     }
 
     public ArrayList<String> getTableNames() {

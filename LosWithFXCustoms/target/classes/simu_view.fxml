@@ -126,7 +126,7 @@
         </VBox>
     </ScrollPane>
     <VBox maxWidth="705.0" prefHeight="1355.0" prefWidth="705.0" spacing="10">
-        <Label text="Console Log" style="-fx-font-size: 18px; -fx-font-weight: bold;" />
+        <Label fx:id="consoleLogLabel" text="Console Log" style="-fx-font-size: 18px; -fx-font-weight: bold;" />
         <TextArea fx:id="consoleLog" editable="false" prefHeight="600" wrapText="true" />
     </VBox>
 </HBox>

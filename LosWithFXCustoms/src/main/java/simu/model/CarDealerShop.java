@@ -1,24 +1,20 @@
 package simu.model;
 
-import java.util.List;
-import java.util.Random;
-import java.util.Set;
+import java.util.*;
 
 import simu.model.cartypes.*;
-
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Iterator;
 
 public class CarDealerShop {
     private List<Car> carCollection;
     private List<Car> soldCars;
     private static Set<String> takenRegisterNumbers = new HashSet<>();
     private static double meanCarSalesProbability;
+    private LinkedList<Customer> customerAtTheDealership;
 
     public CarDealerShop() {
         carCollection = new ArrayList<>();
         soldCars = new ArrayList<>();
+        customerAtTheDealership = new LinkedList<>();
         meanCarSalesProbability = 0.0;
     }
 
@@ -200,6 +196,22 @@ public class CarDealerShop {
             if (car != null) {
                 addCar(car);  // Add the newly created car to the collection
             }
+        }
+    }
+
+    public LinkedList<Customer> getCustomerAtTheDealership(){
+        return customerAtTheDealership;
+    }
+
+    public void addCustomerAtTheDealership(Customer customer){
+        if (customer != null) {
+            customerAtTheDealership.add(customer);
+        }
+    }
+
+    public void removeCustomerAtTheDealership(Customer customer){
+        if (customer != null) {
+            customerAtTheDealership.remove(customer);
         }
     }
 

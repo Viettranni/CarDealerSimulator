@@ -27,6 +27,7 @@ public class Customer {
 	private final double BASECREDITSCORE = 500;
 	private final double COEFFICIENT = 0.05;
 	private int testDriveCount;
+	private String currentServicePoint;
 
 
 	// Normal distribution parameters for Budget and Credit Score
@@ -64,6 +65,7 @@ public class Customer {
 		this.financeAccepted = false;
 		this.purchased = false;
 		this.testDriveCount = 1;
+		currentServicePoint = "entry";
 	}
 
 	// Method to assign a random car type based on predefined probabilities (discrete distribution)
@@ -195,6 +197,14 @@ public class Customer {
 
 	public int getTestDriveCount() {
 		return testDriveCount;
+	}
+
+	public String getCurrentServicePoint() {
+		return currentServicePoint;
+	}
+
+	public void setCurrentServicePoint(String currentServicePoint) {
+		this.currentServicePoint = currentServicePoint;
 	}
 
 	public double calculateFinanceProbability(double customerCreditScore) {

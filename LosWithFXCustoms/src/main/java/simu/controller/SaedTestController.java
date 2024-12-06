@@ -12,6 +12,7 @@ import simu.framework.Clock;
 import simu.framework.Trace;
 import javafx.application.Platform;
 import simu.model.Customer;
+import simu.model.ServicePoint;
 
 import java.util.*;
 
@@ -59,17 +60,26 @@ public class SaedTestController {
     private SimuController simuController = new SimuController();
     private Thread simulationThread;
     private String tableName;
-    ArrayList<String[]> carsToBeCreated = new ArrayList<>();
-    int simulationSpeed;
-    String dataBaseTableName;
+    private ArrayList<String[]> carsToBeCreated = new ArrayList<>();
+    private int simulationSpeed;
+    private String dataBaseTableName;
+    private int arrivalCustomerAmount;
+    private int financeCustomerAmount;
+    private int testDriveCustomerAmount;
+    private int closureCustomerAmount;
+    private boolean isInArrival = false;
+    private boolean isInFinance = false;
+    private boolean isInTestDrive = false;
+    private boolean isInClosure = false;
+    private LinkedList<Customer> customers = new LinkedList<>();
 
-    private ObservableList<Car> cars = FXCollections.observableArrayList();
 
     @FXML
     public void initialize() {
         setupSliders();
         setupCarTypeListener();
         setupCarSetsListener();
+        setupTableViewListener();
         setupCarTypes();
         setUpFuelTypes();
         setupCarSets();
@@ -113,6 +123,18 @@ public class SaedTestController {
                 getCarsFromDb();  // Fetch the new cars based on the selected car type
                 populateTable();  // Update the table with the new data
                 consoleLog.appendText("Car combinations to be created: " + carsToBeCreated.size() + "\n");
+            }
+        });
+    }
+
+    private void setupTableViewListener() {
+        // Adding a listener to the selection model
+        carTable.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
+            if (newValue != null) {
+                // Get the index of the selected row
+                int selectedIndex = carTable.getSelectionModel().getSelectedIndex();
+                String newBasePrice = carsToBeCreated.get(selectedIndex)[5];
+                basePrice.setText(newBasePrice);
             }
         });
     }
@@ -200,11 +222,12 @@ public class SaedTestController {
         String carBasePrice = basePrice.getText();
         consoleLog.appendText("Amount: " + amount + "\n" + "CarType: " + type + "\n" + "CarFuelType: " + carFuelType + "\n"
                         + "Car mean price: " + carMeanPrice + "\n" + "Car price variance: " + carPriceVariance);
-        if (!amount.isEmpty() && !type.isEmpty() && !carFuelType.isEmpty() && !carMeanPrice.isEmpty() && !carPriceVariance.isEmpty()) {
-            carsToBeCreated.add(new String[]{amount, type, carFuelType, carMeanPrice, carPriceVariance, carBasePrice});
+        if (amount != null && type != null && carFuelType != null && carMeanPrice != null && carPriceVariance != null) {
+            carsToBeCreated.add(new String[]{amount, type.toLowerCase(), carFuelType.toLowerCase(), carMeanPrice, carPriceVariance, carBasePrice});
             populateTable();
             consoleLog.appendText("Car combinations to be created: " + carsToBeCreated.size() + "\n");
-            dataBaseTableName = dealerShipName.getText();
+            dataBaseTableName = dealerShipName.getText().trim();
+            dataBaseTableName = dataBaseTableName.replace(" ", "_");
         }
         amountOfCars.clear();
         meanPrice.clear();
@@ -228,18 +251,8 @@ public class SaedTestController {
         simulationSpeed = 50;
         int arrivalServicePoint = arrivalServicePoints.getValue();
         int financeServicePoint = financeServicePoints.getValue();
-        int testdriveServicePoint = 5;
+        int testdriveServicePoint = setTestDriveServicePoints();
         int closureServicePoint = closureServicePoints.getValue();
-        int vanMean = 30000;
-        int vanVariance = 5000;
-        int suvMean = 40000;
-        int suvVariance = 6000;
-        int sedanMean = 30000;
-        int sedanVariance = 4000;
-        int sportMean = 60000;
-        int sportVariance = 10000;
-        int compactMean = 20000;
-        int compactVariance = 3000;
         consoleLog.appendText("Simulation initialized with the following values:");
         consoleLog.appendText("\nArrival mean: " + arrivalMean + "\nArrival Variance: " + arrivalVariance);
         consoleLog.appendText("\nFinance mean: " + financeMean + "\nFinance Variance: " + financeVariance);
@@ -249,6 +262,9 @@ public class SaedTestController {
         consoleLog.appendText("\nFinance service points: " + financeServicePoint);
         consoleLog.appendText("\nTest drive service points: " + testdriveServicePoint);
         consoleLog.appendText("\nClosure service points: " + closureServicePoint + "\n");
+        for (String[] car : carsToBeCreated) {
+            Platform.runLater(() -> consoleLog.appendText(car[0] + " : " + car[1] + " : " + car[3]));
+        }
 
         //createCars();
         //createCarsFromDb();
@@ -295,11 +311,96 @@ public class SaedTestController {
         }
     }
 
+    public void getServicePointQueueSize() {
+        ServicePoint[] servicePoints = simuController.getServicePoint();
+        if (servicePoints == null) {
+            Platform.runLater(() -> consoleLog.appendText("No service points available.\n"));
+            return;
+        }
+
+        for (ServicePoint sp : servicePoints) {
+            if (sp == null) {
+                Platform.runLater(() -> consoleLog.appendText("Encountered a null service point, skipping...\n"));
+                continue;
+            }
+
+            String name = sp.getName();
+            if (name == null) {
+                Platform.runLater(() -> consoleLog.appendText("Service point name is null, skipping...\n"));
+                continue;
+            }
+
+            int queueSize = (sp.getQueue() != null) ? sp.getQueue().size() : 0;
+            boolean isInQueue = sp.isOnQueue();
+
+            switch (name) {
+                case "entry":
+                    Platform.runLater(() -> consoleLog.appendText("Customer entered the dealership\n"));
+                    break;
+                case "arrival":
+                    arrivalCustomerAmount = queueSize;
+                    isInArrival = isInQueue;
+                    Platform.runLater(() -> consoleLog.appendText("Arrival queue size: " + queueSize + ", is in queue: " + isInQueue + "\n"));
+                    break;
+                case "finance":
+                    financeCustomerAmount = queueSize;
+                    isInFinance = isInQueue;
+                    Platform.runLater(() -> consoleLog.appendText("Finance queue size: " + queueSize + ", is in queue: " + isInQueue + "\n"));
+                    break;
+                case "testdrive":
+                    testDriveCustomerAmount = queueSize;
+                    isInTestDrive = isInQueue;
+                    Platform.runLater(() -> consoleLog.appendText("Test Drive queue size: " + queueSize + ", is in queue: " + isInQueue + "\n"));
+                    break;
+                case "closure":
+                    closureCustomerAmount = queueSize;
+                    isInClosure = isInQueue;
+                    Platform.runLater(() -> consoleLog.appendText("Closure queue size: " + queueSize + ", is in queue: " + isInQueue + "\n"));
+                    break;
+                default:
+                    Platform.runLater(() -> consoleLog.appendText("Unexpected ServicePoint name: " + name + "\n"));
+                    break;
+            }
+        }
+    }
+
+
+    public void getCustomerStatus(){
+        try {
+            LinkedList<Customer> newCustomers = simuController.getCustomersAtTheDealership();
+            if (newCustomers == null) {
+                Platform.runLater(() -> consoleLog.appendText("Customer list is a null\n"));
+                return;
+            }
+            if (customers.size() != newCustomers.size()) {
+                for (Customer customer : customers) {
+                    Platform.runLater(() -> consoleLog.appendText( "Customer #"+ customer.getId() + " is at " + customer.getCurrentServicePoint() + " stage.\n"));
+                }
+                customers = new LinkedList<>(newCustomers);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            Platform.runLater(() -> consoleLog.appendText("Error occurred: " + e + "\n"));
+        }
+    }
+
+    public int setTestDriveServicePoints(){
+        int testDriveServicePoints = 0;
+        for (String[] car : carsToBeCreated) {
+            testDriveServicePoints += Integer.parseInt(car[0]);
+        }
+        return testDriveServicePoints;
+    }
+
+
+
     public void updateUI() {
         new Thread(() -> {
             int customersBefore = 0;
             int carsSoldBefore = 0;
             while (!simuController.isSimulationComplete()) {
+                getServicePointQueueSize();
+                //getCustomerStatus();
                 displaySimulationTime();
                 changeSimulationSpeed();
                 try {
@@ -381,7 +482,7 @@ public class SaedTestController {
                 String basePrice = car[5];
 
                 // Add the car data to the list
-                carsToBeCreated.add(new String[]{amount, carType, fuelType, meanPrice, priceVariance});
+                carsToBeCreated.add(new String[]{amount, carType, fuelType, meanPrice, priceVariance, basePrice});
             }
         }
     }

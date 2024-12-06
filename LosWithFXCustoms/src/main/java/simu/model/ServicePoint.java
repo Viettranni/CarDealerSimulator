@@ -11,14 +11,15 @@ public class ServicePoint {
 	private ContinuousGenerator generator;
 	private EventList eventList;
 	private EventType eventTypeScheduled;
-	//Queuestrategy strategy; // option: ordering of the customer
+	private String name;
     protected boolean reserved = false;
 
 
-	public ServicePoint(ContinuousGenerator generator, EventList eventList, EventType type){
+	public ServicePoint(ContinuousGenerator generator, EventList eventList, EventType type, String name) {
 		this.eventList = eventList;
 		this.generator = generator;
 		this.eventTypeScheduled = type;
+		this.name = name;
 	}
 
 	public Customer peekQueue(){
@@ -63,5 +64,9 @@ public class ServicePoint {
 
 	public LinkedList<Customer> getQueue(){
 		return queue;
+	}
+
+	public String getName() {
+		return name;
 	}
 }

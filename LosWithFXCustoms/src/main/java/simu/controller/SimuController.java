@@ -3,11 +3,7 @@ package simu.controller;
 
 import simu.dao.CarsDao;
 import simu.framework.Clock;
-import simu.framework.Trace;
 import simu.model.*;
-
-
-import java.io.IOException;
 import java.util.*;
 
 
@@ -17,33 +13,8 @@ public class SimuController implements Runnable {
     private Car car;
     private CarsDao carsDao;
 
-
     // Means and variances
     private int arrivalMean;
-    private int arrivalVariance;
-    private int financeMean;
-    private int financeVariance;
-    private int testdriveMean;
-    private int testdriveVariance;
-    private int closureMean;
-    private int closureVariance;
-    private int simulationSpeed;
-    private int arrivalServicePoints;
-    private int financeServicePoints;
-    private int testdriveServicePoints;
-    private int closureServicePoints;
-
-
-    private int vanMean;
-    private int vanVariance;
-    private int suvMean;
-    private int suvVariance;
-    private int sedanMean;
-    private int sedanVariance;
-    private int sportMean;
-    private int sportVariance;
-    private int compactMean;
-    private int compactVariance;
     private final int ARRIVALINTERVALMULTIPLIER = 200;
     private int simulationTime;
     private boolean simulationInitialized = false;
@@ -334,8 +305,6 @@ public class SimuController implements Runnable {
         carsDao.deleteTable(tableName);
     }
 
-
-
     public void addCarsToTable(String tableName, ArrayList<String[]> carsToBeCreated) {
         carsDao.addCarsToTable(tableName, carsToBeCreated);
     }
@@ -349,12 +318,11 @@ public class SimuController implements Runnable {
         return carsToBeCreated;
     }
 
-
-
-
     // Getters and Setters for all instance variables
 
-
+    public LinkedList<Customer> getCustomersAtTheDealership(){
+        return myEngine.getCarDealerShop().getCustomerAtTheDealership();
+    }
     public MyEngine getMyEngine() {
         return myEngine;
     }
@@ -374,39 +342,17 @@ public class SimuController implements Runnable {
         this.car = car;
     }
 
-
-   /*public ServicePoint getServicePoint() {
-       return servicePoint;
+   public ServicePoint[] getServicePoint() {
+       return myEngine.getServicePoints();
    }
-
-
-   public void setServicePoint(ServicePoint servicePoint) {
-       this.servicePoint = servicePoint;
-   }
-
 
    public CarDealerShop getCarDealerShop() {
-       return carDealerShop;
+       return myEngine.getCarDealerShop();
    }
-
-
-   public void setCarDealerShop(CarDealerShop carDealerShop) {
-       this.carDealerShop = carDealerShop;
-   }
-
-
-   public Customer getCustomer() {
-       return customer;
-   }
-
-
-   public void setCustomer(Customer customer) {
-       this.customer = customer;
-   }*/
 
 
     public int getArrivalMean() {
-        return arrivalMean;
+        return myEngine.getArrivalMean();
     }
 
 
@@ -418,7 +364,7 @@ public class SimuController implements Runnable {
 
 
     public int getArrivalVariance() {
-        return arrivalVariance;
+        return myEngine.getArrivalVariance();
     }
 
 
@@ -429,7 +375,7 @@ public class SimuController implements Runnable {
 
 
     public int getFinanceMean() {
-        return financeMean;
+        return myEngine.getFinanceMean();
     }
 
 
@@ -440,7 +386,7 @@ public class SimuController implements Runnable {
 
 
     public int getFinanceVariance() {
-        return financeVariance;
+        return myEngine.getFinanceVariance();
     }
 
 
@@ -451,7 +397,7 @@ public class SimuController implements Runnable {
 
 
     public int getTestdriveMean() {
-        return testdriveMean;
+        return myEngine.getTestdriveMean();
     }
 
 
@@ -462,7 +408,7 @@ public class SimuController implements Runnable {
 
 
     public int getTestdriveVariance() {
-        return testdriveVariance;
+        return myEngine.getTestdriveVariance();
     }
 
 
@@ -473,7 +419,7 @@ public class SimuController implements Runnable {
 
 
     public int getClosureMean() {
-        return closureMean;
+        return myEngine.getClosureMean();
     }
 
 
@@ -486,7 +432,7 @@ public class SimuController implements Runnable {
 
 
     public int getClosureVariance() {
-        return closureVariance;
+        return myEngine.getClosureVariance();
     }
 
 
@@ -503,7 +449,7 @@ public class SimuController implements Runnable {
 
 
     public int getArrivalServicePoints() {
-        return arrivalServicePoints;
+        return myEngine.getArrivalServicePoints();
     }
 
 
@@ -514,7 +460,7 @@ public class SimuController implements Runnable {
 
 
     public int getFinanceServicePoints() {
-        return financeServicePoints;
+        return myEngine.getFinanceServicePoints();
     }
 
 
@@ -525,7 +471,7 @@ public class SimuController implements Runnable {
 
 
     public int getTestdriveServicePoints() {
-        return testdriveServicePoints;
+        return myEngine.getTestdriveServicePoints();
     }
 
 
@@ -536,7 +482,7 @@ public class SimuController implements Runnable {
 
 
     public int getClosureServicePoints() {
-        return closureServicePoints;
+        return myEngine.getClosureServicePoints();
     }
 
 
@@ -553,156 +499,6 @@ public class SimuController implements Runnable {
 
 
     public ArrayList<String[]> getCarsToBeCreated() {
-        return carsToBeCreated;
+        return myEngine.getCarsToBeCreated();
     }
-
-
-
-
-    /*public static void main(String[] args) {
-        Trace.setTraceLevel(Trace.Level.INFO);
-        //MyEngine m = new MyEngine();
-        SimuController simuController = new SimuController();
-        MyEngine m = simuController.getMyEngine();
-
-
-        Scanner scanner = new Scanner(System.in);
-        boolean valid = true;
-        int arrivalMean = 0;
-        int arrivalVariance = 0;
-        int financeMean = 0;
-        int financeVariance = 0;
-        int testdriveMean = 0;
-        int testdriveVariance = 0;
-        int closureMean = 0;
-        int closureVariance = 0;
-        int simulationTime = 1440;
-        int simulationSpeed = 1000;
-        int arrivalServicePoints = 5;
-        int financeServicePoints = 5;
-        int testdriveServicePoints = 5;
-        int closureServicePoints = 5;
-        int vanMean = 30000;
-        int vanVariance = 5000;
-        int suvMean = 40000;
-        int suvVariance = 6000;
-        int sedanMean = 30000;
-        int sedanVariance = 4000;
-        int sportMean = 60000;
-        int sportVariance = 10000;
-        int compactMean = 20000;
-        int compactVariance = 3000;
-        ArrayList<String[]> carsToBeCreated = new ArrayList<>();
-        // int amount, int carType, int fuelType, double meanPrice, double priceVariance
-        for (int i = 1; i < 4; i++) {
-            simuController.createCar(10 ,"1", i,  suvMean, suvVariance, carsToBeCreated);
-        }
-        for (int i = 1; i < 4; i++) {
-            simuController.createCar(10 ,"2", i,  suvMean, suvVariance, carsToBeCreated);
-        }
-        for (int i = 1; i < 4; i++) {
-            simuController.createCar(10 ,"3", i,  suvMean, suvVariance, carsToBeCreated);
-        }
-        for (int i = 0; i < 4; i++) {
-            simuController.createCar(10 ,"4", i,  suvMean, suvVariance, carsToBeCreated);
-        }
-
-        for (int i = 1; i < 4; i++) {
-            simuController.createCar(10 ,"5", i,  suvMean, suvVariance, carsToBeCreated);
-        }
-
-
-        while (valid) {
-            try {
-                System.out.println("Enter the average arrival service time: ");
-                arrivalMean = Integer.parseInt(scanner.nextLine());
-                System.out.println("Enter the variance of arrival service time: ");
-                arrivalVariance = Integer.parseInt(scanner.nextLine());
-                System.out.println("Enter the average financing service time: ");
-                financeMean = Integer.parseInt(scanner.nextLine());
-                System.out.println("Enter the variance of financing service time: ");
-                financeVariance = Integer.parseInt(scanner.nextLine());
-                System.out.println("Enter the average test-drive service time: ");
-                testdriveMean = Integer.parseInt(scanner.nextLine());
-                System.out.println("Enter the variance of test-drive service time: ");
-                testdriveVariance = Integer.parseInt(scanner.nextLine());
-                System.out.println("Enter the average closure service time: ");
-                closureMean = Integer.parseInt(scanner.nextLine());
-                System.out.println("Enter the variance of closure service time: ");
-                closureVariance = Integer.parseInt(scanner.nextLine());
-                valid = false;
-            } catch (NumberFormatException e) {
-                System.out.println("Enter a valid number");
-            }
-        }
-        System.out.println("Gas cars:");
-        System.out.println("Vans: " + Arrays.toString(carsToBeCreated.get(0)));
-        System.out.println("Compacts: " + Arrays.toString(carsToBeCreated.get(1)));
-        System.out.println("Sedans: " + Arrays.toString(carsToBeCreated.get(2)));
-        System.out.println("SUVs: " + Arrays.toString(carsToBeCreated.get(3)));
-        System.out.println("Sports: " + Arrays.toString(carsToBeCreated.get(4)));
-
-
-        System.out.println("Hybrid cars:");
-        System.out.println("Vans: " + Arrays.toString(carsToBeCreated.get(5)));
-        System.out.println("Compacts: " + Arrays.toString(carsToBeCreated.get(6)));
-        System.out.println("Sedans: " + Arrays.toString(carsToBeCreated.get(7)));
-        System.out.println("SUVs: " + Arrays.toString(carsToBeCreated.get(8)));
-        System.out.println("Sports: " + Arrays.toString(carsToBeCreated.get(9)));
-
-
-        System.out.println("Electric cars:");
-        System.out.println("Vans: " + Arrays.toString(carsToBeCreated.get(10)));
-        System.out.println("Compacts: " + Arrays.toString(carsToBeCreated.get(11)));
-        System.out.println("Sedans: " + Arrays.toString(carsToBeCreated.get(12)));
-        System.out.println("SUVs: " + Arrays.toString(carsToBeCreated.get(13)));
-        System.out.println("Sports: " + Arrays.toString(carsToBeCreated.get(14)));
-
-
-        Thread inputThread = new Thread(() -> {
-            try {
-                while (true) {
-                    int key = System.in.read(); // Capture user input
-                    switch (key) {
-                        case 'w': // Increase speed
-                            //m.speedUpSimulationSpeed(100); // Reduce sleep time (faster simulation)
-                            simuController.speedUpSimulation(100);
-                            Trace.out(Trace.Level.INFO, "Speed increased to: " + simuController.getSimulationSpeed());
-                            break;
-                        case 's': // Decrease speed
-                            //m.slowDownSimulationSpeed(100); // Increase sleep time (slower simulation)
-                            simuController.slowdownSimulation(100);
-                            Trace.out(Trace.Level.INFO, "Speed decreased to: " + simuController.getSimulationSpeed());
-                            break;
-                        case 'q': // Stop the program
-                            Trace.out(Trace.Level.INFO, "Stopping the simulation...");
-                            System.exit(0); // Exit the program
-                            break;
-                        default:
-                            // Optionally handle other keys here if needed
-                            break;
-                    }
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        });
-        inputThread.start();
-
-
-        simuController.initializeSimulation( arrivalMean, arrivalVariance, financeMean, financeVariance, testdriveMean,
-                testdriveVariance, closureMean, closureVariance, simulationSpeed, carsToBeCreated,
-                arrivalServicePoints, financeServicePoints, testdriveServicePoints, closureServicePoints
-        );
-
-        simuController.startSimulation(simulationTime);
-
-        Set<Integer> duplicateIds = MyEngine.findDuplicateIds();
-
-        if (!duplicateIds.isEmpty()) {
-            System.out.println("Duplicate IDs detected: " + duplicateIds);
-        } else {
-            System.out.println("No duplicate IDs found.");
-        }
-    }*/
 }

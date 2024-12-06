@@ -8,7 +8,7 @@ import simu.model.*;
 public class ClosureServicePoint extends ServicePoint {
     CarDealerShop carDealerShop;
     public ClosureServicePoint(ContinuousGenerator generator, EventList eventList, EventType type, CarDealerShop carDealerShop) {
-        super(generator, eventList, type);
+        super(generator, eventList, type, "closure");
         this.carDealerShop = carDealerShop;
     }
 
@@ -22,7 +22,7 @@ public class ClosureServicePoint extends ServicePoint {
             Trace.out(Trace.Level.WAR, "No customer in the queue to serve.");
             return;
         }
-
+        customer.setCurrentServicePoint("closure");
         Trace.out(Trace.Level.INFO, "Customer #" + customer.getId() + " is closing the deal.");
 
         Car car = customer.getPurchaseCar();

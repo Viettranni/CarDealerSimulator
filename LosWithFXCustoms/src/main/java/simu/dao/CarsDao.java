@@ -151,7 +151,7 @@ public class CarsDao {
         try {
             PreparedStatement ps = conn.prepareStatement(sql);
             for (String[] row : data) {
-                if (row.length > 5) {
+                if (row.length >= 5) {
                     // Parse values from the String array and set them into the prepared statement
                     ps.setInt(1, Integer.parseInt(row[0])); // amount
                     ps.setString(2, row[1]);               // car_type

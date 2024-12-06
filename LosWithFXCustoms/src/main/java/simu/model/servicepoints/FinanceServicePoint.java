@@ -12,7 +12,7 @@ import simu.model.ServicePoint;
 
 public class FinanceServicePoint extends ServicePoint {
     public FinanceServicePoint(ContinuousGenerator generator, EventList eventList, EventType type) {
-        super(generator, eventList, type);
+        super(generator, eventList, type, "finance");
     }
 
     @Override
@@ -25,6 +25,7 @@ public class FinanceServicePoint extends ServicePoint {
             Trace.out(Trace.Level.WAR, "No customer in the queue to serve.");
             return;
         }
+        customer.setCurrentServicePoint("finance");
         Trace.out(Trace.Level.INFO, "Checking finances for Customer #" + customer.getId());
         double customerCreditScore = customer.getCreditScore();
         boolean financeAccepted = Math.random() < customer.calculateFinanceProbability(customerCreditScore);

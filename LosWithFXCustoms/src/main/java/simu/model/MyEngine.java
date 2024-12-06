@@ -202,9 +202,12 @@ public class MyEngine extends Engine {
 			case ARR1:
 				// Loop through arrivalServicePoints and get the shortest queue. Add the customer there
 				shortestArrivalServicePoint = getShortestQueue(arrivalServicePoints);
-				shortestArrivalServicePoint.addQueue(new Customer());
+				customer = new Customer();
+				shortestArrivalServicePoint.addQueue(customer);
+				carDealerShop.addCustomerAtTheDealership(customer);
 				// Generate one arrival event per each customer added to the arrivalServicePoint queue. In this case one
 				arrivalProcess.generateNextEvent();
+
 				break;
 
 			case DEP1:
@@ -269,6 +272,7 @@ public class MyEngine extends Engine {
 					// Set removal time, total time and report results for the customer
 					if (customer != null) {
 						customer = closurePoint.removeQueue();
+						carDealerShop.removeCustomerAtTheDealership(customer);
 						processedCustomers.add(customer);
 						customer.setRemovalTime(Clock.getInstance().getClock());
 						customer.setTotalTime();
@@ -453,7 +457,7 @@ public class MyEngine extends Engine {
 		// Calls callDealerShop's method and passes the arguments
 		// callDealerShop creates the cars and adds them to it's collection
 		for (String[] car : carsToBeCreated) {
-			if (car.length >= 6) {
+			if (car.length >= 5) {
 				amount = Integer.parseInt(car[0]);
 				carType = car[1];
 				fuelType = car[2];

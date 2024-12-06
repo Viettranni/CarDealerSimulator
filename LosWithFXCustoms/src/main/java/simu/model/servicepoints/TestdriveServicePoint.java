@@ -10,7 +10,7 @@ public class TestdriveServicePoint extends ServicePoint {
     CarDealerShop carDealerShop;
 
     public TestdriveServicePoint(ContinuousGenerator generator, EventList eventList, EventType type, CarDealerShop carDealerShop) {
-        super(generator, eventList, type);
+        super(generator, eventList, type, "testdrive");
         this.carDealerShop = carDealerShop;
     }
 
@@ -37,7 +37,7 @@ public class TestdriveServicePoint extends ServicePoint {
             Trace.out(Trace.Level.WAR, "No customer in the queue to serve.");
             return;
         }
-
+        customer.setCurrentServicePoint("testdrive");
         Trace.out(Trace.Level.INFO, "Customer #" + customer.getId() + " is requesting to test drive a " + customer.getPreferredCarType());
 
         // Check if the preferred car is available

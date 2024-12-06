@@ -14,6 +14,9 @@ import javafx.application.Platform;
 import simu.model.Customer;
 import simu.model.ServicePoint;
 
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.*;
 
 public class SaedTestController {
@@ -421,6 +424,8 @@ public class SaedTestController {
                 }
             }
             results();
+            String resultsFile = dataBaseTableName != null ? dataBaseTableName : "results";
+            saveResultsToCSV(resultsFile + ".csv");
         }).start();
     }
 
@@ -651,6 +656,142 @@ public class SaedTestController {
             consoleLog.appendText("\nCars sold: " + totalSoldCars + "\n");
         });
     }
+
+    public void saveResultsToCSV(String filePath) {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(filePath))) {
+            // Write customer data
+            writer.write("\nCustomer Data\n");
+            writer.write("ID,Arrival Time,Removal Time,Total Time,Preferred Car Type,Fuel Type,Budget,Credit Score,Finance Accepted,Happy with Test-drive,Purchased a Car\n");
+            double totalArrivalTime = 0, totalRemovalTime = 0, totalTime = 0, totalBudget = 0, totalCreditScore = 0;
+            int totalCustomers = simuController.getMyEngine().getProcessedCustomer().size();
+            int purchasedCount = 0;
+
+            for (Customer customer : simuController.getMyEngine().getProcessedCustomer()) {
+                totalArrivalTime += customer.getArrivalTime();
+                totalRemovalTime += customer.getRemovalTime();
+                totalTime += customer.getTotalTime();
+                totalBudget += customer.getBudget();
+                totalCreditScore += customer.getCreditScore();
+                if (customer.isPurchased()) purchasedCount++;
+
+                writer.write(String.format(
+                        "%d,%.2f,%.2f,%.2f,%s,%s,%.2f,%d,%b,%b,%b\n",
+                        customer.getId(),
+                        customer.getArrivalTime(),
+                        customer.getRemovalTime(),
+                        customer.getTotalTime(),
+                        customer.getPreferredCarType(),
+                        customer.getPreferredFuelType(),
+                        customer.getBudget(),
+                        customer.getCreditScore(),
+                        customer.isFinanceAccepted(),
+                        customer.happyWithTestdrive(),
+                        customer.isPurchased()
+                ));
+            }
+
+            // Write customer averages
+            writer.write("\nCustomer Averages\n");
+            writer.write("Average Arrival Time,Average Removal Time,Average Total Time,Average Budget,Average Credit Score,Purchased Percentage\n");
+            writer.write(String.format(
+                    "%.2f,%.2f,%.2f,%.2f,%.2f,%.2f\n",
+                    totalArrivalTime / totalCustomers,
+                    totalRemovalTime / totalCustomers,
+                    totalTime / totalCustomers,
+                    totalBudget / totalCustomers,
+                    totalCreditScore / totalCustomers,
+                    (purchasedCount / (double) totalCustomers) * 100
+            ));
+
+            // Initialize sets and maps for statistics
+            Set<String> allCarTypes = new HashSet<>();
+            Set<String> allFuelTypes = new HashSet<>();
+            Map<String, Integer> carTypeSoldCounts = new HashMap<>();
+            Map<String, Integer> fuelTypeSoldCounts = new HashMap<>();
+            Map<String, Integer> carFuelTypeSoldCounts = new HashMap<>();
+            int totalSoldCars = 0;
+
+            // Collect car and fuel types
+            for (Customer customer : simuController.getMyEngine().getProcessedCustomer()) {
+                allCarTypes.add(customer.getPreferredCarType());
+                allFuelTypes.add(customer.getPreferredFuelType());
+                if (customer.isPurchased()) {
+                    totalSoldCars++;
+                    String carType = customer.getPreferredCarType();
+                    String fuelType = customer.getPreferredFuelType();
+
+                    carTypeSoldCounts.put(carType, carTypeSoldCounts.getOrDefault(carType, 0) + 1);
+                    fuelTypeSoldCounts.put(fuelType, fuelTypeSoldCounts.getOrDefault(fuelType, 0) + 1);
+                    carFuelTypeSoldCounts.put(carType + " - " + fuelType, carFuelTypeSoldCounts.getOrDefault(carType + " - " + fuelType, 0) + 1);
+                }
+            }
+
+            // Write car type preferences
+            writer.write("\nCar Type Preferences\n");
+            writer.write("Car Type,Percentage of Customers\n");
+            for (String carType : allCarTypes) {
+                long count = simuController.getMyEngine().getProcessedCustomer().stream()
+                        .filter(customer -> customer.getPreferredCarType().equals(carType))
+                        .count();
+                writer.write(carType + "," + String.format("%.2f", (count / (double) totalCustomers) * 100) + "%\n");
+            }
+
+            // Write fuel type preferences
+            writer.write("\nFuel Type Preferences\n");
+            writer.write("Fuel Type,Percentage of Customers\n");
+            for (String fuelType : allFuelTypes) {
+                long count = simuController.getMyEngine().getProcessedCustomer().stream()
+                        .filter(customer -> customer.getPreferredFuelType().equals(fuelType))
+                        .count();
+                writer.write(fuelType + "," + String.format("%.2f", (count / (double) totalCustomers) * 100) + "%\n");
+            }
+
+            // Write sold cars by type
+            writer.write("\nCar Type Sold Percentages\n");
+            writer.write("Car Type,Percentage Sold\n");
+            for (String carType : allCarTypes) {
+                int soldCount = carTypeSoldCounts.getOrDefault(carType, 0);
+                writer.write(carType + "," + String.format("%.2f", (soldCount / (double) totalSoldCars) * 100) + "%\n");
+            }
+
+            // Write sold cars by fuel type
+            writer.write("\nFuel Type Sold Percentages\n");
+            writer.write("Fuel Type,Percentage Sold\n");
+            for (String fuelType : allFuelTypes) {
+                int soldCount = fuelTypeSoldCounts.getOrDefault(fuelType, 0);
+                writer.write(fuelType + "," + String.format("%.2f", (soldCount / (double) totalSoldCars) * 100) + "%\n");
+            }
+
+            // Write sold cars by car-fuel combination
+            writer.write("\nCar-Fuel Combination Sold Percentages\n");
+            writer.write("Combination,Percentage Sold\n");
+            for (String combination : carFuelTypeSoldCounts.keySet()) {
+                int soldCount = carFuelTypeSoldCounts.get(combination);
+                writer.write(combination + "," + String.format("%.2f", (soldCount / (double) totalSoldCars) * 100) + "%\n");
+            }
+
+            // Write remaining cars
+            writer.write("\nRemaining Cars\n");
+            writer.write("Car Type,Fuel Type,Base Price,Selling Price\n");
+            for (simu.model.Car car : simuController.getMyEngine().getCarDealerShop().getCarCollection()) {
+                writer.write(car.getCarType() + "," + car.getFuelType() + "," + car.getBasePrice() + "," + car.getMeanPrice() + "\n");
+            }
+
+            // Write sold cars
+            writer.write("\nSold Cars\n");
+            writer.write("Car Type,Fuel Type,Base Price,Selling Price\n");
+            for (simu.model.Car car : simuController.getMyEngine().getCarDealerShop().getSoldCars()) {
+                writer.write(car.getCarType() + "," + car.getFuelType() + "," + car.getBasePrice() + "," + car.getMeanPrice() + "\n");
+            }
+
+            Platform.runLater(() -> consoleLog.appendText("Results saved successfully to: " + filePath + "\n"));
+            System.out.println("Results saved successfully to " + filePath);
+        } catch (IOException e) {
+            System.err.println("Error writing to CSV file: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
 
 
     public static class Car {

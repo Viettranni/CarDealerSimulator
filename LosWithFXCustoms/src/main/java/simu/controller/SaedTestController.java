@@ -15,6 +15,7 @@ import simu.model.Customer;
 import simu.model.ServicePoint;
 
 import java.io.BufferedWriter;
+import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.*;
@@ -147,7 +148,16 @@ public class SaedTestController {
     private void setUpFuelTypes() {fuelType.getItems().addAll("Gas", "Hybrid", "Electric");}
 
     // THIS WILL BE CHANGED LATER
-    private void setupCarSets() {carSets.getItems().addAll(simuController.getTableNames());}
+    private void setupCarSets() {
+        if (simuController == null || simuController.getTableNames() == null) {
+            Platform.runLater(() -> consoleLog.appendText("Error: simuController or table names are null."));
+            return;
+        }
+        Platform.runLater(() -> {
+        carSets.getItems().clear();
+        carSets.getItems().addAll(simuController.getTableNames());
+        });
+    }
 
     // THIS WILL BE CHANGED LATER
     private void setupCarTable() {
@@ -223,19 +233,29 @@ public class SaedTestController {
         String carMeanPrice = meanPrice.getText();
         String carPriceVariance = priceVariance.getText();
         String carBasePrice = basePrice.getText();
-        consoleLog.appendText("Amount: " + amount + "\n" + "CarType: " + type + "\n" + "CarFuelType: " + carFuelType + "\n"
-                        + "Car mean price: " + carMeanPrice + "\n" + "Car price variance: " + carPriceVariance);
+
         if (amount != null && type != null && carFuelType != null && carMeanPrice != null && carPriceVariance != null) {
+            if (Integer.parseInt(carMeanPrice) <= 0 && Integer.parseInt(carPriceVariance) <= 0) {
+                consoleLog.appendText("Car mean price and price variance cannot be 0 or negative.\n");
+                return;
+            }
+            consoleLog.appendText("Amount: " + amount + "\n" + "CarType: " + type + "\n" + "CarFuelType: " + carFuelType + "\n"
+                    + "Car mean price: " + carMeanPrice + "\n" + "Car price variance: " + carPriceVariance + "\n");
+
             carsToBeCreated.add(new String[]{amount, type.toLowerCase(), carFuelType.toLowerCase(), carMeanPrice, carPriceVariance, carBasePrice});
             populateTable();
             consoleLog.appendText("Car combinations to be created: " + carsToBeCreated.size() + "\n");
-            dataBaseTableName = dealerShipName.getText().trim();
-            dataBaseTableName = dataBaseTableName.replace(" ", "_");
+
+            dataBaseTableName = dealerShipName.getText().trim().replace(" ", "_");
+        } else {
+            consoleLog.appendText("Empty values cannot be added.\n");
         }
+
         amountOfCars.clear();
         meanPrice.clear();
         priceVariance.clear();
     }
+
 
     @FXML
     private void handleStartSimulation() {
@@ -256,6 +276,11 @@ public class SaedTestController {
         int financeServicePoint = financeServicePoints.getValue();
         int testdriveServicePoint = setTestDriveServicePoints();
         int closureServicePoint = closureServicePoints.getValue();
+        int amountOfCars = 0;
+        if (carsToBeCreated.isEmpty()) {
+            Platform.runLater(() -> consoleLog.appendText("Cannot run the simulation without adding car(s)"));
+            return;
+        }
         consoleLog.appendText("Simulation initialized with the following values:");
         consoleLog.appendText("\nArrival mean: " + arrivalMean + "\nArrival Variance: " + arrivalVariance);
         consoleLog.appendText("\nFinance mean: " + financeMean + "\nFinance Variance: " + financeVariance);
@@ -264,10 +289,11 @@ public class SaedTestController {
         consoleLog.appendText("\nArrival service points: " + arrivalServicePoint);
         consoleLog.appendText("\nFinance service points: " + financeServicePoint);
         consoleLog.appendText("\nTest drive service points: " + testdriveServicePoint);
-        consoleLog.appendText("\nClosure service points: " + closureServicePoint + "\n");
+        consoleLog.appendText("\nClosure service points: " + closureServicePoint);
         for (String[] car : carsToBeCreated) {
-            Platform.runLater(() -> consoleLog.appendText(car[0] + " : " + car[1] + " : " + car[3]));
+            amountOfCars += Integer.parseInt(car[0]);
         }
+        consoleLog.appendText("Amount of cars to be created: " + amountOfCars + "\n");
 
         //createCars();
         //createCarsFromDb();
@@ -425,7 +451,8 @@ public class SaedTestController {
             }
             results();
             String resultsFile = dataBaseTableName != null ? dataBaseTableName : "results";
-            saveResultsToCSV(resultsFile + ".csv");
+            saveResultsToCsv(resultsFile);
+            setupCarSets();
         }).start();
     }
 
@@ -657,11 +684,17 @@ public class SaedTestController {
         });
     }
 
-    public void saveResultsToCSV(String filePath) {
+    public void saveCustomerBaseDataToCSV(String filePath1) {
+        String parentDir = "SimulationResults/";
+        File directory = new File(parentDir);
+        if (!directory.exists()) {
+            directory.mkdirs();
+        }
+        String filePath = parentDir +  filePath1 + "CustomerBaseData.csv";
+
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(filePath))) {
             // Write customer data
-            writer.write("\nCustomer Data\n");
-            writer.write("ID,Arrival Time,Removal Time,Total Time,Preferred Car Type,Fuel Type,Budget,Credit Score,Finance Accepted,Happy with Test-drive,Purchased a Car\n");
+            writer.write("ID,Arrival Time,Removal Time,Total Time,Preferred Car Type,Fuel Type,Budget,Credit Score,Finance Accepted,Happy with Test-drive, Test Drive Count, Purchased a Car, Seller Price, Base Price\n");
             double totalArrivalTime = 0, totalRemovalTime = 0, totalTime = 0, totalBudget = 0, totalCreditScore = 0;
             int totalCustomers = simuController.getMyEngine().getProcessedCustomer().size();
             int purchasedCount = 0;
@@ -672,10 +705,12 @@ public class SaedTestController {
                 totalTime += customer.getTotalTime();
                 totalBudget += customer.getBudget();
                 totalCreditScore += customer.getCreditScore();
+                double sellerPrice = customer.getPurchaseCar() != null ? customer.getPurchaseCar().getSellerPrice() : 0;
+                double basePrice = customer.getPurchaseCar() != null ? customer.getPurchaseCar().getBasePrice() : 0;
                 if (customer.isPurchased()) purchasedCount++;
 
                 writer.write(String.format(
-                        "%d,%.2f,%.2f,%.2f,%s,%s,%.2f,%d,%b,%b,%b\n",
+                        "%d,%.2f,%.2f,%.2f,%s,%s,%.2f,%d,%b,%b, %d, %b, %.2f, %.2f\n",
                         customer.getId(),
                         customer.getArrivalTime(),
                         customer.getRemovalTime(),
@@ -686,22 +721,32 @@ public class SaedTestController {
                         customer.getCreditScore(),
                         customer.isFinanceAccepted(),
                         customer.happyWithTestdrive(),
-                        customer.isPurchased()
+                        customer.getTestDriveCount(),
+                        customer.isPurchased(),
+                        sellerPrice,
+                        basePrice
+
                 ));
             }
 
-            // Write customer averages
-            writer.write("\nCustomer Averages\n");
-            writer.write("Average Arrival Time,Average Removal Time,Average Total Time,Average Budget,Average Credit Score,Purchased Percentage\n");
-            writer.write(String.format(
-                    "%.2f,%.2f,%.2f,%.2f,%.2f,%.2f\n",
-                    totalArrivalTime / totalCustomers,
-                    totalRemovalTime / totalCustomers,
-                    totalTime / totalCustomers,
-                    totalBudget / totalCustomers,
-                    totalCreditScore / totalCustomers,
-                    (purchasedCount / (double) totalCustomers) * 100
-            ));
+            Platform.runLater(() -> consoleLog.appendText("Results saved successfully to: " + filePath + "\n"));
+            System.out.println("Results saved successfully to " + filePath);
+        } catch (IOException e) {
+            System.err.println("Error writing to CSV file: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
+    public void saveCustomerCarDataToCSV(String filePath1) {
+        String parentDir = "SimulationResults/";
+        File directory = new File(parentDir);
+        if (!directory.exists()) {
+            directory.mkdirs();
+        }
+        String filePath = parentDir +  filePath1 + "CustomerCarTypeData.csv";
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(filePath))) {
+            // Write customer data
+            int totalCustomers = simuController.getMyEngine().getProcessedCustomer().size();
 
             // Initialize sets and maps for statistics
             Set<String> allCarTypes = new HashSet<>();
@@ -727,58 +772,278 @@ public class SaedTestController {
             }
 
             // Write car type preferences
-            writer.write("\nCar Type Preferences\n");
-            writer.write("Car Type,Percentage of Customers\n");
+            writer.write("Car Type,Customer count\n");
             for (String carType : allCarTypes) {
                 long count = simuController.getMyEngine().getProcessedCustomer().stream()
                         .filter(customer -> customer.getPreferredCarType().equals(carType))
                         .count();
-                writer.write(carType + "," + String.format("%.2f", (count / (double) totalCustomers) * 100) + "%\n");
+                writer.write(carType + "," + String.format("%d", count) + "\n");
             }
 
+            Platform.runLater(() -> consoleLog.appendText("Results saved successfully to: " + filePath + "\n"));
+            System.out.println("Results saved successfully to " + filePath);
+        } catch (IOException e) {
+            System.err.println("Error writing to CSV file: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
+    public void saveCustomerFuelDataToCSV(String filePath1) {
+        String parentDir = "SimulationResults/";
+        File directory = new File(parentDir);
+        if (!directory.exists()) {
+            directory.mkdirs();
+        }
+        String filePath = parentDir +  filePath1 + "CustomerFuelData.csv";
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(filePath))) {
+            // Initialize sets and maps for statistics
+            Set<String> allCarTypes = new HashSet<>();
+            Set<String> allFuelTypes = new HashSet<>();
+            Map<String, Integer> carTypeSoldCounts = new HashMap<>();
+            Map<String, Integer> fuelTypeSoldCounts = new HashMap<>();
+            Map<String, Integer> carFuelTypeSoldCounts = new HashMap<>();
+            int totalSoldCars = 0;
+
+            // Collect car and fuel types
+            for (Customer customer : simuController.getMyEngine().getProcessedCustomer()) {
+                allCarTypes.add(customer.getPreferredCarType());
+                allFuelTypes.add(customer.getPreferredFuelType());
+                if (customer.isPurchased()) {
+                    totalSoldCars++;
+                    String carType = customer.getPreferredCarType();
+                    String fuelType = customer.getPreferredFuelType();
+
+                    carTypeSoldCounts.put(carType, carTypeSoldCounts.getOrDefault(carType, 0) + 1);
+                    fuelTypeSoldCounts.put(fuelType, fuelTypeSoldCounts.getOrDefault(fuelType, 0) + 1);
+                    carFuelTypeSoldCounts.put(carType + " - " + fuelType, carFuelTypeSoldCounts.getOrDefault(carType + " - " + fuelType, 0) + 1);
+                }
+            }
             // Write fuel type preferences
-            writer.write("\nFuel Type Preferences\n");
-            writer.write("Fuel Type,Percentage of Customers\n");
+            writer.write("Fuel Type,Customer count\n");
             for (String fuelType : allFuelTypes) {
                 long count = simuController.getMyEngine().getProcessedCustomer().stream()
                         .filter(customer -> customer.getPreferredFuelType().equals(fuelType))
                         .count();
-                writer.write(fuelType + "," + String.format("%.2f", (count / (double) totalCustomers) * 100) + "%\n");
+                writer.write(fuelType + "," + String.format("%d", count) + "\n");
             }
 
-            // Write sold cars by type
-            writer.write("\nCar Type Sold Percentages\n");
-            writer.write("Car Type,Percentage Sold\n");
+            Platform.runLater(() -> consoleLog.appendText("Results saved successfully to: " + filePath + "\n"));
+            System.out.println("Results saved successfully to " + filePath);
+        } catch (IOException e) {
+            System.err.println("Error writing to CSV file: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
+    public void saveCarsSoldByTypeDataToCSV(String filePath1) {
+        String parentDir = "SimulationResults/";
+        File directory = new File(parentDir);
+        if (!directory.exists()) {
+            directory.mkdirs();
+        }
+        String filePath = parentDir +  filePath1 + "CarsSoldByTypeData.csv";
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(filePath))) {
+            // Initialize sets and maps for statistics
+            Set<String> allCarTypes = new HashSet<>();
+            Set<String> allFuelTypes = new HashSet<>();
+            Map<String, Integer> carTypeSoldCounts = new HashMap<>();
+            Map<String, Integer> fuelTypeSoldCounts = new HashMap<>();
+            Map<String, Integer> carFuelTypeSoldCounts = new HashMap<>();
+            int totalSoldCars = 0;
+
+            // Collect car and fuel types
+            for (Customer customer : simuController.getMyEngine().getProcessedCustomer()) {
+                allCarTypes.add(customer.getPreferredCarType());
+                allFuelTypes.add(customer.getPreferredFuelType());
+                if (customer.isPurchased()) {
+                    totalSoldCars++;
+                    String carType = customer.getPreferredCarType();
+                    String fuelType = customer.getPreferredFuelType();
+
+                    carTypeSoldCounts.put(carType, carTypeSoldCounts.getOrDefault(carType, 0) + 1);
+                    fuelTypeSoldCounts.put(fuelType, fuelTypeSoldCounts.getOrDefault(fuelType, 0) + 1);
+                    carFuelTypeSoldCounts.put(carType + " - " + fuelType, carFuelTypeSoldCounts.getOrDefault(carType + " - " + fuelType, 0) + 1);
+                }
+            }
+
+            writer.write("Car Type,Count\n");
             for (String carType : allCarTypes) {
                 int soldCount = carTypeSoldCounts.getOrDefault(carType, 0);
-                writer.write(carType + "," + String.format("%.2f", (soldCount / (double) totalSoldCars) * 100) + "%\n");
+                writer.write(carType + "," + String.format("%d", soldCount)  + "\n");
             }
 
+            Platform.runLater(() -> consoleLog.appendText("Results saved successfully to: " + filePath + "\n"));
+            System.out.println("Results saved successfully to " + filePath);
+        } catch (IOException e) {
+            System.err.println("Error writing to CSV file: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
+    public void saveCarsSoldByFuelDataToCSV(String filePath1) {
+        String parentDir = "SimulationResults/";
+        File directory = new File(parentDir);
+        if (!directory.exists()) {
+            directory.mkdirs();
+        }
+        String filePath = parentDir +  filePath1 + "CarsSoldByFuelData.csv";
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(filePath))) {
+            // Initialize sets and maps for statistics
+            Set<String> allCarTypes = new HashSet<>();
+            Set<String> allFuelTypes = new HashSet<>();
+            Map<String, Integer> carTypeSoldCounts = new HashMap<>();
+            Map<String, Integer> fuelTypeSoldCounts = new HashMap<>();
+            Map<String, Integer> carFuelTypeSoldCounts = new HashMap<>();
+            int totalSoldCars = 0;
+
+            // Collect car and fuel types
+            for (Customer customer : simuController.getMyEngine().getProcessedCustomer()) {
+                allCarTypes.add(customer.getPreferredCarType());
+                allFuelTypes.add(customer.getPreferredFuelType());
+                if (customer.isPurchased()) {
+                    totalSoldCars++;
+                    String carType = customer.getPreferredCarType();
+                    String fuelType = customer.getPreferredFuelType();
+
+                    carTypeSoldCounts.put(carType, carTypeSoldCounts.getOrDefault(carType, 0) + 1);
+                    fuelTypeSoldCounts.put(fuelType, fuelTypeSoldCounts.getOrDefault(fuelType, 0) + 1);
+                    carFuelTypeSoldCounts.put(carType + " - " + fuelType, carFuelTypeSoldCounts.getOrDefault(carType + " - " + fuelType, 0) + 1);
+                }
+            }
             // Write sold cars by fuel type
-            writer.write("\nFuel Type Sold Percentages\n");
-            writer.write("Fuel Type,Percentage Sold\n");
+            writer.write("Fuel Type,Count\n");
             for (String fuelType : allFuelTypes) {
                 int soldCount = fuelTypeSoldCounts.getOrDefault(fuelType, 0);
-                writer.write(fuelType + "," + String.format("%.2f", (soldCount / (double) totalSoldCars) * 100) + "%\n");
+                writer.write(fuelType + "," + String.format("%d", soldCount) + "\n");
             }
 
+            Platform.runLater(() -> consoleLog.appendText("Results saved successfully to: " + filePath + "\n"));
+            System.out.println("Results saved successfully to " + filePath);
+        } catch (IOException e) {
+            System.err.println("Error writing to CSV file: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
+    public void saveCarsSoldByTypeAndFuelDataToCSV(String filePath1) {
+        String parentDir = "SimulationResults/";
+        File directory = new File(parentDir);
+        if (!directory.exists()) {
+            directory.mkdirs();
+        }
+        String filePath = parentDir +  filePath1 + "CarsSoldByTypeAndFuel.csv";
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(filePath))) {
+            // Initialize sets and maps for statistics
+            Set<String> allCarTypes = new HashSet<>();
+            Set<String> allFuelTypes = new HashSet<>();
+            Map<String, Integer> carTypeSoldCounts = new HashMap<>();
+            Map<String, Integer> fuelTypeSoldCounts = new HashMap<>();
+            Map<String, Integer> carFuelTypeSoldCounts = new HashMap<>();
+            int totalSoldCars = 0;
+
+            // Collect car and fuel types
+            for (Customer customer : simuController.getMyEngine().getProcessedCustomer()) {
+                allCarTypes.add(customer.getPreferredCarType());
+                allFuelTypes.add(customer.getPreferredFuelType());
+                if (customer.isPurchased()) {
+                    totalSoldCars++;
+                    String carType = customer.getPreferredCarType();
+                    String fuelType = customer.getPreferredFuelType();
+
+                    carTypeSoldCounts.put(carType, carTypeSoldCounts.getOrDefault(carType, 0) + 1);
+                    fuelTypeSoldCounts.put(fuelType, fuelTypeSoldCounts.getOrDefault(fuelType, 0) + 1);
+                    carFuelTypeSoldCounts.put(carType + " - " + fuelType, carFuelTypeSoldCounts.getOrDefault(carType + " - " + fuelType, 0) + 1);
+                }
+            }
             // Write sold cars by car-fuel combination
-            writer.write("\nCar-Fuel Combination Sold Percentages\n");
-            writer.write("Combination,Percentage Sold\n");
+            writer.write("Combination,Count\n");
             for (String combination : carFuelTypeSoldCounts.keySet()) {
                 int soldCount = carFuelTypeSoldCounts.get(combination);
-                writer.write(combination + "," + String.format("%.2f", (soldCount / (double) totalSoldCars) * 100) + "%\n");
+                writer.write(combination + "," + String.format("%d", soldCount) + "\n");
             }
 
+            Platform.runLater(() -> consoleLog.appendText("Results saved successfully to: " + filePath + "\n"));
+            System.out.println("Results saved successfully to " + filePath);
+        } catch (IOException e) {
+            System.err.println("Error writing to CSV file: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
+    public void saveCarsRemainingDataToCSV(String filePath1) {
+        String parentDir = "SimulationResults/";
+        File directory = new File(parentDir);
+        if (!directory.exists()) {
+            directory.mkdirs();
+        }
+        String filePath = parentDir +  filePath1 + "CarsRemainingData.csv";
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(filePath))) {
+            // Initialize sets and maps for statistics
+            Set<String> allCarTypes = new HashSet<>();
+            Set<String> allFuelTypes = new HashSet<>();
+            Map<String, Integer> carTypeSoldCounts = new HashMap<>();
+            Map<String, Integer> fuelTypeSoldCounts = new HashMap<>();
+            Map<String, Integer> carFuelTypeSoldCounts = new HashMap<>();
+            int totalSoldCars = 0;
+
+            // Collect car and fuel types
+            for (Customer customer : simuController.getMyEngine().getProcessedCustomer()) {
+                allCarTypes.add(customer.getPreferredCarType());
+                allFuelTypes.add(customer.getPreferredFuelType());
+                if (customer.isPurchased()) {
+                    totalSoldCars++;
+                    String carType = customer.getPreferredCarType();
+                    String fuelType = customer.getPreferredFuelType();
+
+                    carTypeSoldCounts.put(carType, carTypeSoldCounts.getOrDefault(carType, 0) + 1);
+                    fuelTypeSoldCounts.put(fuelType, fuelTypeSoldCounts.getOrDefault(fuelType, 0) + 1);
+                    carFuelTypeSoldCounts.put(carType + " - " + fuelType, carFuelTypeSoldCounts.getOrDefault(carType + " - " + fuelType, 0) + 1);
+                }
+            }
             // Write remaining cars
-            writer.write("\nRemaining Cars\n");
             writer.write("Car Type,Fuel Type,Base Price,Selling Price\n");
             for (simu.model.Car car : simuController.getMyEngine().getCarDealerShop().getCarCollection()) {
                 writer.write(car.getCarType() + "," + car.getFuelType() + "," + car.getBasePrice() + "," + car.getMeanPrice() + "\n");
             }
+            Platform.runLater(() -> consoleLog.appendText("Results saved successfully to: " + filePath + "\n"));
+            System.out.println("Results saved successfully to " + filePath);
+        } catch (IOException e) {
+            System.err.println("Error writing to CSV file: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
 
+    public void saveCarsSoldDataToCSV(String filePath1) {
+        String parentDir = "SimulationResults/";
+        File directory = new File(parentDir);
+        if (!directory.exists()) {
+            directory.mkdirs();
+        }
+        String filePath = parentDir + filePath1 + "CarsSoldData.csv";
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(filePath))) {
+            // Initialize sets and maps for statistics
+            Set<String> allCarTypes = new HashSet<>();
+            Set<String> allFuelTypes = new HashSet<>();
+            Map<String, Integer> carTypeSoldCounts = new HashMap<>();
+            Map<String, Integer> fuelTypeSoldCounts = new HashMap<>();
+            Map<String, Integer> carFuelTypeSoldCounts = new HashMap<>();
+            int totalSoldCars = 0;
+
+            // Collect car and fuel types
+            for (Customer customer : simuController.getMyEngine().getProcessedCustomer()) {
+                allCarTypes.add(customer.getPreferredCarType());
+                allFuelTypes.add(customer.getPreferredFuelType());
+                if (customer.isPurchased()) {
+                    totalSoldCars++;
+                    String carType = customer.getPreferredCarType();
+                    String fuelType = customer.getPreferredFuelType();
+
+                    carTypeSoldCounts.put(carType, carTypeSoldCounts.getOrDefault(carType, 0) + 1);
+                    fuelTypeSoldCounts.put(fuelType, fuelTypeSoldCounts.getOrDefault(fuelType, 0) + 1);
+                    carFuelTypeSoldCounts.put(carType + " - " + fuelType, carFuelTypeSoldCounts.getOrDefault(carType + " - " + fuelType, 0) + 1);
+                }
+            }
             // Write sold cars
-            writer.write("\nSold Cars\n");
             writer.write("Car Type,Fuel Type,Base Price,Selling Price\n");
             for (simu.model.Car car : simuController.getMyEngine().getCarDealerShop().getSoldCars()) {
                 writer.write(car.getCarType() + "," + car.getFuelType() + "," + car.getBasePrice() + "," + car.getMeanPrice() + "\n");
@@ -792,21 +1057,15 @@ public class SaedTestController {
         }
     }
 
-
-
-    public static class Car {
-        private final String model;
-        private final String type;
-        private final double price;
-
-        public Car(String model, String type, double price) {
-            this.model = model;
-            this.type = type;
-            this.price = price;
-        }
-
-        public String getModel() { return model; }
-        public String getType() { return type; }
-        public double getPrice() { return price; }
+    public void saveResultsToCsv(String fileName) {
+        saveCustomerBaseDataToCSV(fileName);
+        saveCustomerCarDataToCSV(fileName);
+        saveCustomerFuelDataToCSV(fileName);
+        saveCarsSoldDataToCSV(fileName);
+        saveCarsSoldByTypeDataToCSV(fileName);
+        saveCarsSoldByFuelDataToCSV(fileName);
+        saveCarsSoldByTypeAndFuelDataToCSV(fileName);
+        saveCarsRemainingDataToCSV(fileName);
     }
+
 }

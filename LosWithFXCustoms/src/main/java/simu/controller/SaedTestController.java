@@ -308,6 +308,7 @@ public class SaedTestController {
         simuController.setSimulationTime(simulationTime);
         simulationThread = new Thread(simuController);
         simulationThread.start();
+        setupCarSets();
         // Monitor simulation progress in a separate thread
         updateUI();
     }
@@ -452,7 +453,6 @@ public class SaedTestController {
             results();
             String resultsFile = dataBaseTableName != null ? dataBaseTableName : "results";
             saveResultsToCsv(resultsFile);
-            setupCarSets();
         }).start();
     }
 

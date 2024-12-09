@@ -533,6 +533,9 @@ public class SaedTestController {
             consoleLog.appendText("\nSimulation ended at: " + (int) Clock.getInstance().getClock());
             consoleLog.appendText("\nResults for: " + tableName);
             consoleLog.appendText("\nProcessed Customers: " + simuController.getMyEngine().getProcessedCustomer().size() + "\n");
+            consoleLog.appendText("Closure mean: " + simuController.getMyEngine().getClosureMean() + "\n");
+            consoleLog.appendText("Closure variance: " + simuController.getMyEngine().getClosureVariance() + "\n");
+            consoleLog.appendText(("Closure service time: " + simuController.getMyEngine().getClosureServiceTime().sample() + "\n"));
 
             // Initialize containers for all car and fuel types
             Set<String> allCarTypes = new HashSet<>();
@@ -546,12 +549,15 @@ public class SaedTestController {
 
             // Print header and customer data
             consoleLog.appendText(String.format(
-                    "%-10s %-15s %-15s %-15s %-20s %-15s %-10s %-12s %-18s %-22s %-20s\n",
-                    "ID", "Arrival Time", "Removal Time", "Total time", "Preferred Car Type", "Fuel Type",
-                    "Budget", "Credit Score", "Finance Accepted", "Happy with Test-drive", "Purchased a Car"
+                    "%-10s %-15s %-15s %-15s %-18s %-18s %-18s %-18s %-20s %-15s %-10s %-12s %-18s %-22s %-20s\n",
+                    "ID", "Arrival Time", "Removal Time", "Total Time", "Info Point", "Finance Point",
+                    "Test Drive Point", "Closure Point", "Preferred Car Type", "Fuel Type", "Budget",
+                    "Credit Score", "Finance Accepted", "Happy with Test-drive", "Purchased a Car"
             ));
 
-            double totalArrivalTime = 0, totalRemovalTime = 0, totalTime = 0, totalBudget = 0, totalCreditScore = 0;
+            double totalArrivalTime = 0, totalRemovalTime = 0, totalTime = 0, totalInfoPointTime = 0,
+                    totalFinancePointTime = 0, totalTestDrivePointTime = 0, totalClosurePointTime = 0, totalBudget = 0,
+                    totalCreditScore = 0;
             int totalCustomers = simuController.getMyEngine().getProcessedCustomer().size();
             int purchasedCount = 0;
 
@@ -559,16 +565,24 @@ public class SaedTestController {
                 totalArrivalTime += customer.getArrivalTime();
                 totalRemovalTime += customer.getRemovalTime();
                 totalTime += customer.getTotalTime();
+                totalInfoPointTime += customer.getTotalTimeAtArrivalServicePoint();
+                totalFinancePointTime += customer.getTotalTimeAtFinanceServicePoint();
+                totalTestDrivePointTime += customer.getTotalTimeAtTestDriveServicePoint();
+                totalClosurePointTime += customer.getRemovalTimeAtClosureServicePoint();
                 totalBudget += customer.getBudget();
                 totalCreditScore += customer.getCreditScore();
                 if (customer.isPurchased()) purchasedCount++;
 
                 consoleLog.appendText(String.format(
-                        "%-10d %-15.2f %-15.2f %-15.2f %-20s %-15s %-10.2f %-12d %-18b %-22b %-20b\n",
+                        "%-10d %-15.2f %-15.2f %-15.2f %-18.2f %-18.2f %-18.2f %-18.2f %-20s %-15s %-10.2f %-12d %-18b %-22b %-20b\n",
                         customer.getId(),
                         customer.getArrivalTime(),
                         customer.getRemovalTime(),
                         customer.getTotalTime(),
+                        customer.getTotalTimeAtArrivalServicePoint(),
+                        customer.getTotalTimeAtFinanceServicePoint(),
+                        customer.getTotalTimeAtTestDriveServicePoint(),
+                        customer.getTotalTimeAtClosureServicePoint(),
                         customer.getPreferredCarType(),
                         customer.getPreferredFuelType(),
                         customer.getBudget(),
@@ -581,11 +595,15 @@ public class SaedTestController {
 
             // Print averages
             consoleLog.appendText(String.format(
-                    "%-10s %-15.2f %-15.2f %-15.2f %-20s %-15s %-10.2f %-12.2f %-18s %-22s %-20.2f\n",
+                    "%-10s %-15.2f %-15.2f %-15.2f %-18.2f %-18.2f %-18.2f %-18.2f %-20s %-15s %-10.2f %-12.2f %-18s %-22s %-20.2f\n",
                     "AVG",
                     totalArrivalTime / totalCustomers,
                     totalRemovalTime / totalCustomers,
                     totalTime / totalCustomers,
+                    totalInfoPointTime / totalCustomers,
+                    totalFinancePointTime / totalCustomers,
+                    totalTestDrivePointTime / totalCustomers,
+                    totalClosurePointTime / totalCustomers,
                     "N/A",
                     "N/A",
                     totalBudget / totalCustomers,
@@ -694,7 +712,7 @@ public class SaedTestController {
 
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(filePath))) {
             // Write customer data
-            writer.write("ID,Arrival Time,Removal Time,Total Time,Preferred Car Type,Fuel Type,Budget,Credit Score,Finance Accepted,Happy with Test-drive, Test Drive Count, Purchased a Car, Seller Price, Base Price\n");
+            writer.write("ID,Arrival Time,Removal Time,Total Time,Time At Info Point,Time At Finance Point,Time At Test Drive point,Time At Closure Point,Preferred Car Type,Fuel Type,Budget,Credit Score,Finance Accepted,Happy with Test-drive, Test Drive Count, Purchased a Car, Seller Price, Base Price\n");
             double totalArrivalTime = 0, totalRemovalTime = 0, totalTime = 0, totalBudget = 0, totalCreditScore = 0;
             int totalCustomers = simuController.getMyEngine().getProcessedCustomer().size();
             int purchasedCount = 0;
@@ -710,11 +728,15 @@ public class SaedTestController {
                 if (customer.isPurchased()) purchasedCount++;
 
                 writer.write(String.format(
-                        "%d,%.2f,%.2f,%.2f,%s,%s,%.2f,%d,%b,%b, %d, %b, %.2f, %.2f\n",
+                        "%d,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%s,%s,%.2f,%d,%b,%b, %d, %b, %.2f, %.2f\n",
                         customer.getId(),
                         customer.getArrivalTime(),
                         customer.getRemovalTime(),
                         customer.getTotalTime(),
+                        customer.getTotalTimeAtArrivalServicePoint(),
+                        customer.getTotalTimeAtFinanceServicePoint(),
+                        customer.getTotalTimeAtTestDriveServicePoint(),
+                        customer.getArrivalTimeAtClosureServicePoint(),
                         customer.getPreferredCarType(),
                         customer.getPreferredFuelType(),
                         customer.getBudget(),

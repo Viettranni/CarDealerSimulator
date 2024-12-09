@@ -1,6 +1,7 @@
 package simu.model.servicepoints;
 
 import eduni.distributions.ContinuousGenerator;
+import simu.framework.Clock;
 import simu.framework.EventList;
 import simu.framework.Trace;
 import simu.model.Customer;
@@ -23,6 +24,7 @@ public class ArrivalServicePoint extends ServicePoint {
             return;
         }
         customer.setCurrentServicePoint("arrival");
+        customer.setArrivalTimeAtArrivalServicePoint(Clock.getInstance().getClock());
         Trace.out(Trace.Level.INFO, "Customer #" + customer.getId() + " is welcomed at the arrival point.");
         super.beginService();
     }

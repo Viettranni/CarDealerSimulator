@@ -1,6 +1,7 @@
 package simu.model.servicepoints;
 
 import eduni.distributions.ContinuousGenerator;
+import simu.framework.Clock;
 import simu.framework.EventList;
 import simu.framework.Trace;
 import simu.model.*;
@@ -23,6 +24,7 @@ public class ClosureServicePoint extends ServicePoint {
             return;
         }
         customer.setCurrentServicePoint("closure");
+        customer.setArrivalTimeAtClosureServicePoint(Clock.getInstance().getClock());
         Trace.out(Trace.Level.INFO, "Customer #" + customer.getId() + " is closing the deal.");
 
         Car car = customer.getPurchaseCar();

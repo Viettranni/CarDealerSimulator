@@ -38,6 +38,7 @@ public class TestdriveServicePoint extends ServicePoint {
             return;
         }
         customer.setCurrentServicePoint("testdrive");
+        customer.setArrivalTimeAtTestDriveServicePoint(Clock.getInstance().getClock());
         Trace.out(Trace.Level.INFO, "Customer #" + customer.getId() + " is requesting to test drive a " + customer.getPreferredCarType());
 
         // Check if the preferred car is available

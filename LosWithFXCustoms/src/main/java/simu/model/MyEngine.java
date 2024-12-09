@@ -220,6 +220,8 @@ public class MyEngine extends Engine {
 					// If there is a customer remove it from the arrivalServicePoint and add it to financeServicePoint
 					if (customer != null){
 						customer = arrivalPoint.removeQueue();
+						customer.setRemovalTimeAtArrivalServicePoint(Clock.getInstance().getClock());
+						customer.updateTotalTimeAtArrivalServicePoint();
 						shortestFinanceServicePoint.addQueue(customer);
 					}
 				}
@@ -237,6 +239,8 @@ public class MyEngine extends Engine {
 					if (customer != null) {
 						if (customer.isFinanceAccepted()) {
 							customer = financePoint.removeQueue();
+							customer.setRemovalTimeAtFinanceServicePoint(Clock.getInstance().getClock());
+							customer.updateTotalTimeAtFinanceServicePoint();
 							shortestTestdriveServicePoint.addQueue(customer);
 						}
 					}
@@ -255,6 +259,8 @@ public class MyEngine extends Engine {
 					if (customer != null) {
 						if (customer.happyWithTestdrive()) {
 							customer = testdrive.removeQueue();
+							customer.setRemovalTimeAtTestDriveServicePoint(Clock.getInstance().getClock());
+							customer.updateTotalTimeAtTestDriveServicePoint();
 							shortestClosureServicePoint.addQueue(customer);
 						}
 					}
@@ -272,6 +278,8 @@ public class MyEngine extends Engine {
 					// Set removal time, total time and report results for the customer
 					if (customer != null) {
 						customer = closurePoint.removeQueue();
+						customer.setRemovalTimeAtClosureServicePoint(Clock.getInstance().getClock());
+						customer.updateTotalTimeAtClosureServicePoint();
 						carDealerShop.removeCustomerAtTheDealership(customer);
 						processedCustomers.add(customer);
 						customer.setRemovalTime(Clock.getInstance().getClock());

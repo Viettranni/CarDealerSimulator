@@ -28,6 +28,18 @@ public class Customer {
 	private final double COEFFICIENT = 0.05;
 	private int testDriveCount;
 	private String currentServicePoint;
+	private double arrivalTimeAtArrivalServicePoint = 0;
+	private double arrivalTimeAtFinanceServicePoint = 0;
+	private double arrivalTimeAtTestDriveServicePoint = 0;
+	private double arrivalTimeAtClosureServicePoint = 0;
+	private double removalTimeAtArrivalServicePoint = 0;
+	private double removalTimeAtFinanceServicePoint = 0;
+	private double removalTimeAtTestDriveServicePoint = 0;
+	private double removalTimeAtClosureServicePoint = 0;
+	private double totalTimeAtArrivalServicePoint = 0;
+	private double totalTimeAtFinanceServicePoint = 0;
+	private double totalTimeAtTestDriveServicePoint = 0;
+	private double totalTimeAtClosureServicePoint = 0;
 
 
 	// Normal distribution parameters for Budget and Credit Score
@@ -206,6 +218,104 @@ public class Customer {
 	public void setCurrentServicePoint(String currentServicePoint) {
 		this.currentServicePoint = currentServicePoint;
 	}
+
+	public double getArrivalTimeAtArrivalServicePoint() {
+		return arrivalTimeAtArrivalServicePoint;
+	}
+
+	public void setArrivalTimeAtArrivalServicePoint(double arrivalTimeAtArrivalServicePoint) {
+		this.arrivalTimeAtArrivalServicePoint = arrivalTimeAtArrivalServicePoint;
+	}
+
+	public double getArrivalTimeAtFinanceServicePoint() {
+		return arrivalTimeAtFinanceServicePoint;
+	}
+
+	public void setArrivalTimeAtFinanceServicePoint(double arrivalTimeAtFinanceServicePoint) {
+		this.arrivalTimeAtFinanceServicePoint = arrivalTimeAtFinanceServicePoint;
+	}
+
+	public double getArrivalTimeAtTestDriveServicePoint() {
+		return arrivalTimeAtTestDriveServicePoint;
+	}
+
+	public void setArrivalTimeAtTestDriveServicePoint(double arrivalTimeAtTestDriveServicePoint) {
+		this.arrivalTimeAtTestDriveServicePoint = arrivalTimeAtTestDriveServicePoint;
+	}
+
+	public double getArrivalTimeAtClosureServicePoint() {
+		return arrivalTimeAtClosureServicePoint;
+	}
+
+	public void setArrivalTimeAtClosureServicePoint(double arrivalTimeAtClosureServicePoint) {
+		this.arrivalTimeAtClosureServicePoint = arrivalTimeAtClosureServicePoint;
+	}
+
+	public double getRemovalTimeAtArrivalServicePoint() {
+		return removalTimeAtArrivalServicePoint;
+	}
+
+	public void setRemovalTimeAtArrivalServicePoint(double removalTimeAtArrivalServicePoint) {
+		this.removalTimeAtArrivalServicePoint = removalTimeAtArrivalServicePoint;
+	}
+
+	public double getRemovalTimeAtFinanceServicePoint() {
+		return removalTimeAtFinanceServicePoint;
+	}
+
+	public void setRemovalTimeAtFinanceServicePoint(double removalTimeAtFinanceServicePoint) {
+		this.removalTimeAtFinanceServicePoint = removalTimeAtFinanceServicePoint;
+	}
+
+	public double getRemovalTimeAtTestDriveServicePoint() {
+		return removalTimeAtTestDriveServicePoint;
+	}
+
+	public void setRemovalTimeAtTestDriveServicePoint(double removalTimeAtTestDriveServicePoint) {
+		this.removalTimeAtTestDriveServicePoint = removalTimeAtTestDriveServicePoint;
+	}
+
+	public double getRemovalTimeAtClosureServicePoint() {
+		return removalTimeAtClosureServicePoint;
+	}
+
+	public void setRemovalTimeAtClosureServicePoint(double removalTimeAtClosureServicePoint) {
+		this.removalTimeAtClosureServicePoint = removalTimeAtClosureServicePoint;
+	}
+
+	public double getTotalTimeAtArrivalServicePoint() {
+		return totalTimeAtArrivalServicePoint;
+	}
+
+	public void updateTotalTimeAtArrivalServicePoint() {
+		this.totalTimeAtArrivalServicePoint = removalTimeAtArrivalServicePoint - arrivalTimeAtArrivalServicePoint;
+	}
+
+	public double getTotalTimeAtFinanceServicePoint() {
+		return totalTimeAtFinanceServicePoint;
+	}
+
+	public void updateTotalTimeAtFinanceServicePoint() {
+		this.totalTimeAtFinanceServicePoint = removalTimeAtFinanceServicePoint - arrivalTimeAtFinanceServicePoint;
+	}
+
+	public double getTotalTimeAtTestDriveServicePoint() {
+		return totalTimeAtTestDriveServicePoint;
+	}
+
+	public void updateTotalTimeAtTestDriveServicePoint() {
+		this.totalTimeAtTestDriveServicePoint = removalTimeAtTestDriveServicePoint - arrivalTimeAtTestDriveServicePoint;
+	}
+
+	public double getTotalTimeAtClosureServicePoint() {
+		return totalTimeAtClosureServicePoint;
+	}
+
+	public void updateTotalTimeAtClosureServicePoint() {
+		this.totalTimeAtClosureServicePoint = removalTimeAtClosureServicePoint - arrivalTimeAtClosureServicePoint;
+	}
+
+
 
 	public double calculateFinanceProbability(double customerCreditScore) {
 		if (customerCreditScore >= BASECREDITSCORE) {

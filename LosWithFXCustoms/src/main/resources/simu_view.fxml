@@ -31,7 +31,7 @@
                         <Slider fx:id="arrivalMeanSlider" max="60" min="1" value="10" />
                         <Label fx:id="arrivalMeanLabel" text="10 minutes" />
                         <Label text="Variance" />
-                        <Slider fx:id="arrivalVarianceSlider" max="10" min="0" value="2" />
+                        <Slider fx:id="arrivalVarianceSlider" max="10" min="1" value="2" />
                         <Label fx:id="arrivalVarianceLabel" text="2" />
                     </VBox>
                 </TitledPane>
@@ -41,7 +41,7 @@
                         <Slider fx:id="financeMeanSlider" max="60" min="1" value="15" />
                         <Label fx:id="financeMeanLabel" text="15 minutes" />
                         <Label text="Variance" />
-                        <Slider fx:id="financeVarianceSlider" max="10" min="0" value="3" />
+                        <Slider fx:id="financeVarianceSlider" max="10" min="1" value="3" />
                         <Label fx:id="financeVarianceLabel" text="3" />
                     </VBox>
                 </TitledPane>
@@ -51,7 +51,7 @@
                         <Slider fx:id="closureMeanSlider" max="60" min="1" value="30" />
                         <Label fx:id="closureMeanLabel" text="30 minutes" />
                         <Label text="Variance" />
-                        <Slider fx:id="closureVarianceSlider" max="10" min="0" value="10" />
+                        <Slider fx:id="closureVarianceSlider" max="10" min="1" value="10" />
                         <Label fx:id="closureVarianceLabel" text="10" />
                     </VBox>
                 </TitledPane>
@@ -61,7 +61,7 @@
                         <Slider fx:id="testDriveMeanSlider" max="60" min="1" value="30" />
                         <Label fx:id="testDriveMeanLabel" text="30 minutes" />
                         <Label text="Variance" />
-                        <Slider fx:id="testDriveVarianceSlider" max="10" min="0" value="10" />
+                        <Slider fx:id="testDriveVarianceSlider" max="10" min="1" value="10" />
                         <Label fx:id="testDriveVarianceLabel" text="10" />
                     </VBox>
                 </TitledPane>

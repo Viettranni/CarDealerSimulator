@@ -152,7 +152,7 @@
                 <padding>
                     <Insets top="10" />
                 </padding>
-                <Label text="Simulation Speed (x real-time)" />
+                <Label text="Duration of simulation (x * real-time)" />
                 <Slider fx:id="simulationSpeedSlider" max="10" min="1" value="1" />
                 <Label fx:id="simulationSpeedLabel" text="1x" />
             </VBox>

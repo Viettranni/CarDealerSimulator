@@ -204,6 +204,7 @@ public class MyEngine extends Engine {
 				shortestArrivalServicePoint = getShortestQueue(arrivalServicePoints);
 				customer = new Customer();
 				shortestArrivalServicePoint.addQueue(customer);
+				customer.setArrivalTimeAtArrivalServicePoint(Clock.getInstance().getClock());
 				carDealerShop.addCustomerAtTheDealership(customer);
 				// Generate one arrival event per each customer added to the arrivalServicePoint queue. In this case one
 				arrivalProcess.generateNextEvent();
@@ -223,6 +224,7 @@ public class MyEngine extends Engine {
 						customer.setRemovalTimeAtArrivalServicePoint(Clock.getInstance().getClock());
 						customer.updateTotalTimeAtArrivalServicePoint();
 						shortestFinanceServicePoint.addQueue(customer);
+						customer.setArrivalTimeAtFinanceServicePoint(Clock.getInstance().getClock());
 					}
 				}
 				break;
@@ -242,6 +244,7 @@ public class MyEngine extends Engine {
 							customer.setRemovalTimeAtFinanceServicePoint(Clock.getInstance().getClock());
 							customer.updateTotalTimeAtFinanceServicePoint();
 							shortestTestdriveServicePoint.addQueue(customer);
+							customer.setArrivalTimeAtTestDriveServicePoint(Clock.getInstance().getClock());
 						}
 					}
 				}
@@ -262,6 +265,7 @@ public class MyEngine extends Engine {
 							customer.setRemovalTimeAtTestDriveServicePoint(Clock.getInstance().getClock());
 							customer.updateTotalTimeAtTestDriveServicePoint();
 							shortestClosureServicePoint.addQueue(customer);
+							customer.setArrivalTimeAtClosureServicePoint(Clock.getInstance().getClock());
 						}
 					}
 				}
@@ -285,9 +289,9 @@ public class MyEngine extends Engine {
 						customer.setRemovalTime(Clock.getInstance().getClock());
 						customer.setTotalTime();
 						customer.reportResults();
-						break;
 					}
 				}
+				break;
 		}
 		// Delay each iteration of the simulation by 1 second
 		// User can speed up or slow down the simulation from different thread

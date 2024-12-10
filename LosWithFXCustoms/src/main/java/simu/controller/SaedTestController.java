@@ -75,6 +75,10 @@ public class SaedTestController {
     private boolean isInFinance = false;
     private boolean isInTestDrive = false;
     private boolean isInClosure = false;
+    private int arrivalOccupied;
+    private int financeOccupied;
+    private int testDriveOccupied;
+    private int closureOccupied;
     private LinkedList<Customer> customers = new LinkedList<>();
 
 
@@ -429,8 +433,8 @@ public class SaedTestController {
             int customersBefore = 0;
             int carsSoldBefore = 0;
             while (!simuController.isSimulationComplete()) {
-                getServicePointQueueSize();
-                //getCustomerStatus();
+                //getServicePointQueueSize();
+                getCustomerStatus();
                 displaySimulationTime();
                 changeSimulationSpeed();
                 try {
@@ -533,9 +537,6 @@ public class SaedTestController {
             consoleLog.appendText("\nSimulation ended at: " + (int) Clock.getInstance().getClock());
             consoleLog.appendText("\nResults for: " + tableName);
             consoleLog.appendText("\nProcessed Customers: " + simuController.getMyEngine().getProcessedCustomer().size() + "\n");
-            consoleLog.appendText("Closure mean: " + simuController.getMyEngine().getClosureMean() + "\n");
-            consoleLog.appendText("Closure variance: " + simuController.getMyEngine().getClosureVariance() + "\n");
-            consoleLog.appendText(("Closure service time: " + simuController.getMyEngine().getClosureServiceTime().sample() + "\n"));
 
             // Initialize containers for all car and fuel types
             Set<String> allCarTypes = new HashSet<>();
@@ -550,8 +551,8 @@ public class SaedTestController {
             // Print header and customer data
             consoleLog.appendText(String.format(
                     "%-10s %-15s %-15s %-15s %-18s %-18s %-18s %-18s %-20s %-15s %-10s %-12s %-18s %-22s %-20s\n",
-                    "ID", "Arrival Time", "Removal Time", "Total Time", "Info Point", "Finance Point",
-                    "Test Drive Point", "Closure Point", "Preferred Car Type", "Fuel Type", "Budget",
+                    "ID", "Arrival Time", "Removal Time", "Total Time", "Time At Info", "Time At Finance",
+                    "Time At Test Drive", "Time At Closure", "Preferred Car Type", "Fuel Type", "Budget",
                     "Credit Score", "Finance Accepted", "Happy with Test-drive", "Purchased a Car"
             ));
 
@@ -568,7 +569,7 @@ public class SaedTestController {
                 totalInfoPointTime += customer.getTotalTimeAtArrivalServicePoint();
                 totalFinancePointTime += customer.getTotalTimeAtFinanceServicePoint();
                 totalTestDrivePointTime += customer.getTotalTimeAtTestDriveServicePoint();
-                totalClosurePointTime += customer.getRemovalTimeAtClosureServicePoint();
+                totalClosurePointTime += customer.getTotalTimeAtClosureServicePoint();
                 totalBudget += customer.getBudget();
                 totalCreditScore += customer.getCreditScore();
                 if (customer.isPurchased()) purchasedCount++;

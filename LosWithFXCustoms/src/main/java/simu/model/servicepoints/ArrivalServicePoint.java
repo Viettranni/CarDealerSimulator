@@ -24,7 +24,7 @@ public class ArrivalServicePoint extends ServicePoint {
             return;
         }
         customer.setCurrentServicePoint("arrival");
-        customer.setArrivalTimeAtArrivalServicePoint(Clock.getInstance().getClock());
+        //customer.setArrivalTimeAtArrivalServicePoint(Clock.getInstance().getClock());
         Trace.out(Trace.Level.INFO, "Customer #" + customer.getId() + " is welcomed at the arrival point.");
         super.beginService();
     }

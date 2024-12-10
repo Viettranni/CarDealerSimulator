@@ -26,7 +26,7 @@ public class FinanceServicePoint extends ServicePoint {
             return;
         }
         customer.setCurrentServicePoint("finance");
-        customer.setArrivalTimeAtFinanceServicePoint(Clock.getInstance().getClock());
+        //customer.setArrivalTimeAtFinanceServicePoint(Clock.getInstance().getClock());
         Trace.out(Trace.Level.INFO, "Checking finances for Customer #" + customer.getId());
         double customerCreditScore = customer.getCreditScore();
         boolean financeAccepted = Math.random() < customer.calculateFinanceProbability(customerCreditScore);

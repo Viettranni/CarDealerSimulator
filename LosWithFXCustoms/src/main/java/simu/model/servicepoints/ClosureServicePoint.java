@@ -24,7 +24,6 @@ public class ClosureServicePoint extends ServicePoint {
             return;
         }
         customer.setCurrentServicePoint("closure");
-        customer.setArrivalTimeAtClosureServicePoint(Clock.getInstance().getClock());
         Trace.out(Trace.Level.INFO, "Customer #" + customer.getId() + " is closing the deal.");
 
         Car car = customer.getPurchaseCar();
@@ -40,7 +39,7 @@ public class ClosureServicePoint extends ServicePoint {
             Trace.out(Trace.Level.WAR, "Customer #" + customer.getId() + " decided not to purchase and is leaving.");
         }
 
-        super.endService();
+        super.beginService();
         Trace.out(Trace.Level.INFO, "queue"+ queue.toString());
     }
 }

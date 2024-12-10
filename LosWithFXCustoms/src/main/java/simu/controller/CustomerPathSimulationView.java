@@ -52,10 +52,10 @@ public class CustomerPathSimulationView extends Pane {
         // Set up the roof
         Image roofImage = new Image("roof.png");
         roofView = new ImageView(roofImage);
-        roofView.setFitWidth(150);
-        roofView.setFitHeight(130);
-        roofView.setX(705 - 460);
-        roofView.setY(25);
+        roofView.setFitWidth(163);
+        roofView.setFitHeight(122);
+        roofView.setX(271);
+        roofView.setY(28);
 
         getChildren().addAll(backgroundView, customerView, carView, roofView);
     }

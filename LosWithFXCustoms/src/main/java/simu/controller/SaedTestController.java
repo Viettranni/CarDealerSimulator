@@ -199,6 +199,25 @@ public class SaedTestController {
 
             {
                 // Configure delete button
+                deleteButton.setStyle("-fx-text-fill: #0c0c1e; " +
+                        "-fx-background-color: #cc5cb8; " +
+                        "-fx-padding: 4 20; " +
+                        "-fx-font-weight: bold; " +
+                        "-fx-border-radius: 3px;");
+
+                // Add hover effect
+                deleteButton.setOnMouseEntered(e -> deleteButton.setStyle("-fx-text-fill: black; " +
+                        "-fx-background-color: #ff77e9; " + // Lighter color on hover
+                        "-fx-padding: 4 20; " +
+                        "-fx-font-weight: bold; " +
+                        "-fx-border-radius: 3px;"));
+
+                deleteButton.setOnMouseExited(e -> deleteButton.setStyle("-fx-text-fill: #0c0c1e; " +
+                        "-fx-background-color: #cc5cb8; " +
+                        "-fx-padding: 4 20; " +
+                        "-fx-font-weight: bold; " +
+                        "-fx-border-radius: 3px;"));
+
                 deleteButton.setOnAction(event -> {
                     int selectedIndex = getIndex(); // Get current row index
                     if (selectedIndex >= 0) {

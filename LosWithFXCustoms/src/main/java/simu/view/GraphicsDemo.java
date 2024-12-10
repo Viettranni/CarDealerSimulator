@@ -14,7 +14,7 @@ public class GraphicsDemo extends Application {
         Parent root = fxmlLoader.load();
 
         Scene scene = new Scene(root);
-        scene.getStylesheets().add("style.css");
+        //scene.getStylesheets().add("style.css");
 
         stage.setScene(scene);
 

@@ -7,6 +7,8 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.StackPane;
+import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
 import simu.framework.Clock;
 import simu.framework.Trace;
@@ -19,6 +21,12 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.*;
+
+import javafx.application.Platform;
+import javafx.fxml.FXML;
+import javafx.scene.control.*;
+import javafx.scene.layout.StackPane;
+import javafx.scene.layout.VBox;
 
 public class SaedTestController {
     public TextField dealerShipName;
@@ -61,6 +69,11 @@ public class SaedTestController {
     @FXML private Label simulationSpeedLabel;
     @FXML private TextArea consoleLog;
     @FXML private Label consoleLogLabel;
+    // ------------------------------- experiments with the animation -----------------------------//
+    @FXML private TabPane rightSideTabPane;
+    @FXML private StackPane animationContainer;
+    private CustomerPathSimulationView customerPathSimulation;
+    // ------------------------------- experiments with the animation -----------------------------//
     private SimuController simuController = new SimuController();
     private Thread simulationThread;
     private String tableName;
@@ -93,7 +106,15 @@ public class SaedTestController {
         setupCarSets();
         setupCarTable();
         //setupPriceAdjustment();
+        setupAnimationView();
     }
+
+    // ------------------------------- experiments with the animation -----------------------------//
+    private void setupAnimationView() {
+        customerPathSimulation = new CustomerPathSimulationView();
+        animationContainer.getChildren().add(customerPathSimulation);
+    }
+    // ------------------------------- experiments with the animation -----------------------------//
 
     private void setupSliders() {
         setupSlider(arrivalMeanSlider, arrivalMeanLabel, " minutes");
@@ -315,6 +336,15 @@ public class SaedTestController {
         setupCarSets();
         // Monitor simulation progress in a separate thread
         updateUI();
+
+        // ------------------------------- experiments with the animation -----------------------------//
+        new Thread(() -> {
+            Platform.runLater(() -> {
+                customerPathSimulation.startAnimation();
+                rightSideTabPane.getSelectionModel().select(1); // Switch to Animation tab
+            });
+        }).start();
+        // ------------------------------- experiments with the animation -----------------------------//
     }
 
     public void changeSimulationSpeed(){

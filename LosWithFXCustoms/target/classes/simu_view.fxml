@@ -1,15 +1,32 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.geometry.*?>
-<?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.Slider?>
+<?import javafx.scene.control.Spinner?>
+<?import javafx.scene.control.Tab?>
+<?import javafx.scene.control.TabPane?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.TitledPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
 
-<HBox prefHeight="713.0" prefWidth="1279.0" spacing="10" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="simu.controller.SaedTestController">
+<HBox prefHeight="713.0" prefWidth="1279.0" spacing="10" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="simu.controller.SaedTestController">
     <padding>
         <Insets bottom="20" left="20" right="20" top="20" />
     </padding>
-    <ScrollPane prefHeight="1127.0" prefWidth="514.0">
-        <VBox prefHeight="1301.0" prefWidth="483.0">
+    <ScrollPane prefHeight="673.0" prefWidth="566.0">
+        <VBox prefHeight="1301.0" prefWidth="523.0">
             <Label style="-fx-font-size: 24px; -fx-font-weight: bold;" text="LosSantosCustoms Simulator" />
             <Label style="-fx-font-size: 14px;" text="Configure your car sales dealer simulation">
                 <VBox.margin>
@@ -91,11 +108,14 @@
                     <GridPane hgap="10" vgap="10">
                         <TextField fx:id="dealerShipName" promptText="Dealership name" GridPane.columnIndex="0" GridPane.rowIndex="0" />
                         <TextField fx:id="amountOfCars" promptText="Amount" GridPane.columnIndex="1" GridPane.rowIndex="0" />
-                        <ComboBox fx:id="carType" promptText="Select car type" GridPane.columnIndex="2" GridPane.rowIndex="0" GridPane.columnSpan="3"  />
-                        <ComboBox fx:id="fuelType" prefHeight="26.0" prefWidth="113.0" promptText="Select fuel type" GridPane.columnIndex="3" GridPane.rowIndex="0"  />
+                        <ComboBox fx:id="carType" prefWidth="130.0" promptText="Select car type" GridPane.columnIndex="2" GridPane.columnSpan="3" GridPane.rowIndex="0" />
+                        <ComboBox fx:id="fuelType" prefHeight="26.0" prefWidth="130.0" promptText="Select fuel type" GridPane.columnIndex="3" GridPane.rowIndex="0">
+                     <GridPane.margin>
+                        <Insets left="30.0" />
+                     </GridPane.margin></ComboBox>
                         <TextField fx:id="meanPrice" promptText="Mean Price" GridPane.columnIndex="0" GridPane.rowIndex="1" />
                         <TextField fx:id="priceVariance" promptText="Price Variance" GridPane.columnIndex="1" GridPane.rowIndex="1" />
-                        <TextField fx:id="basePrice" promptText="Base Price" GridPane.columnIndex="2" GridPane.rowIndex="1" editable="false" />
+                        <TextField fx:id="basePrice" editable="false" promptText="Base Price" GridPane.columnIndex="2" GridPane.rowIndex="1" />
                         <ComboBox fx:id="carSets" promptText="Select car sets" GridPane.columnIndex="3" GridPane.rowIndex="1" />
                         <!--<VBox spacing="5" GridPane.columnIndex="4" GridPane.rowIndex="0">
                             <Label text="Price Adjustment" />
@@ -143,8 +163,16 @@
             </Button>
         </VBox>
     </ScrollPane>
-    <VBox maxWidth="705.0" prefHeight="1355.0" prefWidth="705.0" spacing="10">
-        <Label fx:id="consoleLogLabel" style="-fx-font-size: 18px; -fx-font-weight: bold;" text="Console Log" />
-        <TextArea fx:id="consoleLog" editable="false" prefHeight="600" wrapText="true" />
+    <VBox prefHeight="673.0" prefWidth="705.0" spacing="10">
+        <Label fx:id="consoleLogLabel" prefHeight="27.0" prefWidth="383.0" style="-fx-font-size: 18px; -fx-font-weight: bold;" text="Your simulation will be displayed here" />
+
+        <TabPane fx:id="rightSideTabPane" VBox.vgrow="ALWAYS">
+            <Tab closable="false" text="Console Log">
+                <TextArea fx:id="consoleLog" editable="false" wrapText="true" />
+            </Tab>
+            <Tab closable="false" text="Animation">
+                <StackPane fx:id="animationContainer" />
+            </Tab>
+        </TabPane>
     </VBox>
 </HBox>

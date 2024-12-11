@@ -1,32 +1,24 @@
 package simu.controller;
 
-import javafx.beans.property.ReadOnlyStringWrapper;
+
+import java.util.*;
+import java.io.File;
 import javafx.fxml.FXML;
-import javafx.scene.control.*;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
-import javafx.scene.control.cell.TextFieldTableCell;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.StackPane;
-import javafx.scene.layout.VBox;
-import javafx.scene.text.Font;
+import java.io.FileWriter;
+import simu.model.Customer;
+import java.io.IOException;
 import simu.framework.Clock;
 import simu.framework.Trace;
-import javafx.application.Platform;
-import simu.model.Customer;
-import simu.model.ServicePoint;
-
 import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.util.*;
-
-import javafx.application.Platform;
-import javafx.fxml.FXML;
+import javafx.scene.text.Font;
 import javafx.scene.control.*;
+import simu.model.ServicePoint;
+import javafx.application.Platform;
 import javafx.scene.layout.StackPane;
-import javafx.scene.layout.VBox;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+import javafx.beans.property.ReadOnlyStringWrapper;
+
 
 public class SaedTestController {
     public TextField dealerShipName;
@@ -73,6 +65,8 @@ public class SaedTestController {
     @FXML private TabPane rightSideTabPane;
     @FXML private StackPane animationContainer;
     private CustomerPathSimulationView customerPathSimulation;
+    CustomerPathSimulationView view;
+    CustomerPathSimulationController controller;
     // ------------------------------- experiments with the animation -----------------------------//
     private SimuController simuController = new SimuController();
     private Thread simulationThread;
@@ -111,8 +105,9 @@ public class SaedTestController {
 
     // ------------------------------- experiments with the animation -----------------------------//
     private void setupAnimationView() {
-        customerPathSimulation = new CustomerPathSimulationView();
-        animationContainer.getChildren().add(customerPathSimulation);
+        view = new CustomerPathSimulationView();
+        controller = new CustomerPathSimulationController(view);
+        animationContainer.getChildren().add(view);
     }
     // ------------------------------- experiments with the animation -----------------------------//
 
@@ -359,10 +354,12 @@ public class SaedTestController {
         // ------------------------------- experiments with the animation -----------------------------//
         new Thread(() -> {
             Platform.runLater(() -> {
-                customerPathSimulation.startAnimation();
+                controller.restartAnimation();
                 rightSideTabPane.getSelectionModel().select(1); // Switch to Animation tab
             });
         }).start();
+//        rightSideTabPane.getSelectionModel().select(1);
+//        controller.restartAnimation();
         // ------------------------------- experiments with the animation -----------------------------//
     }
 
@@ -574,6 +571,9 @@ public class SaedTestController {
 
 
     public void results() {
+        controller.stopAnimation();
+        rightSideTabPane.getSelectionModel().select(0);
+
         Platform.runLater(() -> {
             // Clear previous logs
             //consoleLog.clear();

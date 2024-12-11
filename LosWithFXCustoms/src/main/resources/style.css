@@ -153,7 +153,7 @@ VBox{
 .context-menu {
     -fx-background-color: #1a1a2e;
     -fx-text-fill: #ff77e9;
-    -fx-padding: 5px;
+    -fx-padding: 0px;
 }
 
 .context-menu .menu-item {

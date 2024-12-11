@@ -112,7 +112,8 @@ public class CarsDao {
             return;
         }
 
-        String sql = "CREATE TABLE " + tableName + " (" +
+        String sqlDrop = "DROP TABLE IF EXISTS " + tableName;
+        String sqlCreate = "CREATE TABLE " + tableName + " (" +
                 "id INT AUTO_INCREMENT PRIMARY KEY, " +
                 "amount INT(10) NOT NULL, " +
                 "car_type VARCHAR(10) NOT NULL, " +
@@ -122,14 +123,18 @@ public class CarsDao {
                 "base_price DECIMAL(10,4)" +
                 ");";
 
-        try {
-            Statement stmt = conn.createStatement();
-            stmt.execute(sql);
-            System.out.println("Table " + tableName + " created successfully.");
+        try (Statement statement = conn.createStatement()) {
+            // Drop the table if it exists
+            statement.execute(sqlDrop);
+
+            // Create the new table
+            statement.execute(sqlCreate);
+
+            System.out.println("Table " + tableName + " recreated successfully.");
         } catch (SQLException e) {
-            errorMessage = "Error creating table " + tableName + ": " + e.getMessage();
             e.printStackTrace();
         }
+
     }
 
     /**

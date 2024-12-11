@@ -1,32 +1,24 @@
 package simu.controller;
 
-import javafx.beans.property.ReadOnlyStringWrapper;
+
+import java.util.*;
+import java.io.File;
 import javafx.fxml.FXML;
-import javafx.scene.control.*;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
-import javafx.scene.control.cell.TextFieldTableCell;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.StackPane;
-import javafx.scene.layout.VBox;
-import javafx.scene.text.Font;
+import java.io.FileWriter;
+import simu.model.Customer;
+import java.io.IOException;
 import simu.framework.Clock;
 import simu.framework.Trace;
-import javafx.application.Platform;
-import simu.model.Customer;
-import simu.model.ServicePoint;
-
 import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.util.*;
-
-import javafx.application.Platform;
-import javafx.fxml.FXML;
+import javafx.scene.text.Font;
 import javafx.scene.control.*;
+import simu.model.ServicePoint;
+import javafx.application.Platform;
 import javafx.scene.layout.StackPane;
-import javafx.scene.layout.VBox;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+import javafx.beans.property.ReadOnlyStringWrapper;
+
 
 public class SaedTestController {
     public TextField dealerShipName;
@@ -69,10 +61,14 @@ public class SaedTestController {
     @FXML private Label simulationSpeedLabel;
     @FXML private TextArea consoleLog;
     @FXML private Label consoleLogLabel;
+    @FXML private Slider simulationDurationSlider;
+    @FXML private Label simulationDurationLabel;
     // ------------------------------- experiments with the animation -----------------------------//
     @FXML private TabPane rightSideTabPane;
     @FXML private StackPane animationContainer;
     private CustomerPathSimulationView customerPathSimulation;
+    CustomerPathSimulationView view;
+    CustomerPathSimulationController controller;
     // ------------------------------- experiments with the animation -----------------------------//
     private SimuController simuController = new SimuController();
     private Thread simulationThread;
@@ -111,8 +107,9 @@ public class SaedTestController {
 
     // ------------------------------- experiments with the animation -----------------------------//
     private void setupAnimationView() {
-        customerPathSimulation = new CustomerPathSimulationView();
-        animationContainer.getChildren().add(customerPathSimulation);
+        view = new CustomerPathSimulationView();
+        controller = new CustomerPathSimulationController(view);
+        animationContainer.getChildren().add(view);
     }
     // ------------------------------- experiments with the animation -----------------------------//
 
@@ -126,6 +123,7 @@ public class SaedTestController {
         setupSlider(testDriveMeanSlider, testDriveMeanLabel, " minutes");
         setupSlider(testDriveVarianceSlider, testDriveVarianceLabel, "");
         setupSlider(simulationSpeedSlider, simulationSpeedLabel, "x");
+        setupSlider(simulationDurationSlider, simulationDurationLabel, " hours");
     }
 
     private void setupSlider(Slider slider, Label label, String suffix) {
@@ -278,7 +276,7 @@ public class SaedTestController {
         String carPriceVariance = priceVariance.getText();
         String carBasePrice = basePrice.getText();
 
-        if (amount != null && type != null && carFuelType != null && carMeanPrice != null && carPriceVariance != null) {
+        if (!amount.isEmpty() && type != null && carFuelType != null && !carMeanPrice.isEmpty() && !carPriceVariance.isEmpty()) {
             if (Integer.parseInt(carMeanPrice) <= 0 && Integer.parseInt(carPriceVariance) <= 0) {
                 consoleLog.appendText("Car mean price and price variance cannot be 0 or negative.\n");
                 return;
@@ -314,8 +312,8 @@ public class SaedTestController {
         int testdriveVariance = (int) testDriveVarianceSlider.getValue();
         int closureMean = (int) closureMeanSlider.getValue();
         int closureVariance = (int) closureVarianceSlider.getValue();
-        int simulationTime = 1440;
-        simulationSpeed = 100;
+        int simulationTime = (int) (simulationDurationSlider.getValue() * 60);
+        simulationSpeed = 300;
         int arrivalServicePoint = arrivalServicePoints.getValue();
         int financeServicePoint = financeServicePoints.getValue();
         int testdriveServicePoint = setTestDriveServicePoints();
@@ -325,6 +323,7 @@ public class SaedTestController {
             Platform.runLater(() -> consoleLog.appendText("Cannot run the simulation without adding car(s)"));
             return;
         }
+        consoleLog.clear();
         consoleLog.appendText("Simulation initialized with the following values:");
         consoleLog.appendText("\nArrival mean: " + arrivalMean + "\nArrival Variance: " + arrivalVariance);
         consoleLog.appendText("\nFinance mean: " + financeMean + "\nFinance Variance: " + financeVariance);
@@ -341,8 +340,14 @@ public class SaedTestController {
 
         //createCars();
         //createCarsFromDb();
-        simuController.creatTable(dataBaseTableName);
-        simuController.addCarsToTable(dataBaseTableName, carsToBeCreated);
+        dataBaseTableName = dealerShipName.getText().trim().replace(" ", "_");
+        if (dataBaseTableName != null) {
+            simuController.creatTable(dataBaseTableName);
+            simuController.addCarsToTable(dataBaseTableName, carsToBeCreated);
+            consoleLog.appendText("Preset is saved successfully.\n");
+        } else {
+            consoleLog.appendText("Unfortunately, you didn't provide DealerShip name, preset wouldn't be saved.\n");
+        }
 
         simuController.initializeSimulation(arrivalMean, arrivalVariance, financeMean, financeVariance, testdriveMean,
                                             testdriveVariance, closureMean, closureVariance, simulationSpeed
@@ -359,17 +364,22 @@ public class SaedTestController {
         // ------------------------------- experiments with the animation -----------------------------//
         new Thread(() -> {
             Platform.runLater(() -> {
-                customerPathSimulation.startAnimation();
+//                view = new CustomerPathSimulationView();
+//                controller = new CustomerPathSimulationController(view);
+//                animationContainer.getChildren().add(view);
+                controller.restartAnimation();
                 rightSideTabPane.getSelectionModel().select(1); // Switch to Animation tab
             });
         }).start();
+//        rightSideTabPane.getSelectionModel().select(1);
+//        controller.restartAnimation();
         // ------------------------------- experiments with the animation -----------------------------//
     }
 
     public void changeSimulationSpeed(){
         try {
             int multiplier = (int) simulationSpeedSlider.getValue();
-            if (multiplier == 10 || multiplier <= 0) multiplier = simulationSpeed;
+            if (multiplier > 9.9) multiplier = simulationSpeed;
             int newSimulationSpeed = simulationSpeed / multiplier;
             int actualSimulationSpeed = simuController.getMyEngine().getSimulationSpeed();
             if (newSimulationSpeed != actualSimulationSpeed) {
@@ -386,8 +396,9 @@ public class SaedTestController {
 
     public void displaySimulationTime(){
         try {
-            String newTime = String.valueOf((int) Clock.getInstance().getClock());
-            Platform.runLater(() -> consoleLogLabel.setText("Current Simulation time: " + newTime + "\n"));
+            double newTime = (Clock.getInstance().getClock() / 60);
+            //Platform.runLater(() -> consoleLogLabel.setText("Current Simulation time: " + newTime + " hours\n"));
+            Platform.runLater(() -> consoleLogLabel.setText(String.format("Current Simulation time: %.1f hours\n", newTime)));
             Thread.sleep(500);
         } catch (Exception e) {
             throw new RuntimeException(e);
@@ -482,8 +493,8 @@ public class SaedTestController {
             int customersBefore = 0;
             int carsSoldBefore = 0;
             while (!simuController.isSimulationComplete()) {
-                // getServicePointQueueSize();
-                // getCustomerStatus();
+                //getServicePointQueueSize();
+                //getCustomerStatus();
                 displaySimulationTime();
                 changeSimulationSpeed();
                 try {
@@ -574,17 +585,24 @@ public class SaedTestController {
 
 
     public void results() {
+//        view = null;
+//        controller = null;
+//        Platform.runLater(() -> {
+//            animationContainer.getChildren().clear(); // Modify the UI safely
+//        });
+        controller.stopAnimation();
+        rightSideTabPane.getSelectionModel().select(0);
+
         Platform.runLater(() -> {
             // Clear previous logs
-            //consoleLog.clear();
+            // consoleLog.clear();
 
             consoleLog.setFont(new Font("Arial", 1)); // Set font to Arial with size 10
             consoleLog.setWrapText(false);
 
             // Append the simulation end time and customer count
-            consoleLogLabel.setText("Simulation ended at: " + (int) Clock.getInstance().getClock());
-            consoleLog.appendText("\nSimulation ended at: " + (int) Clock.getInstance().getClock());
-            consoleLog.appendText("\nResults for: " + tableName);
+            consoleLogLabel.setText(String.format("Simulation ended at: %.1f", (Clock.getInstance().getClock() / 60)));
+            consoleLog.appendText("\nSimulation ended in: " + (int) Clock.getInstance().getClock() + " minutes");
             consoleLog.appendText("\nProcessed Customers: " + simuController.getMyEngine().getProcessedCustomer().size() + "\n");
 
             // Initialize containers for all car and fuel types
@@ -762,7 +780,7 @@ public class SaedTestController {
 
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(filePath))) {
             // Write customer data
-            writer.write("ID,Arrival Time,Removal Time,Total Time,Time At Info Point,Time At Finance Point,Time At Test Drive point,Time At Closure Point,Preferred Car Type,Fuel Type,Budget,Credit Score,Finance Accepted,Happy with Test-drive, Test Drive Count, Purchased a Car, Seller Price, Base Price\n");
+            writer.write("ID;Arrival Time;Removal Time;Total Time;Time At Info Point;Time At Finance Point;Time At Test Drive point;Time At Closure Point;Preferred Car Type;Fuel Type;Budget;Credit Score;Finance Accepted;Happy with Test-drive; Test Drive Count; Purchased a Car; Seller Price; Base Price\n");
             double totalArrivalTime = 0, totalRemovalTime = 0, totalTime = 0, totalBudget = 0, totalCreditScore = 0;
             int totalCustomers = simuController.getMyEngine().getProcessedCustomer().size();
             int purchasedCount = 0;
@@ -778,7 +796,7 @@ public class SaedTestController {
                 if (customer.isPurchased()) purchasedCount++;
 
                 writer.write(String.format(
-                        "%d,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%s,%s,%.2f,%d,%b,%b, %d, %b, %.2f, %.2f\n",
+                        "%d;%.2f;%.2f;%.2f;%.2f;%.2f;%.2f;%.2f;%s;%s;%.2f;%d;%b;%b; %d; %b; %.2f; %.2f\n",
                         customer.getId(),
                         customer.getArrivalTime(),
                         customer.getRemovalTime(),
@@ -797,7 +815,6 @@ public class SaedTestController {
                         customer.isPurchased(),
                         sellerPrice,
                         basePrice
-
                 ));
             }
 
@@ -844,12 +861,12 @@ public class SaedTestController {
             }
 
             // Write car type preferences
-            writer.write("Car Type,Customer count\n");
+            writer.write("Car Type;Customer count\n");
             for (String carType : allCarTypes) {
                 long count = simuController.getMyEngine().getProcessedCustomer().stream()
                         .filter(customer -> customer.getPreferredCarType().equals(carType))
                         .count();
-                writer.write(carType + "," + String.format("%d", count) + "\n");
+                writer.write(carType + ";" + String.format("%d", count) + "\n");
             }
 
             Platform.runLater(() -> consoleLog.appendText("Results saved successfully to: " + filePath + "\n"));
@@ -891,12 +908,12 @@ public class SaedTestController {
                 }
             }
             // Write fuel type preferences
-            writer.write("Fuel Type,Customer count\n");
+            writer.write("Fuel Type;Customer count\n");
             for (String fuelType : allFuelTypes) {
                 long count = simuController.getMyEngine().getProcessedCustomer().stream()
                         .filter(customer -> customer.getPreferredFuelType().equals(fuelType))
                         .count();
-                writer.write(fuelType + "," + String.format("%d", count) + "\n");
+                writer.write(fuelType + ";" + String.format("%d", count) + "\n");
             }
 
             Platform.runLater(() -> consoleLog.appendText("Results saved successfully to: " + filePath + "\n"));
@@ -938,10 +955,10 @@ public class SaedTestController {
                 }
             }
 
-            writer.write("Car Type,Count\n");
+            writer.write("Car Type;Count\n");
             for (String carType : allCarTypes) {
                 int soldCount = carTypeSoldCounts.getOrDefault(carType, 0);
-                writer.write(carType + "," + String.format("%d", soldCount)  + "\n");
+                writer.write(carType + ";" + String.format("%d", soldCount)  + "\n");
             }
 
             Platform.runLater(() -> consoleLog.appendText("Results saved successfully to: " + filePath + "\n"));
@@ -983,10 +1000,10 @@ public class SaedTestController {
                 }
             }
             // Write sold cars by fuel type
-            writer.write("Fuel Type,Count\n");
+            writer.write("Fuel Type;Count\n");
             for (String fuelType : allFuelTypes) {
                 int soldCount = fuelTypeSoldCounts.getOrDefault(fuelType, 0);
-                writer.write(fuelType + "," + String.format("%d", soldCount) + "\n");
+                writer.write(fuelType + ";" + String.format("%d", soldCount) + "\n");
             }
 
             Platform.runLater(() -> consoleLog.appendText("Results saved successfully to: " + filePath + "\n"));
@@ -1028,10 +1045,10 @@ public class SaedTestController {
                 }
             }
             // Write sold cars by car-fuel combination
-            writer.write("Combination,Count\n");
+            writer.write("Combination;Count\n");
             for (String combination : carFuelTypeSoldCounts.keySet()) {
                 int soldCount = carFuelTypeSoldCounts.get(combination);
-                writer.write(combination + "," + String.format("%d", soldCount) + "\n");
+                writer.write(combination + ";" + String.format("%d", soldCount) + "\n");
             }
 
             Platform.runLater(() -> consoleLog.appendText("Results saved successfully to: " + filePath + "\n"));
@@ -1073,9 +1090,9 @@ public class SaedTestController {
                 }
             }
             // Write remaining cars
-            writer.write("Car Type,Fuel Type,Base Price,Selling Price\n");
+            writer.write("Car Type;Fuel Type;Base Price;Selling Price\n");
             for (simu.model.Car car : simuController.getMyEngine().getCarDealerShop().getCarCollection()) {
-                writer.write(car.getCarType() + "," + car.getFuelType() + "," + car.getBasePrice() + "," + car.getMeanPrice() + "\n");
+                writer.write(car.getCarType() + ";" + car.getFuelType() + ";" + car.getBasePrice() + ";" + car.getMeanPrice() + "\n");
             }
             Platform.runLater(() -> consoleLog.appendText("Results saved successfully to: " + filePath + "\n"));
             System.out.println("Results saved successfully to " + filePath);
@@ -1116,9 +1133,9 @@ public class SaedTestController {
                 }
             }
             // Write sold cars
-            writer.write("Car Type,Fuel Type,Base Price,Selling Price\n");
+            writer.write("Car Type;Fuel Type;Base Price;Selling Price\n");
             for (simu.model.Car car : simuController.getMyEngine().getCarDealerShop().getSoldCars()) {
-                writer.write(car.getCarType() + "," + car.getFuelType() + "," + car.getBasePrice() + "," + car.getMeanPrice() + "\n");
+                writer.write(car.getCarType() + ";" + car.getFuelType() + ";" + car.getBasePrice() + ";" + car.getMeanPrice() + "\n");
             }
 
             Platform.runLater(() -> consoleLog.appendText("Results saved successfully to: " + filePath + "\n"));

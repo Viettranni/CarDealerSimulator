@@ -148,6 +148,24 @@ VBox{
     -fx-prompt-text-fill: #82b1ff; /* Neon blue prompt text */
 }
 
+/* Right click */
+
+.context-menu {
+    -fx-background-color: #1a1a2e;
+    -fx-text-fill: #ff77e9;
+    -fx-padding: 0px;
+}
+
+.context-menu .menu-item {
+    -fx-background-color: #1a1a2e;
+}
+
+.context-menu .menu-item:hover {
+    -fx-background-color: #2a2a3e; /* Dropdown item hover color */
+    -fx-effect: dropshadow(gaussian, rgba(255, 119, 233, 0.7), 10, 0.3, 0, 0);
+}
+
+
 /* Button styles */
 .button {
     -fx-background-color: #cc5cb8;

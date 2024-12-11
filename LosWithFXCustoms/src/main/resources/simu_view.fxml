@@ -152,9 +152,12 @@
                 <padding>
                     <Insets top="10" />
                 </padding>
-                <Label text="Duration of simulation (x * real-time)" />
+                <Label text="Simulation time (x  real-time)" />
                 <Slider fx:id="simulationSpeedSlider" max="10" min="1" value="1" />
                 <Label fx:id="simulationSpeedLabel" text="1x" />
+            <Label text="Simulation duration (in hours)" />
+            <Slider fx:id="simulationDurationSlider" max="12.0" min="6.0" value="8.0" />
+            <Label fx:id="simulationDurationLabel" text="8 hours" />
             </VBox>
             <Button maxWidth="Infinity" onAction="#handleStartSimulation" text="Start Simulation">
                 <VBox.margin>

@@ -315,7 +315,7 @@ public class SaedTestController {
         int closureMean = (int) closureMeanSlider.getValue();
         int closureVariance = (int) closureVarianceSlider.getValue();
         int simulationTime = 1440;
-        simulationSpeed = 50;
+        simulationSpeed = 100;
         int arrivalServicePoint = arrivalServicePoints.getValue();
         int financeServicePoint = financeServicePoints.getValue();
         int testdriveServicePoint = setTestDriveServicePoints();
@@ -369,8 +369,8 @@ public class SaedTestController {
     public void changeSimulationSpeed(){
         try {
             int multiplier = (int) simulationSpeedSlider.getValue();
-            if (multiplier == 1 || multiplier <= 0) multiplier = 0;
-            int newSimulationSpeed = simulationSpeed * multiplier;
+            if (multiplier == 10 || multiplier <= 0) multiplier = simulationSpeed;
+            int newSimulationSpeed = simulationSpeed / multiplier;
             int actualSimulationSpeed = simuController.getMyEngine().getSimulationSpeed();
             if (newSimulationSpeed != actualSimulationSpeed) {
                 actualSimulationSpeed = newSimulationSpeed;
@@ -482,8 +482,8 @@ public class SaedTestController {
             int customersBefore = 0;
             int carsSoldBefore = 0;
             while (!simuController.isSimulationComplete()) {
-                //getServicePointQueueSize();
-                getCustomerStatus();
+                // getServicePointQueueSize();
+                // getCustomerStatus();
                 displaySimulationTime();
                 changeSimulationSpeed();
                 try {

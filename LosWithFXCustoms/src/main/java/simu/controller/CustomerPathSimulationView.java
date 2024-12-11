@@ -137,7 +137,10 @@ public class CustomerPathSimulationView extends Pane {
         });
 
         TranslateTransition poof = createTranslateTransition(poofView, 0, 11, 3);
-        poof.setOnFinished(event -> poofView.setVisible(false));
+        poof.setOnFinished(event -> {
+            poofView.setVisible(false);
+            customerView.setVisible(true);
+        });
 
         return new SequentialTransition(
                 moveUpToSP1, moveRightToSP1, moveDownToSP1,    // 1

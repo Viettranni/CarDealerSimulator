@@ -61,6 +61,8 @@ public class SaedTestController {
     @FXML private Label simulationSpeedLabel;
     @FXML private TextArea consoleLog;
     @FXML private Label consoleLogLabel;
+    @FXML private Slider simulationDurationSlider;
+    @FXML private Label simulationDurationLabel;
     // ------------------------------- experiments with the animation -----------------------------//
     @FXML private TabPane rightSideTabPane;
     @FXML private StackPane animationContainer;
@@ -100,7 +102,7 @@ public class SaedTestController {
         setupCarSets();
         setupCarTable();
         //setupPriceAdjustment();
-        setupAnimationView();
+        //setupAnimationView();
     }
 
     // ------------------------------- experiments with the animation -----------------------------//
@@ -121,6 +123,7 @@ public class SaedTestController {
         setupSlider(testDriveMeanSlider, testDriveMeanLabel, " minutes");
         setupSlider(testDriveVarianceSlider, testDriveVarianceLabel, "");
         setupSlider(simulationSpeedSlider, simulationSpeedLabel, "x");
+        setupSlider(simulationDurationSlider, simulationDurationLabel, " hours");
     }
 
     private void setupSlider(Slider slider, Label label, String suffix) {
@@ -309,8 +312,8 @@ public class SaedTestController {
         int testdriveVariance = (int) testDriveVarianceSlider.getValue();
         int closureMean = (int) closureMeanSlider.getValue();
         int closureVariance = (int) closureVarianceSlider.getValue();
-        int simulationTime = 1440;
-        simulationSpeed = 50;
+        int simulationTime = (int) (simulationDurationSlider.getValue() * 60);
+        simulationSpeed = 300;
         int arrivalServicePoint = arrivalServicePoints.getValue();
         int financeServicePoint = financeServicePoints.getValue();
         int testdriveServicePoint = setTestDriveServicePoints();
@@ -354,6 +357,9 @@ public class SaedTestController {
         // ------------------------------- experiments with the animation -----------------------------//
         new Thread(() -> {
             Platform.runLater(() -> {
+                view = new CustomerPathSimulationView();
+                controller = new CustomerPathSimulationController(view);
+                animationContainer.getChildren().add(view);
                 controller.restartAnimation();
                 rightSideTabPane.getSelectionModel().select(1); // Switch to Animation tab
             });
@@ -366,8 +372,8 @@ public class SaedTestController {
     public void changeSimulationSpeed(){
         try {
             int multiplier = (int) simulationSpeedSlider.getValue();
-            if (multiplier == 1 || multiplier <= 0) multiplier = 0;
-            int newSimulationSpeed = simulationSpeed * multiplier;
+            if (multiplier > 9.9) multiplier = simulationSpeed;
+            int newSimulationSpeed = simulationSpeed / multiplier;
             int actualSimulationSpeed = simuController.getMyEngine().getSimulationSpeed();
             if (newSimulationSpeed != actualSimulationSpeed) {
                 actualSimulationSpeed = newSimulationSpeed;
@@ -383,8 +389,9 @@ public class SaedTestController {
 
     public void displaySimulationTime(){
         try {
-            String newTime = String.valueOf((int) Clock.getInstance().getClock());
-            Platform.runLater(() -> consoleLogLabel.setText("Current Simulation time: " + newTime + "\n"));
+            double newTime = (Clock.getInstance().getClock() / 60);
+            //Platform.runLater(() -> consoleLogLabel.setText("Current Simulation time: " + newTime + " hours\n"));
+            Platform.runLater(() -> consoleLogLabel.setText(String.format("Current Simulation time: %.1f hours\n", newTime)));
             Thread.sleep(500);
         } catch (Exception e) {
             throw new RuntimeException(e);
@@ -480,7 +487,7 @@ public class SaedTestController {
             int carsSoldBefore = 0;
             while (!simuController.isSimulationComplete()) {
                 //getServicePointQueueSize();
-                getCustomerStatus();
+                //getCustomerStatus();
                 displaySimulationTime();
                 changeSimulationSpeed();
                 try {
@@ -571,19 +578,24 @@ public class SaedTestController {
 
 
     public void results() {
-        controller.stopAnimation();
+        view = null;
+        controller = null;
+        Platform.runLater(() -> {
+            animationContainer.getChildren().clear(); // Modify the UI safely
+        });
+        //controller.stopAnimation();
         rightSideTabPane.getSelectionModel().select(0);
 
         Platform.runLater(() -> {
             // Clear previous logs
-            //consoleLog.clear();
+            consoleLog.clear();
 
             consoleLog.setFont(new Font("Arial", 1)); // Set font to Arial with size 10
             consoleLog.setWrapText(false);
 
             // Append the simulation end time and customer count
-            consoleLogLabel.setText("Simulation ended at: " + (int) Clock.getInstance().getClock());
-            consoleLog.appendText("\nSimulation ended at: " + (int) Clock.getInstance().getClock());
+            consoleLogLabel.setText(String.format("Simulation ended at: %.1f", (Clock.getInstance().getClock() / 60)));
+            consoleLog.appendText("\nSimulation ended in: " + (int) Clock.getInstance().getClock() + " minutes");
             consoleLog.appendText("\nResults for: " + tableName);
             consoleLog.appendText("\nProcessed Customers: " + simuController.getMyEngine().getProcessedCustomer().size() + "\n");
 

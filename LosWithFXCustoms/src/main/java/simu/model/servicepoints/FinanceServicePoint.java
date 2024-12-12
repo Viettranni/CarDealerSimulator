@@ -32,12 +32,7 @@ public class FinanceServicePoint extends ServicePoint {
         boolean financeAccepted = Math.random() < customer.calculateFinanceProbability(customerCreditScore);
         if (!financeAccepted) {  // Example credit score threshold
             Trace.out(Trace.Level.WAR, "Customer #" + customer.getId() + " rejected due to poor credit score.");
-            customer = queue.poll();//// Remove customer
-            if (customer != null) {
-                customer.setRemovalTime(Clock.getInstance().getClock());
-                customer.setTotalTime();
-                MyEngine.addProcessedCustomer(customer); // Add to the processed list
-            }
+            super.beginService();// Proceed to schedule the next event
         } else {
             Trace.out(Trace.Level.INFO, "Customer #" + customer.getId() + " approved for financing.");
             customer.setFinanceAccepted(true);

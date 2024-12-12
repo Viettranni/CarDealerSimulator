@@ -245,6 +245,13 @@ public class MyEngine extends Engine {
 							customer.updateTotalTimeAtFinanceServicePoint();
 							shortestTestdriveServicePoint.addQueue(customer);
 							customer.setArrivalTimeAtTestDriveServicePoint(Clock.getInstance().getClock());
+						} else {
+							customer = financePoint.removeQueue();//// Remove customer
+							customer.setRemovalTimeAtFinanceServicePoint(Clock.getInstance().getClock());
+							customer.updateTotalTimeAtFinanceServicePoint();
+							customer.setRemovalTime(Clock.getInstance().getClock());
+							customer.setTotalTime();
+							MyEngine.addProcessedCustomer(customer); // Add to the processed list
 						}
 					}
 				}
@@ -266,6 +273,13 @@ public class MyEngine extends Engine {
 							customer.updateTotalTimeAtTestDriveServicePoint();
 							shortestClosureServicePoint.addQueue(customer);
 							customer.setArrivalTimeAtClosureServicePoint(Clock.getInstance().getClock());
+						} else {
+							customer = testdrive.removeQueue();//// Remove customer
+							customer.setRemovalTimeAtTestDriveServicePoint(Clock.getInstance().getClock());
+							customer.updateTotalTimeAtTestDriveServicePoint();
+							customer.setRemovalTime(Clock.getInstance().getClock());
+							customer.setTotalTime();
+							MyEngine.addProcessedCustomer(customer); // Add to the processed list
 						}
 					}
 				}

@@ -341,7 +341,7 @@ public class SaedTestController {
         //createCars();
         //createCarsFromDb();
         dataBaseTableName = dealerShipName.getText().trim().replace(" ", "_");
-        if (dataBaseTableName != null) {
+        if (!dataBaseTableName.isEmpty()) {
             simuController.creatTable(dataBaseTableName);
             simuController.addCarsToTable(dataBaseTableName, carsToBeCreated);
             consoleLog.appendText("Preset is saved successfully.\n");
@@ -601,7 +601,7 @@ public class SaedTestController {
             consoleLog.setWrapText(false);
 
             // Append the simulation end time and customer count
-            consoleLogLabel.setText(String.format("Simulation ended at: %.1f", (Clock.getInstance().getClock() / 60)));
+            consoleLogLabel.setText(String.format("Simulation ended at: %.1f hours", (Clock.getInstance().getClock() / 60)));
             consoleLog.appendText("\nSimulation ended in: " + (int) Clock.getInstance().getClock() + " minutes");
             consoleLog.appendText("\nProcessed Customers: " + simuController.getMyEngine().getProcessedCustomer().size() + "\n");
 

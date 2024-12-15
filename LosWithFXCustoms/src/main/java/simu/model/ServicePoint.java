@@ -49,23 +49,33 @@ public class ServicePoint {
 		reserved = true;
 		eventList.add(new Event(eventTypeScheduled, Clock.getInstance().getClock()));
 	}
-
+	/**
+	 * @hidden
+	 */
 	public boolean isReserved(){
 		return reserved;
 	}
-
+	/**
+	 * @hidden
+	 */
 	public boolean isOnQueue(){
 		return queue.size() != 0;
 	}
-
+	/**
+	 * @hidden
+	 */
 	public EventType getEventType(){
 		return eventTypeScheduled;
 	}
-
+	/**
+	 * @hidden
+	 */
 	public LinkedList<Customer> getQueue(){
 		return queue;
 	}
-
+	/**
+	 * @hidden
+	 */
 	public String getName() {
 		return name;
 	}

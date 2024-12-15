@@ -9,12 +9,50 @@ import simu.model.EventType;
 import simu.model.MyEngine;
 import simu.model.ServicePoint;
 
-
+/**
+ * Represents a finance service point in the simulation.
+ *
+ * <p>This class extends the generic <code>ServicePoint</code> and specializes in handling
+ * the financial approval process for customers. It evaluates each customer's credit score
+ * and determines whether they qualify for financing. Customers who are approved proceed
+ * to the next stage in the simulation. Finance service points are the second interaction
+ * point for customers in the simulation.</p>
+ *
+ * <p><strong>Key Responsibilities:</strong></p>
+ * <ul>
+ *   <li>Processes customer financing requests and determines approval.</li>
+ *   <li>Logs financing outcomes for each customer.</li>
+ *   <li>Delegates service start logic to the parent <code>ServicePoint</code>.</li>
+ * </ul>
+ *
+ * @see ServicePoint
+ */
 public class FinanceServicePoint extends ServicePoint {
+    /**
+     * Constructs a finance service point with the specified attributes.
+     *
+     * @param generator  A distribution generator used to determine service times.
+     * @param eventList  The event list to schedule future simulation events.
+     * @param type       The event type associated with this service point.
+     */
     public FinanceServicePoint(ContinuousGenerator generator, EventList eventList, EventType type) {
         super(generator, eventList, type, "finance");
     }
 
+    /**
+     * Begins service for the customer at the finance service point.
+     *
+     * <p><strong>Key Steps:</strong></p>
+     * <ul>
+     *   <li>Checks the queue and retrieves the first customer.</li>
+     *   <li>Logs the customer's interaction at the finance service point.</li>
+     *   <li>Calculates the probability of financing approval based on the customer's credit score.</li>
+     *   <li>Logs whether the customer was approved or rejected for financing.</li>
+     *   <li>Delegates further service logic to the parent <code>ServicePoint</code>.</li>
+     * </ul>
+     *
+     *<p><strong>Note:</strong> If the queue is empty, this method exits without taking action.</p>
+     */
     @Override
     public void beginService() {
         if (!isOnQueue()) return;

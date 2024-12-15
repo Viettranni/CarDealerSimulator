@@ -48,8 +48,6 @@ public class SaedTestController {
     @FXML private ComboBox<String> fuelType;
     @FXML private ComboBox<String> carSets;
     @FXML private TextField basePrice;
-    @FXML private Slider priceAdjustmentSlider;
-    @FXML private Label adjustedPriceLabel;
     @FXML private TableView<String[]> carTable;
     @FXML private TableColumn<String[], String> carAmountColumn;
     @FXML private TableColumn<String[], String> carTypeColumn;
@@ -63,34 +61,25 @@ public class SaedTestController {
     @FXML private Label consoleLogLabel;
     @FXML private Slider simulationDurationSlider;
     @FXML private Label simulationDurationLabel;
-    // ------------------------------- experiments with the animation -----------------------------//
+    // ------------------------------- animation stuff -----------------------------//
     @FXML private TabPane rightSideTabPane;
     @FXML private StackPane animationContainer;
     private CustomerPathSimulationView customerPathSimulation;
     CustomerPathSimulationView view;
     CustomerPathSimulationController controller;
-    // ------------------------------- experiments with the animation -----------------------------//
+    // ------------------------------- animation stuff -----------------------------//
     private SimuController simuController = new SimuController();
     private Thread simulationThread;
     private String tableName;
     private ArrayList<String[]> carsToBeCreated = new ArrayList<>();
     private int simulationSpeed;
     private String dataBaseTableName;
-    private int arrivalCustomerAmount;
-    private int financeCustomerAmount;
-    private int testDriveCustomerAmount;
-    private int closureCustomerAmount;
-    private boolean isInArrival = false;
-    private boolean isInFinance = false;
-    private boolean isInTestDrive = false;
-    private boolean isInClosure = false;
-    private int arrivalOccupied;
-    private int financeOccupied;
-    private int testDriveOccupied;
-    private int closureOccupied;
     private LinkedList<Customer> customers = new LinkedList<>();
 
-
+    /**
+     * Initializes the UI components by setting up sliders, car type listeners, car set listeners,
+     * table view listeners, car types, fuel types, car sets, and animation view.
+     */
     @FXML
     public void initialize() {
         setupSliders();
@@ -101,19 +90,27 @@ public class SaedTestController {
         setUpFuelTypes();
         setupCarSets();
         setupCarTable();
-        //setupPriceAdjustment();
         setupAnimationView();
     }
 
-    // ------------------------------- experiments with the animation -----------------------------//
+    /**
+     * Sets up the animation view by initializing the CustomerPathSimulationView and its controller,
+     * and adding the view to the animation container.
+     */
     private void setupAnimationView() {
         view = new CustomerPathSimulationView();
         controller = new CustomerPathSimulationController(view);
         animationContainer.getChildren().add(view);
     }
-    // ------------------------------- experiments with the animation -----------------------------//
 
-    private void setupSliders() {
+
+    /**
+     * Configures the sliders for various parameters and sets their value listeners
+     * to update corresponding labels with formatted values.
+     *
+     * Uses <code>setupSlider</code> as utility method.
+     */
+    public void setupSliders() {
         setupSlider(arrivalMeanSlider, arrivalMeanLabel, " minutes");
         setupSlider(arrivalVarianceSlider, arrivalVarianceLabel, "");
         setupSlider(financeMeanSlider, financeMeanLabel, " minutes");
@@ -126,11 +123,25 @@ public class SaedTestController {
         setupSlider(simulationDurationSlider, simulationDurationLabel, " hours");
     }
 
-    private void setupSlider(Slider slider, Label label, String suffix) {
+
+    /**
+     * Configures a single slider with a value listener to update its associated label
+     * with the current slider value and a suffix.
+     *
+     * @param slider The slider to configure.
+     * @param label  The label to update.
+     * @param suffix The suffix to append to the slider value.
+     */
+    public void setupSlider(Slider slider, Label label, String suffix) {
         slider.valueProperty().addListener((obs, oldVal, newVal) ->
                 label.setText(String.format("%.1f%s", newVal.doubleValue(), suffix)));
     }
 
+
+    /**
+     * Sets up a listener for the car type ComboBox to update the base price field
+     * based on the selected car type.
+     */
     private void setupCarTypeListener() {
         // Add a listener to carSets (ComboBox)
         carType.valueProperty().addListener((observable, oldValue, newValue) -> {
@@ -142,6 +153,11 @@ public class SaedTestController {
         });
     }
 
+
+    /**
+     * Sets up a listener for the car sets ComboBox to fetch cars from the database,
+     * populate the table, and log the number of car combinations to be created.
+     */
     private void setupCarSetsListener() {
         // Add a listener to carSets (ComboBox)
         carSets.valueProperty().addListener((observable, oldValue, newValue) -> {
@@ -154,6 +170,11 @@ public class SaedTestController {
         });
     }
 
+
+    /**
+     * Sets up a listener for the TableView to update the base price field
+     * based on the selected row in the table.
+     */
     private void setupTableViewListener() {
         // Adding a listener to the selection model
         carTable.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
@@ -170,7 +191,10 @@ public class SaedTestController {
 
     private void setUpFuelTypes() {fuelType.getItems().addAll("Gas", "Hybrid", "Electric");}
 
-    // THIS WILL BE CHANGED LATER
+
+    /**
+     * Check for value in the CheckBox - reads value and clears it if something found.
+     */
     private void setupCarSets() {
         if (simuController == null || simuController.getTableNames() == null) {
             Platform.runLater(() -> consoleLog.appendText("Error: simuController or table names are null."));
@@ -182,15 +206,25 @@ public class SaedTestController {
         });
     }
 
-    // THIS WILL BE CHANGED LATER
-    private void setupCarTable() {
+
+    /**
+     * Configures the <code>TableView</code> for displaying car data.
+     *
+     * <li><STRONG>Key tasks:</STRONG></li>
+     * <li> - Maps table columns to data indices (e.g., car type, fuel type, price).</li>
+     * <li> - Adds a styled "Delete" button for row deletion, updating both the <code>TableView</code>
+     *   and <code>carsToBeCreated</code> list.</li>
+     * <li> - Fetches and populates car data from the database.</li>
+     * <li> - Enhances UI with hover effects for the "Delete" button.</li>
+     */
+    public void setupCarTable() {
         // Set cell value factories to point to specific columns in the data
         carAmountColumn.setCellValueFactory(param -> new ReadOnlyStringWrapper(param.getValue()[0])); // Car Amount (index 0)
         carTypeColumn.setCellValueFactory(param -> new ReadOnlyStringWrapper(param.getValue()[1])); // Car Type (index 1)
         carFuelTypeColumn.setCellValueFactory(param -> new ReadOnlyStringWrapper(param.getValue()[2])); // Fuel Type (index 2)
         carMeanPriceColumnn.setCellValueFactory(param -> new ReadOnlyStringWrapper(param.getValue()[3])); // Mean Price (index 3)
         carPriceVarianceColumn.setCellValueFactory(param -> new ReadOnlyStringWrapper(param.getValue()[4])); // Price variance (index 4)
-        // Add delete button to the action column
+
         // Add delete button to the action column
         carActionColumn.setCellFactory(param -> new TableCell<>() {
             private final Button deleteButton = new Button("Delete");
@@ -247,8 +281,6 @@ public class SaedTestController {
         consoleLog.appendText("Car combinations to be created: " + carsToBeCreated.size() + "\n");
     }
 
-
-    // THIS WILL BE CHANGED LATER
     private void populateTable() {
         // Convert ArrayList<String[]> to ObservableList<String[]>
         ObservableList<String[]> tableData = FXCollections.observableArrayList(carsToBeCreated);
@@ -258,15 +290,10 @@ public class SaedTestController {
     }
 
 
-
-    private void setupPriceAdjustment() {
-        priceAdjustmentSlider.valueProperty().addListener((obs, oldVal, newVal) -> {
-            double basePrice = Double.parseDouble(this.basePrice.getText());
-            double adjustedPrice = basePrice * (1 + newVal.doubleValue() / 100);
-            adjustedPriceLabel.setText(String.format("Adjusted Price: $%.2f", adjustedPrice));
-        });
-    }
-
+    /**
+     * Handles the action of adding a car to the list of cars to be created. Validates input fields,
+     * logs the added car data, and updates the table.
+     */
     @FXML
     private void handleAddCar() {
         String amount = amountOfCars.getText();
@@ -299,8 +326,12 @@ public class SaedTestController {
     }
 
 
+    /**
+     * Starts the simulation by initializing parameters, creating cars, saving presets, and starting
+     * a new thread for the simulation. Also updates the UI logs to display progress.
+     */
     @FXML
-    private void handleStartSimulation() {
+    public void handleStartSimulation() {
         // Implement simulation logic here
         Trace.setTraceLevel(Trace.Level.INFO);
         carTable.getItems().clear(); // Clear the table view
@@ -316,7 +347,7 @@ public class SaedTestController {
         simulationSpeed = 300;
         int arrivalServicePoint = arrivalServicePoints.getValue();
         int financeServicePoint = financeServicePoints.getValue();
-        int testdriveServicePoint = setTestDriveServicePoints();
+        int testDriveServicePoint = setTestDriveServicePoints();
         int closureServicePoint = closureServicePoints.getValue();
         int amountOfCars = 0;
         if (carsToBeCreated.isEmpty()) {
@@ -331,15 +362,13 @@ public class SaedTestController {
         consoleLog.appendText("\nClosure mean: " + closureMean + "\nClosure Variance: " + closureVariance);
         consoleLog.appendText("\nArrival service points: " + arrivalServicePoint);
         consoleLog.appendText("\nFinance service points: " + financeServicePoint);
-        consoleLog.appendText("\nTest drive service points: " + testdriveServicePoint);
+        consoleLog.appendText("\nTest drive service points: " + testDriveServicePoint);
         consoleLog.appendText("\nClosure service points: " + closureServicePoint);
         for (String[] car : carsToBeCreated) {
             amountOfCars += Integer.parseInt(car[0]);
         }
         consoleLog.appendText("Amount of cars to be created: " + amountOfCars + "\n");
 
-        //createCars();
-        //createCarsFromDb();
         dataBaseTableName = dealerShipName.getText().trim().replace(" ", "_");
         if (!dataBaseTableName.isEmpty()) {
             simuController.creatTable(dataBaseTableName);
@@ -352,30 +381,32 @@ public class SaedTestController {
         simuController.initializeSimulation(arrivalMean, arrivalVariance, financeMean, financeVariance, testdriveMean,
                                             testdriveVariance, closureMean, closureVariance, simulationSpeed
                                             ,carsToBeCreated, arrivalServicePoint, financeServicePoint,
-                                            testdriveServicePoint, closureServicePoint);
+                                            testDriveServicePoint, closureServicePoint);
 
         simuController.setSimulationTime(simulationTime);
         simulationThread = new Thread(simuController);
         simulationThread.start();
         setupCarSets();
+
+        // ------------------------------- animation stuff -----------------------------//
         // Monitor simulation progress in a separate thread
         updateUI();
 
-        // ------------------------------- experiments with the animation -----------------------------//
+        // Make Shruk running
         new Thread(() -> {
             Platform.runLater(() -> {
-//                view = new CustomerPathSimulationView();
-//                controller = new CustomerPathSimulationController(view);
-//                animationContainer.getChildren().add(view);
                 controller.restartAnimation();
                 rightSideTabPane.getSelectionModel().select(1); // Switch to Animation tab
             });
         }).start();
-//        rightSideTabPane.getSelectionModel().select(1);
-//        controller.restartAnimation();
-        // ------------------------------- experiments with the animation -----------------------------//
+        // ------------------------------- animation stuff -----------------------------//
     }
 
+
+    /**
+     * Changes the simulation speed dynamically based on the value of the simulationSpeedSlider.
+     * Adjusts the simulation speed in the engine adjusting sleep time value.
+     */
     public void changeSimulationSpeed(){
         try {
             int multiplier = (int) simulationSpeedSlider.getValue();
@@ -394,10 +425,12 @@ public class SaedTestController {
         }
     }
 
-    public void displaySimulationTime(){
+    /**
+     * Updates the current simulation time in hours in the UI.
+     */
+    private void displaySimulationTime(){
         try {
             double newTime = (Clock.getInstance().getClock() / 60);
-            //Platform.runLater(() -> consoleLogLabel.setText("Current Simulation time: " + newTime + " hours\n"));
             Platform.runLater(() -> consoleLogLabel.setText(String.format("Current Simulation time: %.1f hours\n", newTime)));
             Thread.sleep(500);
         } catch (Exception e) {
@@ -405,79 +438,13 @@ public class SaedTestController {
         }
     }
 
-    public void getServicePointQueueSize() {
-        ServicePoint[] servicePoints = simuController.getServicePoint();
-        if (servicePoints == null) {
-            Platform.runLater(() -> consoleLog.appendText("No service points available.\n"));
-            return;
-        }
 
-        for (ServicePoint sp : servicePoints) {
-            if (sp == null) {
-                Platform.runLater(() -> consoleLog.appendText("Encountered a null service point, skipping...\n"));
-                continue;
-            }
-
-            String name = sp.getName();
-            if (name == null) {
-                Platform.runLater(() -> consoleLog.appendText("Service point name is null, skipping...\n"));
-                continue;
-            }
-
-            int queueSize = (sp.getQueue() != null) ? sp.getQueue().size() : 0;
-            boolean isInQueue = sp.isOnQueue();
-
-            switch (name) {
-                case "entry":
-                    Platform.runLater(() -> consoleLog.appendText("Customer entered the dealership\n"));
-                    break;
-                case "arrival":
-                    arrivalCustomerAmount = queueSize;
-                    isInArrival = isInQueue;
-                    Platform.runLater(() -> consoleLog.appendText("Arrival queue size: " + queueSize + ", is in queue: " + isInQueue + "\n"));
-                    break;
-                case "finance":
-                    financeCustomerAmount = queueSize;
-                    isInFinance = isInQueue;
-                    Platform.runLater(() -> consoleLog.appendText("Finance queue size: " + queueSize + ", is in queue: " + isInQueue + "\n"));
-                    break;
-                case "testdrive":
-                    testDriveCustomerAmount = queueSize;
-                    isInTestDrive = isInQueue;
-                    Platform.runLater(() -> consoleLog.appendText("Test Drive queue size: " + queueSize + ", is in queue: " + isInQueue + "\n"));
-                    break;
-                case "closure":
-                    closureCustomerAmount = queueSize;
-                    isInClosure = isInQueue;
-                    Platform.runLater(() -> consoleLog.appendText("Closure queue size: " + queueSize + ", is in queue: " + isInQueue + "\n"));
-                    break;
-                default:
-                    Platform.runLater(() -> consoleLog.appendText("Unexpected ServicePoint name: " + name + "\n"));
-                    break;
-            }
-        }
-    }
-
-
-    public void getCustomerStatus(){
-        try {
-            LinkedList<Customer> newCustomers = simuController.getCustomersAtTheDealership();
-            if (newCustomers == null) {
-                Platform.runLater(() -> consoleLog.appendText("Customer list is a null\n"));
-                return;
-            }
-            if (customers.size() != newCustomers.size()) {
-                for (Customer customer : customers) {
-                    Platform.runLater(() -> consoleLog.appendText( "Customer #"+ customer.getId() + " is at " + customer.getCurrentServicePoint() + " stage.\n"));
-                }
-                customers = new LinkedList<>(newCustomers);
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-            Platform.runLater(() -> consoleLog.appendText("Error occurred: " + e + "\n"));
-        }
-    }
-
+    /**
+     * Calculates the total number of test drive service points based on the number of cars
+     * to be created and returns the value.
+     *
+     * @return The total number of test drive service points.
+     */
     public int setTestDriveServicePoints(){
         int testDriveServicePoints = 0;
         for (String[] car : carsToBeCreated) {
@@ -487,14 +454,15 @@ public class SaedTestController {
     }
 
 
-
+    /**
+     * Continuously monitors the simulation progress by updating UI components with real-time
+     * data, such as simulation time, speed, and customer statistics.
+     */
     public void updateUI() {
         new Thread(() -> {
             int customersBefore = 0;
             int carsSoldBefore = 0;
             while (!simuController.isSimulationComplete()) {
-                //getServicePointQueueSize();
-                //getCustomerStatus();
                 displaySimulationTime();
                 changeSimulationSpeed();
                 try {
@@ -520,44 +488,8 @@ public class SaedTestController {
         }).start();
     }
 
-    public void createCars() {
-        // Create a copy of carsToBeCreated to avoid concurrent modification
-        List<String[]> carCopy = new ArrayList<>(carsToBeCreated);
 
-        for (String[] car : carCopy) {
-            String amount = car[0];
-            String carType = car[1];
-            String fuelType = car[2];
-            String meanPrice = car[3];
-            String priceVariance = car[4];
-
-            // Add the car data to the list
-            carsToBeCreated.add(new String[]{amount, carType, fuelType, meanPrice, priceVariance});
-        }
-    }
-
-    public void createCarsFromDb(){
-        ArrayList<String[]> cars;
-        ArrayList<String> tableNames = simuController.getTableNames();
-        tableName = tableNames.get(2);
-        //tableName = carSets.getValue();
-        cars = simuController.getCarsToBeCreated(tableName);
-
-        for (String[] car : cars) {
-            String amount = car[0];
-            String carType = car[1];
-            String fuelType = car[2];
-            String meanPrice = car[3];
-            String priceVariance = car[4];
-            String basePrice = car[5];
-
-            // Add the car data to the list
-            carsToBeCreated.add(new String[]{amount, carType, fuelType, meanPrice, priceVariance, basePrice});
-        }
-    }
-
-
-    public void getCarsFromDb() {
+    private void getCarsFromDb() {
         // Clear previous data in the table
         carsToBeCreated.clear();
 
@@ -584,12 +516,21 @@ public class SaedTestController {
     }
 
 
+    /**
+     * Summarizes and displays simulation results in the console log.
+     *
+     * </br>
+     * <li><STRONG>Key tasks:</STRONG></li>
+     * <li> - Stops the animation and updates the UI.</li>
+     * <li> - Logs simulation end time, total processed customers, and their data:
+     *   arrival/removal times, service durations, car preferences, budget, credit score,
+     *   and purchase status. </li>
+     * <li> - Calculates and displays averages for all customers. </li>
+     * <li> - Logs statistics for car preferences, sold percentages by type and fuel,
+     *   and car-fuel combinations. </li>
+     * <li> - Lists remaining and sold cars with pricing details. </li>
+     */
     public void results() {
-//        view = null;
-//        controller = null;
-//        Platform.runLater(() -> {
-//            animationContainer.getChildren().clear(); // Modify the UI safely
-//        });
         controller.stopAnimation();
         rightSideTabPane.getSelectionModel().select(0);
 
@@ -770,7 +711,7 @@ public class SaedTestController {
         });
     }
 
-    public void saveCustomerBaseDataToCSV(String filePath1) {
+    private void saveCustomerBaseDataToCSV(String filePath1) {
         String parentDir = "SimulationResults/";
         File directory = new File(parentDir);
         if (!directory.exists()) {
@@ -826,7 +767,7 @@ public class SaedTestController {
         }
     }
 
-    public void saveCustomerCarDataToCSV(String filePath1) {
+    private void saveCustomerCarDataToCSV(String filePath1) {
         String parentDir = "SimulationResults/";
         File directory = new File(parentDir);
         if (!directory.exists()) {
@@ -877,7 +818,7 @@ public class SaedTestController {
         }
     }
 
-    public void saveCustomerFuelDataToCSV(String filePath1) {
+    private void saveCustomerFuelDataToCSV(String filePath1) {
         String parentDir = "SimulationResults/";
         File directory = new File(parentDir);
         if (!directory.exists()) {
@@ -924,7 +865,7 @@ public class SaedTestController {
         }
     }
 
-    public void saveCarsSoldByTypeDataToCSV(String filePath1) {
+    private void saveCarsSoldByTypeDataToCSV(String filePath1) {
         String parentDir = "SimulationResults/";
         File directory = new File(parentDir);
         if (!directory.exists()) {
@@ -969,7 +910,7 @@ public class SaedTestController {
         }
     }
 
-    public void saveCarsSoldByFuelDataToCSV(String filePath1) {
+    private void saveCarsSoldByFuelDataToCSV(String filePath1) {
         String parentDir = "SimulationResults/";
         File directory = new File(parentDir);
         if (!directory.exists()) {
@@ -1014,7 +955,7 @@ public class SaedTestController {
         }
     }
 
-    public void saveCarsSoldByTypeAndFuelDataToCSV(String filePath1) {
+    private void saveCarsSoldByTypeAndFuelDataToCSV(String filePath1) {
         String parentDir = "SimulationResults/";
         File directory = new File(parentDir);
         if (!directory.exists()) {
@@ -1059,7 +1000,7 @@ public class SaedTestController {
         }
     }
 
-    public void saveCarsRemainingDataToCSV(String filePath1) {
+    private void saveCarsRemainingDataToCSV(String filePath1) {
         String parentDir = "SimulationResults/";
         File directory = new File(parentDir);
         if (!directory.exists()) {
@@ -1102,7 +1043,7 @@ public class SaedTestController {
         }
     }
 
-    public void saveCarsSoldDataToCSV(String filePath1) {
+    private void saveCarsSoldDataToCSV(String filePath1) {
         String parentDir = "SimulationResults/";
         File directory = new File(parentDir);
         if (!directory.exists()) {
@@ -1146,6 +1087,13 @@ public class SaedTestController {
         }
     }
 
+
+    /**
+     * Saves customer data, car preferences, fuel preferences, and simulation results to various
+     * CSV files under the SimulationResults directory.
+     *
+     * @param fileName The base file name for saving results.
+     */
     public void saveResultsToCsv(String fileName) {
         saveCustomerBaseDataToCSV(fileName);
         saveCustomerCarDataToCSV(fileName);

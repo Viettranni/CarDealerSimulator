@@ -1,15 +1,14 @@
 package simu.model;
 
-import eduni.distributions.ContinuousGenerator;
+import java.util.*;
+import simu.framework.*;
 import eduni.distributions.Normal;
 import eduni.distributions.Negexp;
-import simu.framework.*;
+import eduni.distributions.ContinuousGenerator;
 import simu.model.servicepoints.ArrivalServicePoint;
 import simu.model.servicepoints.ClosureServicePoint;
 import simu.model.servicepoints.FinanceServicePoint;
 import simu.model.servicepoints.TestdriveServicePoint;
-
-import java.util.*;
 
 public class MyEngine extends Engine {
 	private ArrivalProcess arrivalProcess;

@@ -21,7 +21,7 @@
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
 
-<HBox prefHeight="730.0" prefWidth="1279.0" spacing="10" stylesheets="@style.css" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="simu.controller.SaedTestController">
+<HBox prefHeight="730.0" prefWidth="1279.0" spacing="10" stylesheets="@style.css" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="simu.controller.MainController">
     <padding>
         <Insets bottom="20" left="20" right="20" top="20" />
     </padding>

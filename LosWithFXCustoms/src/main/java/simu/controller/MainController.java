@@ -12,15 +12,15 @@ import simu.framework.Trace;
 import java.io.BufferedWriter;
 import javafx.scene.text.Font;
 import javafx.scene.control.*;
-import simu.model.ServicePoint;
 import javafx.application.Platform;
 import javafx.scene.layout.StackPane;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.beans.property.ReadOnlyStringWrapper;
+import simu.view.ShrekPathView;
 
 
-public class SaedTestController {
+public class MainController {
     public TextField dealerShipName;
     @FXML private TextField meanPrice;
     @FXML private TextField priceVariance;
@@ -64,17 +64,15 @@ public class SaedTestController {
     // ------------------------------- animation stuff -----------------------------//
     @FXML private TabPane rightSideTabPane;
     @FXML private StackPane animationContainer;
-    private CustomerPathSimulationView customerPathSimulation;
-    CustomerPathSimulationView view;
-    CustomerPathSimulationController controller;
+    private ShrekPathView customerPathSimulation;
+    ShrekPathView view;
+    AnimationController controller;
     // ------------------------------- animation stuff -----------------------------//
     private SimuController simuController = new SimuController();
     private Thread simulationThread;
-    private String tableName;
     private ArrayList<String[]> carsToBeCreated = new ArrayList<>();
     private int simulationSpeed;
     private String dataBaseTableName;
-    private LinkedList<Customer> customers = new LinkedList<>();
 
     /**
      * Initializes the UI components by setting up sliders, car type listeners, car set listeners,
@@ -98,8 +96,8 @@ public class SaedTestController {
      * and adding the view to the animation container.
      */
     private void setupAnimationView() {
-        view = new CustomerPathSimulationView();
-        controller = new CustomerPathSimulationController(view);
+        view = new ShrekPathView();
+        controller = new AnimationController(view);
         animationContainer.getChildren().add(view);
     }
 
@@ -210,12 +208,14 @@ public class SaedTestController {
     /**
      * Configures the <code>TableView</code> for displaying car data.
      *
-     * <li><STRONG>Key tasks:</STRONG></li>
-     * <li> - Maps table columns to data indices (e.g., car type, fuel type, price).</li>
-     * <li> - Adds a styled "Delete" button for row deletion, updating both the <code>TableView</code>
+     * <p><STRONG>Key tasks:</STRONG></p>
+     * <ul>
+     *   <li>Maps table columns to data indices (e.g., car type, fuel type, price).</li>
+     *   <li>Adds a styled "Delete" button for row deletion, updating both the <code>TableView</code>
      *   and <code>carsToBeCreated</code> list.</li>
-     * <li> - Fetches and populates car data from the database.</li>
-     * <li> - Enhances UI with hover effects for the "Delete" button.</li>
+     *   <li>Fetches and populates car data from the database.</li>
+     *   <li>Enhances UI with hover effects for the "Delete" button.</li>
+     * </ul>
      */
     public void setupCarTable() {
         // Set cell value factories to point to specific columns in the data
@@ -519,16 +519,15 @@ public class SaedTestController {
     /**
      * Summarizes and displays simulation results in the console log.
      *
-     * </br>
-     * <li><STRONG>Key tasks:</STRONG></li>
-     * <li> - Stops the animation and updates the UI.</li>
-     * <li> - Logs simulation end time, total processed customers, and their data:
-     *   arrival/removal times, service durations, car preferences, budget, credit score,
-     *   and purchase status. </li>
-     * <li> - Calculates and displays averages for all customers. </li>
-     * <li> - Logs statistics for car preferences, sold percentages by type and fuel,
-     *   and car-fuel combinations. </li>
-     * <li> - Lists remaining and sold cars with pricing details. </li>
+     * <p><STRONG>Key tasks:</STRONG></p>
+     * <ul>
+     *   <li>Stops the animation and updates the UI.</li>
+     *   <li>Logs simulation end time, total processed customers, and their data:
+     *   arrival/removal times, service durations, car preferences, budget, credit score and purchase status. </li>
+     *   <li>Calculates and displays averages for all customers. </li>
+     *   <li>Logs statistics for car preferences, sold percentages by type and fuel, and car-fuel combinations. </li>
+     *   <li>Lists remaining and sold cars with pricing details. </li>
+     * </ul>
      */
     public void results() {
         controller.stopAnimation();

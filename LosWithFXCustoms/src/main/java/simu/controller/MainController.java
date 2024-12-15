@@ -366,7 +366,7 @@ public class MainController {
         for (String[] car : carsToBeCreated) {
             amountOfCars += Integer.parseInt(car[0]);
         }
-        consoleLog.appendText("Amount of cars to be created: " + amountOfCars + "\n");
+        consoleLog.appendText("\nAmount of cars to be created: " + amountOfCars + "\n");
 
         dataBaseTableName = dealerShipName.getText().trim().replace(" ", "_");
         if (!dataBaseTableName.isEmpty()) {

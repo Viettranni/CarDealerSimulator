@@ -11,7 +11,6 @@ import java.util.List;
 /**
  * Data Access Object (DAO) class for handling operations related to cars and database tables.
  */
-
 public class CarsDao {
     private String errorMessage;
 

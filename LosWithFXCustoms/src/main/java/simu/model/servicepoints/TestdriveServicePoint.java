@@ -6,16 +6,46 @@ import simu.framework.EventList;
 import simu.framework.Trace;
 import simu.model.*;
 
+/**
+ * Represents a test drive service point in the simulation.
+ *
+ * <p>This class extends the generic <code>ServicePoint</code> and specializes in handling
+ * customer test drive requests. It determines car availability, manages customer satisfaction
+ * with the test drive, and handles scenarios where customers request multiple test drives.
+ * Test drive service points are the third interaction point for customers in the simulation.</p>
+ *
+ * <p><strong>Key Responsibilities:</strong></p>
+ * <ul>
+ *   <li>Processes customer requests for test drives.</li>
+ *   <li>Handles scenarios where customers are unhappy with the test drive or their preferred car is unavailable.</li>
+ *   <li>Updates customer attributes based on test drive outcomes and schedules the next steps in the simulation.</li>
+ * </ul>
+ *
+ * @see ServicePoint
+ */
 public class TestdriveServicePoint extends ServicePoint {
     CarDealerShop carDealerShop;
 
+    /**
+     * Constructs a test drive service point with the specified attributes.
+     *
+     * @param generator      A distribution generator used to determine service times.
+     * @param eventList      The event list to schedule future simulation events.
+     * @param type           The event type associated with this service point.
+     * @param carDealerShop  The car dealership associated with this service point, used for managing car availability.
+     */
     public TestdriveServicePoint(ContinuousGenerator generator, EventList eventList, EventType type, CarDealerShop carDealerShop) {
         super(generator, eventList, type, "testdrive");
         this.carDealerShop = carDealerShop;
     }
 
     /**
-     * Handles the case where a customer is returned to the back of the queue.
+     * Returns the current customer to the back of the queue.
+     *
+     * <p>This method removes the customer from the front of the queue and re-adds them to the end of the queue.
+     * It is used in scenarios where the customer's preferred car is unavailable or they wish to test drive another car.</p>
+     *
+     * <p><strong>Note:</strong> If the queue is empty, this method exits without performing any actions.</p>
      */
     public void customerBackToQueue() {
         Customer customer = queue.poll();  // Remove the customer from the front of the queue
@@ -25,6 +55,19 @@ public class TestdriveServicePoint extends ServicePoint {
         }
     }
 
+    /**
+     * Begins service for the customer at the test drive service point.
+     *
+     * <p>This method processes the customer at the front of the queue. It checks the availability
+     * of the customer's preferred car and determines their satisfaction with the test drive. If the car
+     * is unavailable or the customer is unsatisfied, they may be returned to the queue for another attempt.</p>
+     *
+     * <p><strong>Edge Cases:</strong></p>
+     * <ul>
+     *   <li>If the queue is empty, this method exits without taking action.</li>
+     *   <li>If a customer is unhappy after three test drives, they leave without proceeding further.</li>
+     * </ul>
+     */
     @Override
     public void beginService() {
         if (!isOnQueue()) {

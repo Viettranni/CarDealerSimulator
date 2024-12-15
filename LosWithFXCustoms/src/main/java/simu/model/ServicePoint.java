@@ -4,8 +4,10 @@ import eduni.distributions.ContinuousGenerator;
 import simu.framework.*;
 import java.util.LinkedList;
 
-// TODO:
-// Service Point functionalities & calculations (+ variables needed) and reporting to be implemented
+/**
+ * Represents a service point in the simulation where customers are served,
+ * handling queuing, service timing, and event scheduling.
+ */
 public class ServicePoint {
 	protected LinkedList<Customer> queue = new LinkedList<>(); // Data Structure used
 	private ContinuousGenerator generator;
@@ -49,23 +51,33 @@ public class ServicePoint {
 		reserved = true;
 		eventList.add(new Event(eventTypeScheduled, Clock.getInstance().getClock()));
 	}
-
+	/**
+	 * @hidden
+	 */
 	public boolean isReserved(){
 		return reserved;
 	}
-
+	/**
+	 * @hidden
+	 */
 	public boolean isOnQueue(){
 		return queue.size() != 0;
 	}
-
+	/**
+	 * @hidden
+	 */
 	public EventType getEventType(){
 		return eventTypeScheduled;
 	}
-
+	/**
+	 * @hidden
+	 */
 	public LinkedList<Customer> getQueue(){
 		return queue;
 	}
-
+	/**
+	 * @hidden
+	 */
 	public String getName() {
 		return name;
 	}

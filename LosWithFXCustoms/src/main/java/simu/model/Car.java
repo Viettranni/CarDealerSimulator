@@ -4,7 +4,10 @@ import eduni.distributions.Normal;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-
+/**
+ * Represents a car with attributes like type, fuel type, price, and probabilities.
+ * Includes methods for calculating sales and type-specific probabilities.
+ */
 public class Car {
     private String registerNumber;
     private String carType;
@@ -26,6 +29,15 @@ public class Car {
         put("sport", 60000.0);
     }};
 
+    /**
+     * Constructor for creating a car object with specified type, fuel type, mean price, and price variance.
+     * It initializes car-specific probabilities, base price, and a unique register number.
+     *
+     * @param carType       The type of the car (e.g., SUV, Sedan).
+     * @param fuelType      The fuel type of the car (e.g., Electric, Gasoline).
+     * @param meanPrice     The average price of the car.
+     * @param priceVariance The variance in the car's price.
+     */
     public Car(String carType, String fuelType, double meanPrice, double priceVariance) {
         this.carType = carType;
         this.carTypeProb = setCarTypeProb(carType);
@@ -42,6 +54,16 @@ public class Car {
         this.registerNumber = CarDealerShop.generateUniqueRegisterNumber();
     }
 
+    /**
+     * Constructor for creating a car object with base price specified.
+     * It initializes car-specific probabilities, seller price, and a unique register number.
+     *
+     * @param carType       The type of the car (e.g., SUV, Sedan).
+     * @param fuelType      The fuel type of the car (e.g., Electric, Gasoline).
+     * @param meanPrice     The average price of the car.
+     * @param priceVariance The variance in the car's price.
+     * @param basePrice     The base price of the car.
+     */
     public Car(String carType, String fuelType, double meanPrice, double priceVariance, double basePrice) {
         this.carType = carType;
         this.carTypeProb = setCarTypeProb(carType);
@@ -58,25 +80,62 @@ public class Car {
         this.registerNumber = CarDealerShop.generateUniqueRegisterNumber();
     }
 
+    /**
+     * @hidden
+     */
+    public double calculateCarTypeProb() {
+        return coefficient * baseProb;
+    }
+
+    /**
+     * Calculates the sale probability of the car based on its seller price.
+     * The formula uses an exponential decay function with the coefficient and base price.
+     *
+     * @param sellerPrice The seller's price of the car.
+     * @return The calculated sale probability.
+     */
+    public double calculateSaleProbability(double sellerPrice) {
+        // Sales probability formula:
+        // saleProbability = basePrice * e^(-coefficient * (sellerPrice - basePrice))
+        saleProb = baseProb * Math.exp(-coefficient * (sellerPrice - basePrice));
+        return saleProb;
+    }
+
+
     // Getters and Setters
+    /**
+     * @hidden
+     */
     public String getRegisterNumber() {
         return registerNumber;
     }
-
+    /**
+     * @hidden
+     */
     public void setRegisterNumber(String registerNumber) {
         this.registerNumber = registerNumber;
     }
-
+    /**
+     * @hidden
+     */
     public String getCarType() {
         return carType;
     }
+    /**
+     * @hidden
+     */
     public void setCarType(String carType) {
         this.carType = carType;
     }
+    /**
+     * @hidden
+     */
     public double getCarTypeProb() {
         return carTypeProb;
     }
-
+    /**
+     * @hidden
+     */
     public double setCarTypeProb(String carType) {
         switch (carType.toLowerCase()) {
             case "sport":
@@ -100,19 +159,27 @@ public class Car {
         }
         return carTypeProb;
     }
-
+    /**
+     * @hidden
+     */
     public String getFuelType() {
         return fuelType;
     }
-
+    /**
+     * @hidden
+     */
     public void setFuelType(String fuelType) {
         this.fuelType = fuelType;
     }
-
+    /**
+     * @hidden
+     */
     public double getFuelTypeProb() {
         return fuelTypeProb;
     }
-
+    /**
+     * @hidden
+     */
     public double setFuelTypeProb(String fuelType) {
         switch (fuelType.toLowerCase()) {
             case "electric":
@@ -130,52 +197,75 @@ public class Car {
         }
         return fuelTypeProb;
     }
-
-
+    /**
+     * @hidden
+     */
     public double getBaseProb() {
         return baseProb;
     }
-
+    /**
+     * @hidden
+     */
     public void setBaseProb(double baseProb) {
         this.baseProb = baseProb;
     }
-
+    /**
+     * @hidden
+     */
     public double getMeanPrice() {
         return meanPrice;
     }
-
+    /**
+     * @hidden
+     */
     public void setMeanPrice(double meanPrice) {
         this.meanPrice = meanPrice;
     }
-
+    /**
+     * @hidden
+     */
     public double getSellerPrice(){
         return sellerPrice;
     }
-
+    /**
+     * @hidden
+     */
     public void setSellerPrice(double sellerPrice) {
         this.sellerPrice = sellerPrice;
     }
-
+    /**
+     * @hidden
+     */
     public double getPriceVariance() {
         return priceVariance;
     }
-
+    /**
+     * @hidden
+     */
     public void setPriceVariance(double priceVariance) {
         this.priceVariance = priceVariance;
     }
-
+    /**
+     * @hidden
+     */
     public double getBasePrice() {
         return basePrice;
     }
-
+    /**
+     * @hidden
+     */
     public static HashMap<String, Double> getBasePrices(){
         return basePrices;
     }
-
+    /**
+     * @hidden
+     */
     public void setBasePrice(double basePrice) {
         this.basePrice = basePrice;
     }
-
+    /**
+     * @hidden
+     */
     public double setBasePrice(String carType) {
         switch (carType.toLowerCase()) {
             case "compact":
@@ -199,19 +289,27 @@ public class Car {
         }
         return basePrice;
     }
-
+    /**
+     * @hidden
+     */
     public double getSaleProb() {
         return saleProb;
     }
-
+    /**
+     * @hidden
+     */
     public void setSaleProb(double saleProb) {
         this.saleProb = saleProb;
     }
-
+    /**
+     * @hidden
+     */
     public synchronized double getCoefficient() {
         return coefficient;
     }
-
+    /**
+     * @hidden
+     */
     public synchronized double setCoefficient(String carType) {
         switch (carType.toLowerCase()) {
             case "sport":
@@ -236,34 +334,4 @@ public class Car {
         return coefficient;
     }
 
-    // Methods
-    public double calculateCarTypeProb() {
-        return coefficient * baseProb;
-    }
-
-    public static void createCar( int numberOfCars, String carType, String fuelType, int sellerCarMean, int sellerCarVariance, ArrayList<String[]> carsToBeCreated) {
-        String amountOfCars = String.valueOf(numberOfCars);
-        String carMean = String.valueOf(sellerCarMean);
-        String carVariance = String.valueOf(sellerCarVariance);
-
-        // Add each car to the list
-        carsToBeCreated.add(new String[]{amountOfCars, carType, fuelType, carMean, carVariance});
-    }
-    public static void createCar( int numberOfCars, String carType, String fuelType, int sellerCarMean, int sellerCarVariance, ArrayList<String[]> carsToBeCreated, double basePrice) {
-        String amountOfCars = String.valueOf(numberOfCars);
-        String carMean = String.valueOf(sellerCarMean);
-        String carVariance = String.valueOf(sellerCarVariance);
-        String carBasePrice = String.valueOf(basePrice);
-
-        // Add each car to the list
-        carsToBeCreated.add(new String[]{amountOfCars, carType, fuelType, carMean, carVariance, carBasePrice});
-    }
-
-    // Method to calculate sale probability
-    public double calculateSaleProbability(double sellerPrice) {
-        // Sales probability formula:
-        // saleProbability = basePrice * e^(-coefficient * (sellerPrice - basePrice))
-        saleProb = baseProb * Math.exp(-coefficient * (sellerPrice - basePrice));
-        return saleProb;
-    }
 }

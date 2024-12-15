@@ -21,7 +21,7 @@
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
 
-<HBox prefHeight="730.0" prefWidth="1279.0" spacing="10" stylesheets="@style.css" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="simu.controller.SaedTestController">
+<HBox prefHeight="730.0" prefWidth="1279.0" spacing="10" stylesheets="@style.css" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="simu.controller.MainController">
     <padding>
         <Insets bottom="20" left="20" right="20" top="20" />
     </padding>
@@ -141,7 +141,7 @@
                             <TableColumn fx:id="carAmountColumn" prefWidth="43.0" text="Qty" />
                             <TableColumn fx:id="carTypeColumn" prefWidth="70.0" text="Type" />
                             <TableColumn fx:id="carFuelTypeColumn" prefWidth="73.0" text="Fuel" />
-                            <TableColumn fx:id="carMeanPriceColumnn" prefWidth="93.0" text="Mean Price" />
+                            <TableColumn fx:id="carMeanPriceColumn" prefWidth="93.0" text="Mean Price" />
                             <TableColumn fx:id="carPriceVarianceColumn" prefWidth="93.0" text="Variance" />
                             <TableColumn fx:id="carActionColumn" prefWidth="90.0" text="Action" />
                         </columns>

@@ -6,7 +6,10 @@ import simu.framework.Clock;
 import simu.model.*;
 import java.util.*;
 
-
+/**
+ * Manages the initialization, configuration, and execution of the car dealership simulation,
+ * including database interactions and simulation parameters.
+ */
 public class SimuController implements Runnable {
     // Instance variables
     private MyEngine myEngine;
@@ -14,20 +17,10 @@ public class SimuController implements Runnable {
     private CarsDao carsDao;
 
     // Means and variances
-    private int arrivalMean;
-    private final int ARRIVALINTERVALMULTIPLIER = 200;
     private int simulationTime;
     private boolean simulationInitialized = false;
     private String statusMessage;
-    private ArrayList<String[]> carsToBeCreated;
     private boolean simulationComplete = false;
-
-
-    // Parameterless constructor (does not initialize fields)
-    public SimuController(MyEngine engine) {
-        myEngine = engine;
-        carsDao = new CarsDao();
-    }
 
 
     public SimuController() {
@@ -35,11 +28,41 @@ public class SimuController implements Runnable {
         carsDao = new CarsDao();
     }
 
-
+    /**
+     * Initializes the simulation with the specified parameters.
+     *
+     * <p>This method configures the simulation engine, sets up service points, initializes
+     * cars to be created, and adjusts simulation settings such as speed, service means,
+     * and variances. It prepares the simulation environment to be ready for execution.</p>
+     *
+     * <p><strong>Key Configuration Steps:</strong></p>
+     * <ul>
+     *   <li>Resets the simulation state.</li>
+     *   <li>Configures means and variances for arrival, finance, test-drive, and closure services.</li>
+     *   <li>Sets the simulation speed and initializes the list of cars to be created.</li>
+     *   <li>Creates and configures service points for each stage of the simulation process.</li>
+     *   <li>Sets up the arrival interval and process.</li>
+     * </ul>
+     *
+     * @param arrivalMean             Mean time between arrivals in time units.
+     * @param arrivalVariance         Variance in time between arrivals in time units.
+     * @param financeMean             Meantime for the finance service in time units.
+     * @param financeVariance         Variance in the finance service time in time units.
+     * @param testDriveMean           Meantime for the test-drive service in time units.
+     * @param testDriveVariance       Variance in the test-drive service time in time units.
+     * @param closureMean             Meantime for the closure service in time units.
+     * @param closureVariance         Variance in the closure service time in time units.
+     * @param simulationSpeed         Simulation speed multiplier (e.g., 1 for normal speed).
+     * @param carsToBeCreated         List of cars to be created during the simulation.
+     * @param arrivalServicePoints    Number of service points for arrivals.
+     * @param financeServicePoints    Number of service points for finance services.
+     * @param testDriveServicePoints  Number of service points for test-drive services.
+     * @param closureServicePoints    Number of service points for closure services.
+     */
     public void initializeSimulation(int arrivalMean, int arrivalVariance, int financeMean, int financeVariance,
-                                     int testdriveMean, int testdriveVariance, int closureMean, int closureVariance,
+                                     int testDriveMean, int testDriveVariance, int closureMean, int closureVariance,
                                      int simulationSpeed, ArrayList<String[]> carsToBeCreated, int arrivalServicePoints,
-                                     int financeServicePoints, int testdriveServicePoints, int closureServicePoints)
+                                     int financeServicePoints, int testDriveServicePoints, int closureServicePoints)
     {
         resetSimulation();
         myEngine.setArrivalMean(arrivalMean);
@@ -58,11 +81,11 @@ public class SimuController implements Runnable {
         System.out.println("Finance Variance set to: " + myEngine.getFinanceVariance());
 
 
-        myEngine.setTestdriveMean(testdriveMean);
+        myEngine.setTestdriveMean(testDriveMean);
         System.out.println("Test-drive Mean set to: " + myEngine.getTestdriveMean());
 
 
-        myEngine.setTestdriveVariance(testdriveVariance);
+        myEngine.setTestdriveVariance(testDriveVariance);
         System.out.println("Test-drive Variance set to: " + myEngine.getTestdriveVariance());
 
 
@@ -90,7 +113,7 @@ public class SimuController implements Runnable {
         System.out.println("Finance Service Points set to: " + myEngine.getFinanceServicePoints());
 
 
-        myEngine.setTestdriveServicePoints(testdriveServicePoints);
+        myEngine.setTestdriveServicePoints(testDriveServicePoints);
         System.out.println("Test-drive Service Points set to: " + myEngine.getTestdriveServicePoints());
 
 
@@ -115,8 +138,8 @@ public class SimuController implements Runnable {
         System.out.println("Finance Service Time set with mean: " + financeMean + ", variance: " + financeVariance);
 
 
-        myEngine.setTestdriveServiceTime(testdriveMean, testdriveVariance);
-        System.out.println("Test-drive Service Time set with mean: " + testdriveMean + ", variance: " + testdriveVariance);
+        myEngine.setTestdriveServiceTime(testDriveMean, testDriveVariance);
+        System.out.println("Test-drive Service Time set with mean: " + testDriveMean + ", variance: " + testDriveVariance);
 
 
         myEngine.setClosureServiceTime(closureMean, closureVariance);
@@ -158,6 +181,23 @@ public class SimuController implements Runnable {
         System.out.println("Simulation Initialized.");
     }
 
+
+    /**
+     * Resets the simulation to its initial state.
+     *
+     * <p>This method clears all configurations, including service points, car collections,
+     * simulation speed, event lists, and the simulation clock. It prepares the simulation
+     * environment for re-initialization or a fresh start.</p>
+     *
+     * <p><strong>Key Reset Actions:</strong></p>
+     * <ul>
+     *   <li>Clears service points and resets their counts to zero.</li>
+     *   <li>Resets the car collection and sales data in the car dealership.</li>
+     *   <li>Clears the event list and processed customers.</li>
+     *   <li>Resets the simulation clock and speed to default values.</li>
+     *   <li>Marks the simulation as incomplete and updates the status message.</li>
+     * </ul>
+     */
     public void resetSimulation() {
         // Reset simulation speed
         myEngine.setSimulationSpeed(1); // Default speed to 1
@@ -211,8 +251,15 @@ public class SimuController implements Runnable {
     }
 
 
-
-    // Thread's run method delegates to startSimulation
+    /**
+     * Executes the simulation in a separate thread.
+     *
+     * <p>This method checks if the simulation has been properly initialized and if the
+     * simulation time is valid. If both conditions are met, it starts the simulation.</p>
+     *
+     * <p><strong>Note:</strong> This method is intended to be executed when the controller
+     * is run as a separate thread.</p>
+     */
     @Override
     public void run() {
         if (!simulationInitialized) {
@@ -226,6 +273,15 @@ public class SimuController implements Runnable {
         startSimulation(simulationTime);
     }
 
+    /**
+     * Starts the simulation for a specified duration.
+     *
+     * <p>This method delegates to the simulation engine to execute the simulation for
+     * the given duration. It sets the simulation time, starts the engine, and updates
+     * the simulation's completion status upon finishing.</p>
+     *
+     * @param simulationTime Total duration of the simulation in time units.
+     */
     public void startSimulation(int simulationTime) {
         this.simulationTime = simulationTime;
         myEngine.setSimulationTime(simulationTime);
@@ -233,82 +289,59 @@ public class SimuController implements Runnable {
         simulationComplete = true;
     }
 
-    public int getSimulationTime() {
-        return simulationTime;
-    }
 
+    /**
+     * @hidden
+     */
     public void setSimulationTime(int simulationTime) {
         this.simulationTime = simulationTime;
     }
-
+    /**
+     * @hidden
+     */
     public boolean isSimulationComplete() {
         return simulationComplete;
     }
-
-    public void createCars(ArrayList<String[]> carsToBeCreated) {
-        myEngine.carsToBeCreated(carsToBeCreated);
-    }
-
-
-    public void startSimulation(int arrivalMean, int arrivalVariance, int financeMean, int financeVariance,
-                                int testdriveMean, int testdriveVariance, int closureMean, int closureVariance,
-                                int simulationSpeed, ArrayList<String[]> carsToBeCreated, int arrivalServicePoints,
-                                int financeServicePoints, int testdriveServicePoints, int closureServicePoints, int simulationTime) {
-
-
-        myEngine = new MyEngine(arrivalMean, arrivalVariance, financeMean, financeVariance, testdriveMean,
-                testdriveVariance, closureMean, closureVariance, simulationSpeed, carsToBeCreated,
-                arrivalServicePoints, financeServicePoints, testdriveServicePoints, closureServicePoints, ARRIVALINTERVALMULTIPLIER
-        );
-        myEngine.setSimulationTime(simulationTime);
-        myEngine.run();
-        simulationComplete = true;
-    }
-
-
-    public void speedUpSimulation(int amount) {
-        myEngine.speedUpSimulationSpeed(amount);
-    }
-
-
-    public void slowdownSimulation(int amount) {
-        myEngine.slowDownSimulationSpeed(amount);
-    }
-
-
-    public int getSimulationSpeed() {
-        return myEngine.getSimulationSpeed();
-    }
-
+    /**
+     * @hidden
+     */
     public HashMap<String, Double> getBasePrices() {
         return Car.getBasePrices();
     }
-
-    // int amount, int carType, int fuelType, double meanPrice, double priceVariance
-    public void createCar( int numberOfCars, String carType, String typeOfFuel, int sellerCarMean, int sellerCarVariance, ArrayList<String[]> carsToBeCreated){
-        Car.createCar(numberOfCars, carType, typeOfFuel, sellerCarMean, sellerCarVariance, carsToBeCreated);
-    }
-
-    public void createCar( int numberOfCars, String carType, String typeOfFuel, int sellerCarMean, int sellerCarVariance, ArrayList<String[]> carsToBeCreated, double basePrice){
-        Car.createCar(numberOfCars, carType, typeOfFuel, sellerCarMean, sellerCarVariance, carsToBeCreated, basePrice);
-    }
-
+    /**
+     * @hidden
+     */
     public void creatTable(String tableName) {
         carsDao.createTable(tableName);
     }
-
+    /**
+     * @hidden
+     */
     public ArrayList<String> getTableNames() {
         return carsDao.getAllTableNames();
     }
 
-    public void deleteTable(String tableName) {
-        carsDao.deleteTable(tableName);
-    }
-
+    /**
+     * Adds a list of cars to a database table for persistence.
+     *
+     * @param tableName       Name of the table to which cars should be added.
+     * @param carsToBeCreated List of cars to be added to the table.
+     */
     public void addCarsToTable(String tableName, ArrayList<String[]> carsToBeCreated) {
         carsDao.addCarsToTable(tableName, carsToBeCreated);
     }
 
+    /**
+     * Retrieves a list of cars from a specified database table.
+     *
+     * <p>If the specified table does not exist, an empty list is returned. Each car in
+     * the list is represented as a `String[]` containing car attributes (e.g., model,
+     * type, price).</p>
+     *
+     * @param tableName Name of the table from which to retrieve cars.
+     * @return List of cars retrieved from the specified table, or an empty list if
+     *         the table does not exist.
+     */
     public ArrayList<String[]> getCarsToBeCreated(String tableName) {
         ArrayList<String> tableNames = getTableNames();
         ArrayList<String[]> carsToBeCreated = new ArrayList<>();
@@ -317,188 +350,22 @@ public class SimuController implements Runnable {
         }
         return carsToBeCreated;
     }
-
-    // Getters and Setters for all instance variables
-
-    public LinkedList<Customer> getCustomersAtTheDealership(){
-        return myEngine.getCarDealerShop().getCustomerAtTheDealership();
-    }
+    /**
+     * @hidden
+     */
     public MyEngine getMyEngine() {
         return myEngine;
     }
-
-
-    public void setMyEngine(MyEngine myEngine) {
-        this.myEngine = myEngine;
-    }
-
-
+    /**
+     * @hidden
+     */
     public Car getCar() {
         return car;
     }
-
-
+    /**
+     * @hidden
+     */
     public void setCar(Car car) {
         this.car = car;
-    }
-
-   public ServicePoint[] getServicePoint() {
-       return myEngine.getServicePoints();
-   }
-
-   public CarDealerShop getCarDealerShop() {
-       return myEngine.getCarDealerShop();
-   }
-
-
-    public int getArrivalMean() {
-        return myEngine.getArrivalMean();
-    }
-
-
-    public void setArrivalMean(int arrivalMean) {
-        myEngine.setArrivalMean(arrivalMean);
-        this.arrivalMean = myEngine.getArrivalMean();
-        System.out.println("Arrival Mean set to: " + myEngine.getArrivalMean());
-    }
-
-
-    public int getArrivalVariance() {
-        return myEngine.getArrivalVariance();
-    }
-
-
-    public void setArrivalVariance(int arrivalVariance) {
-        myEngine.setArrivalVariance(arrivalVariance);
-        System.out.println("Arrival Variance set to: " + myEngine.getArrivalVariance());
-    }
-
-
-    public int getFinanceMean() {
-        return myEngine.getFinanceMean();
-    }
-
-
-    public void setFinanceMean(int financeMean) {
-        myEngine.setFinanceMean(financeMean);
-        System.out.println("Finance Mean set to: " + myEngine.getFinanceMean());
-    }
-
-
-    public int getFinanceVariance() {
-        return myEngine.getFinanceVariance();
-    }
-
-
-    public void setFinanceVariance(int financeVariance) {
-        myEngine.setFinanceVariance(financeVariance);
-        System.out.println("Finance Variance set to: " + myEngine.getFinanceVariance());
-    }
-
-
-    public int getTestdriveMean() {
-        return myEngine.getTestdriveMean();
-    }
-
-
-    public void setTestdriveMean(int testdriveMean) {
-        myEngine.setTestdriveMean(testdriveMean);
-        System.out.println("Test-drive Mean set to: " + myEngine.getTestdriveMean());
-    }
-
-
-    public int getTestdriveVariance() {
-        return myEngine.getTestdriveVariance();
-    }
-
-
-    public void setTestdriveVariance(int testdriveVariance) {
-        myEngine.setTestdriveVariance(testdriveVariance);
-        System.out.println("Test-drive Variance set to: " + myEngine.getTestdriveVariance());
-    }
-
-
-    public int getClosureMean() {
-        return myEngine.getClosureMean();
-    }
-
-
-    public void setClosureMean(int closureMean) {
-        myEngine.setClosureMean(closureMean);
-        System.out.println("Closure Mean set to: " + myEngine.getClosureMean());
-
-
-    }
-
-
-    public int getClosureVariance() {
-        return myEngine.getClosureVariance();
-    }
-
-
-    public void setClosureVariance(int closureVariance) {
-        myEngine.setClosureVariance(closureVariance);
-        System.out.println("Closure Variance set to: " + myEngine.getClosureVariance());
-    }
-
-
-    public void setSimulationSpeed(int simulationSpeed) {
-        myEngine.setSimulationSpeed(simulationSpeed);
-        System.out.println("Simulation Speed set to: " + myEngine.getSimulationSpeed());
-    }
-
-
-    public int getArrivalServicePoints() {
-        return myEngine.getArrivalServicePoints();
-    }
-
-
-    public void setArrivalServicePoints(int arrivalServicePoints) {
-        myEngine.setArrivalServicePoints(arrivalServicePoints);
-        System.out.println("Arrival Service Points set to: " + myEngine.getArrivalServicePoints());
-    }
-
-
-    public int getFinanceServicePoints() {
-        return myEngine.getFinanceServicePoints();
-    }
-
-
-    public void setFinanceServicePoints(int financeServicePoints) {
-        myEngine.setFinanceServicePoints(financeServicePoints);
-        System.out.println("Finance Service Points set to: " + myEngine.getFinanceServicePoints());
-    }
-
-
-    public int getTestdriveServicePoints() {
-        return myEngine.getTestdriveServicePoints();
-    }
-
-
-    public void setTestdriveServicePoints(int testdriveServicePoints) {
-        myEngine.setTestdriveServicePoints(testdriveServicePoints);
-        System.out.println("Test-drive Service Points set to: " + myEngine.getTestdriveServicePoints());
-    }
-
-
-    public int getClosureServicePoints() {
-        return myEngine.getClosureServicePoints();
-    }
-
-
-    public void setClosureServicePoints(int closureServicePoints) {
-        myEngine.setClosureServicePoints(closureServicePoints);
-        System.out.println("Closure Service Points set to: " + myEngine.getClosureServicePoints());
-    }
-
-
-    public void setCarsToBeCreated(ArrayList<String[]> carsToBeCreated) {
-        myEngine.carsToBeCreated(carsToBeCreated);
-        System.out.println("Cars to be created: " + myEngine.getCarDealerShop().getCarCollection().size());
-    }
-
-
-    public ArrayList<String[]> getCarsToBeCreated() {
-        return myEngine.getCarsToBeCreated();
     }
 }

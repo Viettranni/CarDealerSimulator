@@ -1,13 +1,17 @@
-package simu.controller;
+package simu.view;
 
 import javafx.animation.SequentialTransition;
 import javafx.animation.TranslateTransition;
-import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.image.Image;
 import javafx.scene.layout.Pane;
 import javafx.util.Duration;
 
-public class CustomerPathSimulationView extends Pane {
+/**
+ * Provides a graphical representation of a customer's journey through various service points,
+ * including animated interactions with cars, visual effects, and timed transitions.
+ */
+public class ShrekPathView extends Pane {
 
     private ImageView backgroundView;
     private ImageView customerView;
@@ -21,10 +25,18 @@ public class CustomerPathSimulationView extends Pane {
     private Image runningLeftGif;
     private Image runningRightGif;
 
-    public CustomerPathSimulationView() {
+    /**
+     * Initializes the customer path simulation view by setting up the background, customer,
+     * cars, and various other visual elements, and adding them to the scene.
+     */
+    public ShrekPathView() {
         initialize();
     }
 
+    /**
+     * Sets up the initial state of the view, including background, customer, car images,
+     * time view, roof view, and poof view. Also adds these elements to the scene.
+     */
     private void initialize() {
         // Set up the background
         Image backgroundImage = new Image("background3.png");
@@ -89,6 +101,12 @@ public class CustomerPathSimulationView extends Pane {
         getChildren().addAll(backgroundView, customerView, carView2, carView, roofView, timeView, poofView);
     }
 
+    /**
+     * Creates a sequence of animations that simulate a customer's journey through various service points,
+     * interactions with cars, and visual effects such as poof and time indicators.
+     *
+     * @return A sequential animation sequence for the customer path.
+     */
     public SequentialTransition createAnimationSequence() {
         // Reset all elements to their initial positions
         resetToInitialState();
@@ -152,6 +170,16 @@ public class CustomerPathSimulationView extends Pane {
         );
     }
 
+    /**
+     * <STRONG>Utility method</STRONG> - Creates an animation movement for a given node.
+     * Uses specified movement in the X and Y directions and duration in seconds.
+     *
+     * @param node           The ImageView to be animated.
+     * @param byX            Distance to move along the X-axis.
+     * @param byY            Distance to move along the Y-axis.
+     * @param durationSeconds Duration of the animation in seconds.
+     * @return A TranslateTransition animation object.
+     */
     private TranslateTransition createTranslateTransition(ImageView node, double byX, double byY, double durationSeconds) {
         TranslateTransition transition = new TranslateTransition(Duration.seconds(durationSeconds), node);
         transition.setByX(byX);
@@ -159,12 +187,24 @@ public class CustomerPathSimulationView extends Pane {
         return transition;
     }
 
+    /**
+     * Updates the customer's image, width, and height during an animation sequence.
+     *
+     * @param image  The new image to set for the customer.
+     * @param width  The new width of the customer image.
+     * @param height The new height of the customer image.
+     */
     private void updateCustomerImage(Image image, double width, double height) {
         customerView.setImage(image);
         customerView.setFitWidth(width);
         customerView.setFitHeight(height);
     }
 
+
+    /**
+     * Resets all visual elements, such as the customer, cars, time view, and poof view,
+     * to their initial states, including position, visibility, and image properties.
+     */
     public void resetToInitialState() {
         // Reset customer
         customerView.setImage(defaultCustomerGif);

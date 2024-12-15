@@ -4,6 +4,22 @@ import simu.framework.*;
 import java.util.Random;
 import eduni.distributions.Normal;
 
+/**
+ * Represents a customer in the simulation.
+ *
+ * <p>This class models a customer's journey through the dealership simulation,
+ * including their preferences, financial attributes, and interactions with service points.
+ * Customers are assigned random attributes such as car type, fuel type, budget, and credit score
+ * based on predefined distributions.</p>
+ *
+ * <p><strong>Key Responsibilities:</strong></p>
+ * <ul>
+ *   <li>Tracks customer-specific attributes such as budget, credit score, and preferences.</li>
+ *   <li>Records arrival and removal times for each service point.</li>
+ *   <li>Calculates probabilities for financial approval and satisfaction with test drives.</li>
+ *   <li>Maintains the customer's state (e.g., finance approval, test drive satisfaction).</li>
+ * </ul>
+ */
 public class Customer {
 	// Simulation-specific variables (from first class)
 	private double arrivalTime;
@@ -54,7 +70,24 @@ public class Customer {
 
 	private static final Random random = new Random();
 
-	// Constructor
+	/**
+	 * Constructs a new customer with randomly assigned attributes.
+	 *
+	 * <p>Each customer is initialized with the following attributes:</p>
+	 * <ul>
+	 *   <li>Unique ID assigned sequentially.</li>
+	 *   <li>Arrival time based on the simulation clock.</li>
+	 *   <li>Randomly generated budget and credit score from normal distributions.</li>
+	 *   <li>Randomly assigned car type and fuel type based on predefined probabilities.</li>
+	 * </ul>
+	 *
+	 * <p>Initial state:</p>
+	 * <ul>
+	 *   <li>Finance approval: <code>false</code></li>
+	 *   <li>Test drive satisfaction: <code>false</code></li>
+	 *   <li>Purchase status: <code>false</code></li>
+	 * </ul>
+	 */
 	public Customer() {
 		// Assign unique ID
 		id = i++;
@@ -80,7 +113,20 @@ public class Customer {
 		currentServicePoint = "entry";
 	}
 
-	// Method to assign a random car type based on predefined probabilities (discrete distribution)
+	/**
+	 * Assigns a random car type to the customer based on predefined probabilities.
+	 *
+	 * <p><strong>Probabilities:</strong></p>
+	 * <ul>
+	 *   <li>20% - SUV</li>
+	 *   <li>20% - Sport</li>
+	 *   <li>30% - Sedan</li>
+	 *   <li>20% - Van</li>
+	 *   <li>10% - Compact</li>
+	 * </ul>
+	 *
+	 * @return A randomly assigned car type as a <code>String</code>.
+	 */
 	private String assignCarType() {
 		double rand = Math.random();
 		if (rand < 0.2) {
@@ -96,7 +142,18 @@ public class Customer {
 		}
 	}
 
-	// Method to assign a random fuel type based on predefined probabilities (discrete distribution)
+	/**
+	 * Assigns a random fuel type to the customer based on predefined probabilities.
+	 *
+	 * <p><strong>Probabilities:</strong></p>
+	 * <ul>
+	 *   <li>50% - Gas</li>
+	 *   <li>30% - Hybrid</li>
+	 *   <li>20% - Electric</li>
+	 * </ul>
+	 *
+	 * @return A randomly assigned fuel type as a <code>String</code>.
+	 */
 	private String assignFuelType() {
 		double rand = Math.random();
 		if (rand < 0.5) {
@@ -108,36 +165,19 @@ public class Customer {
 		}
 	}
 
-	// Getters and Setters for Simulation-Specific Variables
-	public double getArrivalTime() {
-		return arrivalTime;
-	}
 
-	public void setArrivalTime(double arrivalTime) {
-		this.arrivalTime = arrivalTime;
-	}
-
-	public double getRemovalTime() {
-		return removalTime;
-	}
-
-	public void setRemovalTime(double removalTime) {
-		this.removalTime = removalTime;
-	}
-
-	public double getTotalTime() {
-		return totalTime;
-	}
-
-	public void setTotalTime() {
-		totalTime = removalTime - arrivalTime;
-	}
-
-	public int getId() {
-		return id;
-	}
-
-	// Report results for this customer
+	/**
+	 * Logs and reports the customer's journey and statistics.
+	 *
+	 * <p>This method outputs details about the customer's experience, including:</p>
+	 * <ul>
+	 *   <li>Arrival and removal times.</li>
+	 *   <li>Total time spent in the simulation.</li>
+	 *   <li>Updated mean service time for all customers.</li>
+	 * </ul>
+	 *
+	 * <p>The mean service time is updated incrementally for each customer.</p>
+	 */
 	public void reportResults() {
 		Trace.out(Trace.Level.INFO, "\nCustomer #" + id + " ready!");
 		Trace.out(Trace.Level.INFO, "Customer #" + id + " arrived at: " + arrivalTime);
@@ -150,184 +190,335 @@ public class Customer {
 		System.out.println("Current mean service time: " + meanServiceTime);
 	}
 
-	// Getters for Customer Attributes
-	public String getPreferredCarType() {
-		return preferredCarType;
-	}
-
-	public String getPreferredFuelType() {
-		return preferredFuelType;
-	}
-
-	public double getBudget() {
-		return budget;
-	}
-
-	public int getCreditScore() {
-		return creditScore;
-	}
-
-	public boolean isFinanceAccepted() {
-		return financeAccepted;
-	}
-
-	public void setFinanceAccepted(boolean financeAccepted) {
-		this.financeAccepted = financeAccepted;
-	}
-
-	public boolean happyWithTestdrive() {
-		return happyWithTestdrive;
-	}
-
-	public void setHappyWithTestdrive(boolean happyWithTestdrive) {
-		this.happyWithTestdrive = happyWithTestdrive;
-	}
-
-	public Car getPurchaseCar() {
-		return purchaseCar;
-	}
-
-	public void setPurchaseCar(Car car) {
-		this.purchaseCar = car;
-	}
-
-	public boolean isPurchased() {
-		return purchased;
-	}
-
-	public void setPurchased(boolean purchased) {
-		this.purchased = purchased;
-	}
-
-	public double getBaseCreditScore() {
-		return BASECREDITSCORE;
-	}
-
-	public void increaseTestDriveCount() {
-		testDriveCount++;
-	}
-
-	public int getTestDriveCount() {
-		return testDriveCount;
-	}
-
-	public String getCurrentServicePoint() {
-		return currentServicePoint;
-	}
-
-	public void setCurrentServicePoint(String currentServicePoint) {
-		this.currentServicePoint = currentServicePoint;
-	}
-
-	public double getArrivalTimeAtArrivalServicePoint() {
-		return arrivalTimeAtArrivalServicePoint;
-	}
-
-	public void setArrivalTimeAtArrivalServicePoint(double arrivalTimeAtArrivalServicePoint) {
-		this.arrivalTimeAtArrivalServicePoint = arrivalTimeAtArrivalServicePoint;
-	}
-
-	public double getArrivalTimeAtFinanceServicePoint() {
-		return arrivalTimeAtFinanceServicePoint;
-	}
-
-	public void setArrivalTimeAtFinanceServicePoint(double arrivalTimeAtFinanceServicePoint) {
-		this.arrivalTimeAtFinanceServicePoint = arrivalTimeAtFinanceServicePoint;
-	}
-
-	public double getArrivalTimeAtTestDriveServicePoint() {
-		return arrivalTimeAtTestDriveServicePoint;
-	}
-
-	public void setArrivalTimeAtTestDriveServicePoint(double arrivalTimeAtTestDriveServicePoint) {
-		this.arrivalTimeAtTestDriveServicePoint = arrivalTimeAtTestDriveServicePoint;
-	}
-
-	public double getArrivalTimeAtClosureServicePoint() {
-		return arrivalTimeAtClosureServicePoint;
-	}
-
-	public void setArrivalTimeAtClosureServicePoint(double arrivalTimeAtClosureServicePoint) {
-		this.arrivalTimeAtClosureServicePoint = arrivalTimeAtClosureServicePoint;
-	}
-
-	public double getRemovalTimeAtArrivalServicePoint() {
-		return removalTimeAtArrivalServicePoint;
-	}
-
-	public void setRemovalTimeAtArrivalServicePoint(double removalTimeAtArrivalServicePoint) {
-		this.removalTimeAtArrivalServicePoint = removalTimeAtArrivalServicePoint;
-	}
-
-	public double getRemovalTimeAtFinanceServicePoint() {
-		return removalTimeAtFinanceServicePoint;
-	}
-
-	public void setRemovalTimeAtFinanceServicePoint(double removalTimeAtFinanceServicePoint) {
-		this.removalTimeAtFinanceServicePoint = removalTimeAtFinanceServicePoint;
-	}
-
-	public double getRemovalTimeAtTestDriveServicePoint() {
-		return removalTimeAtTestDriveServicePoint;
-	}
-
-	public void setRemovalTimeAtTestDriveServicePoint(double removalTimeAtTestDriveServicePoint) {
-		this.removalTimeAtTestDriveServicePoint = removalTimeAtTestDriveServicePoint;
-	}
-
-	public double getRemovalTimeAtClosureServicePoint() {
-		return removalTimeAtClosureServicePoint;
-	}
-
-	public void setRemovalTimeAtClosureServicePoint(double removalTimeAtClosureServicePoint) {
-		this.removalTimeAtClosureServicePoint = removalTimeAtClosureServicePoint;
-	}
-
-	public double getTotalTimeAtArrivalServicePoint() {
-		return totalTimeAtArrivalServicePoint;
-	}
-
-	public void updateTotalTimeAtArrivalServicePoint() {
-		this.totalTimeAtArrivalServicePoint = removalTimeAtArrivalServicePoint - arrivalTimeAtArrivalServicePoint;
-	}
-
-	public double getTotalTimeAtFinanceServicePoint() {
-		return totalTimeAtFinanceServicePoint;
-	}
-
-	public void updateTotalTimeAtFinanceServicePoint() {
-		this.totalTimeAtFinanceServicePoint = removalTimeAtFinanceServicePoint - arrivalTimeAtFinanceServicePoint;
-	}
-
-	public double getTotalTimeAtTestDriveServicePoint() {
-		return totalTimeAtTestDriveServicePoint;
-	}
-
-	public void updateTotalTimeAtTestDriveServicePoint() {
-		this.totalTimeAtTestDriveServicePoint = removalTimeAtTestDriveServicePoint - arrivalTimeAtTestDriveServicePoint;
-	}
-
-	public double getTotalTimeAtClosureServicePoint() {
-		return totalTimeAtClosureServicePoint;
-	}
-
-	public void updateTotalTimeAtClosureServicePoint() {
-		this.totalTimeAtClosureServicePoint = removalTimeAtClosureServicePoint - arrivalTimeAtClosureServicePoint;
-	}
-
-
-
+	/**
+	 * Calculates the probability of financial approval based on the customer's credit score.
+	 *
+	 * <p>If the customer's credit score meets or exceeds a baseline, a base probability
+	 * is returned. Otherwise, the probability is reduced exponentially based on the difference
+	 * between the credit score and the baseline score.</p>
+	 *
+	 * <p><strong>Formula:</strong></p>
+	 * <code>financeProbability = BASEPROB * e^(-COEFFICIENT * (customerCreditScore - BASECREDITSCORE))</code>
+	 *
+	 * @param customerCreditScore The customer's credit score.
+	 * @return The calculated probability of financial approval as a <code>double</code>.
+	 */
 	public double calculateFinanceProbability(double customerCreditScore) {
 		if (customerCreditScore >= BASECREDITSCORE) {
 			return BASEPROB;
 		} else {
-			// Sales probability formula:
-			// saleProbability = basePrice * e^(-coefficient * (customerPrice - basePrice))
 			financeProb = BASEPROB * Math.exp(-COEFFICIENT * (customerCreditScore - BASECREDITSCORE));
 			return financeProb;
 		}
 	}
 
+
+	// Getters and Setters for Simulation-Specific Variables
+
+	/**
+	 * @hidden
+	 */
+	public double getArrivalTime() {
+		return arrivalTime;
+	}
+	/**
+	 * @hidden
+	 */
+	public void setArrivalTime(double arrivalTime) {
+		this.arrivalTime = arrivalTime;
+	}
+	/**
+	 * @hidden
+	 */
+	public double getRemovalTime() {
+		return removalTime;
+	}
+	/**
+	 * @hidden
+	 */
+	public void setRemovalTime(double removalTime) {
+		this.removalTime = removalTime;
+	}
+	/**
+	 * @hidden
+	 */
+	public double getTotalTime() {
+		return totalTime;
+	}
+	/**
+	 * @hidden
+	 */
+	public void setTotalTime() {
+		totalTime = removalTime - arrivalTime;
+	}
+	/**
+	 * @hidden
+	 */
+	public int getId() {
+		return id;
+	}
+
+
+	// Getters for Customer Attributes
+
+	/**
+	 * @hidden
+	 */
+	public String getPreferredCarType() {
+		return preferredCarType;
+	}
+	/**
+	 * @hidden
+	 */
+	public String getPreferredFuelType() {
+		return preferredFuelType;
+	}
+	/**
+	 * @hidden
+	 */
+	public double getBudget() {
+		return budget;
+	}
+	/**
+	 * @hidden
+	 */
+	public int getCreditScore() {
+		return creditScore;
+	}
+	/**
+	 * @hidden
+	 */
+	public boolean isFinanceAccepted() {
+		return financeAccepted;
+	}
+	/**
+	 * @hidden
+	 */
+	public void setFinanceAccepted(boolean financeAccepted) {
+		this.financeAccepted = financeAccepted;
+	}
+	/**
+	 * @hidden
+	 */
+	public boolean happyWithTestdrive() {
+		return happyWithTestdrive;
+	}
+	/**
+	 * @hidden
+	 */
+	public void setHappyWithTestdrive(boolean happyWithTestdrive) {
+		this.happyWithTestdrive = happyWithTestdrive;
+	}
+	/**
+	 * @hidden
+	 */
+	public Car getPurchaseCar() {
+		return purchaseCar;
+	}
+	/**
+	 * @hidden
+	 */
+	public void setPurchaseCar(Car car) {
+		this.purchaseCar = car;
+	}
+	/**
+	 * @hidden
+	 */
+	public boolean isPurchased() {
+		return purchased;
+	}
+	/**
+	 * @hidden
+	 */
+	public void setPurchased(boolean purchased) {
+		this.purchased = purchased;
+	}
+	/**
+	 * @hidden
+	 */
+	public double getBaseCreditScore() {
+		return BASECREDITSCORE;
+	}
+	/**
+	 * @hidden
+	 */
+	public void increaseTestDriveCount() {
+		testDriveCount++;
+	}
+	/**
+	 * @hidden
+	 */
+	public int getTestDriveCount() {
+		return testDriveCount;
+	}
+	/**
+	 * @hidden
+	 */
+	public String getCurrentServicePoint() {
+		return currentServicePoint;
+	}
+	/**
+	 * @hidden
+	 */
+	public void setCurrentServicePoint(String currentServicePoint) {
+		this.currentServicePoint = currentServicePoint;
+	}
+	/**
+	 * @hidden
+	 */
+	public double getArrivalTimeAtArrivalServicePoint() {
+		return arrivalTimeAtArrivalServicePoint;
+	}
+	/**
+	 * @hidden
+	 */
+	public void setArrivalTimeAtArrivalServicePoint(double arrivalTimeAtArrivalServicePoint) {
+		this.arrivalTimeAtArrivalServicePoint = arrivalTimeAtArrivalServicePoint;
+	}
+	/**
+	 * @hidden
+	 */
+	public double getArrivalTimeAtFinanceServicePoint() {
+		return arrivalTimeAtFinanceServicePoint;
+	}
+	/**
+	 * @hidden
+	 */
+	public void setArrivalTimeAtFinanceServicePoint(double arrivalTimeAtFinanceServicePoint) {
+		this.arrivalTimeAtFinanceServicePoint = arrivalTimeAtFinanceServicePoint;
+	}
+	/**
+	 * @hidden
+	 */
+	public double getArrivalTimeAtTestDriveServicePoint() {
+		return arrivalTimeAtTestDriveServicePoint;
+	}
+	/**
+	 * @hidden
+	 */
+	public void setArrivalTimeAtTestDriveServicePoint(double arrivalTimeAtTestDriveServicePoint) {
+		this.arrivalTimeAtTestDriveServicePoint = arrivalTimeAtTestDriveServicePoint;
+	}
+	/**
+	 * @hidden
+	 */
+	public double getArrivalTimeAtClosureServicePoint() {
+		return arrivalTimeAtClosureServicePoint;
+	}
+	/**
+	 * @hidden
+	 */
+	public void setArrivalTimeAtClosureServicePoint(double arrivalTimeAtClosureServicePoint) {
+		this.arrivalTimeAtClosureServicePoint = arrivalTimeAtClosureServicePoint;
+	}
+	/**
+	 * @hidden
+	 */
+	public double getRemovalTimeAtArrivalServicePoint() {
+		return removalTimeAtArrivalServicePoint;
+	}
+	/**
+	 * @hidden
+	 */
+	public void setRemovalTimeAtArrivalServicePoint(double removalTimeAtArrivalServicePoint) {
+		this.removalTimeAtArrivalServicePoint = removalTimeAtArrivalServicePoint;
+	}
+	/**
+	 * @hidden
+	 */
+	public double getRemovalTimeAtFinanceServicePoint() {
+		return removalTimeAtFinanceServicePoint;
+	}
+	/**
+	 * @hidden
+	 */
+	public void setRemovalTimeAtFinanceServicePoint(double removalTimeAtFinanceServicePoint) {
+		this.removalTimeAtFinanceServicePoint = removalTimeAtFinanceServicePoint;
+	}
+	/**
+	 * @hidden
+	 */
+	public double getRemovalTimeAtTestDriveServicePoint() {
+		return removalTimeAtTestDriveServicePoint;
+	}
+	/**
+	 * @hidden
+	 */
+	public void setRemovalTimeAtTestDriveServicePoint(double removalTimeAtTestDriveServicePoint) {
+		this.removalTimeAtTestDriveServicePoint = removalTimeAtTestDriveServicePoint;
+	}
+	/**
+	 * @hidden
+	 */
+	public double getRemovalTimeAtClosureServicePoint() {
+		return removalTimeAtClosureServicePoint;
+	}
+	/**
+	 * @hidden
+	 */
+	public void setRemovalTimeAtClosureServicePoint(double removalTimeAtClosureServicePoint) {
+		this.removalTimeAtClosureServicePoint = removalTimeAtClosureServicePoint;
+	}
+	/**
+	 * @hidden
+	 */
+	public double getTotalTimeAtArrivalServicePoint() {
+		return totalTimeAtArrivalServicePoint;
+	}
+	/**
+	 * @hidden
+	 */
+	public void updateTotalTimeAtArrivalServicePoint() {
+		this.totalTimeAtArrivalServicePoint = removalTimeAtArrivalServicePoint - arrivalTimeAtArrivalServicePoint;
+	}
+	/**
+	 * @hidden
+	 */
+	public double getTotalTimeAtFinanceServicePoint() {
+		return totalTimeAtFinanceServicePoint;
+	}
+	/**
+	 * @hidden
+	 */
+	public void updateTotalTimeAtFinanceServicePoint() {
+		this.totalTimeAtFinanceServicePoint = removalTimeAtFinanceServicePoint - arrivalTimeAtFinanceServicePoint;
+	}
+	/**
+	 * @hidden
+	 */
+	public double getTotalTimeAtTestDriveServicePoint() {
+		return totalTimeAtTestDriveServicePoint;
+	}
+	/**
+	 * @hidden
+	 */
+	public void updateTotalTimeAtTestDriveServicePoint() {
+		this.totalTimeAtTestDriveServicePoint = removalTimeAtTestDriveServicePoint - arrivalTimeAtTestDriveServicePoint;
+	}
+	/**
+	 * @hidden
+	 */
+	public double getTotalTimeAtClosureServicePoint() {
+		return totalTimeAtClosureServicePoint;
+	}
+	/**
+	 * @hidden
+	 */
+	public void updateTotalTimeAtClosureServicePoint() {
+		this.totalTimeAtClosureServicePoint = removalTimeAtClosureServicePoint - arrivalTimeAtClosureServicePoint;
+	}
+
+	/**
+	 * Returns a string representation of the customer.
+	 *
+	 * <p>This method provides a detailed overview of the customer's key attributes,
+	 * including their ID, arrival and removal times, car and fuel type preferences,
+	 * budget, credit score, and status indicators such as finance acceptance and
+	 * test drive satisfaction.</p>
+	 *
+	 * @return A string representation of the customer, formatted as:</br>
+	 *         <code>Customer{id=..., arrivalTime=..., removalTime=..., ...}</code>
+	 */
 	@Override
 	public String toString() {
 		return "Customer{" +

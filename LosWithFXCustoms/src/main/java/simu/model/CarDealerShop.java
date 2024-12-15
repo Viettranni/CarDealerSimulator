@@ -4,6 +4,9 @@ import java.util.*;
 
 import simu.model.cartypes.*;
 
+/**
+ * Manages the car dealership operations, including inventory, sales, and customer interactions.
+ */
 public class CarDealerShop {
     private List<Car> carCollection;
     private List<Car> soldCars;
@@ -18,19 +21,13 @@ public class CarDealerShop {
         meanCarSalesProbability = 0.0;
     }
 
-    // Getters setters
 
-    public List<Car> getCarCollection() {
-        return carCollection;
-    }
-
-    public List<Car> getSoldCars() {
-        return soldCars;
-    }
-
-    // METHODS
-
-    // Adding the car to Car Gallery
+    /**
+     * Adds a car to the car collection (gallery).
+     * Validates the car object before adding it.
+     *
+     * @param vehicle The car to be added to the gallery.
+     */
     public void addCar(Car vehicle) {
         try {
             if (vehicle == null) {
@@ -44,7 +41,13 @@ public class CarDealerShop {
         }
     }
 
-    // Adding car to sold list
+
+    /**
+     * Adds a car to the list of sold cars.
+     * Validates the car object before adding it.
+     *
+     * @param vehicle The car to be added to the sold list.
+     */
     public void addCarToSold(Car vehicle) {
         try {
             if (vehicle == null) {
@@ -57,8 +60,14 @@ public class CarDealerShop {
             System.out.println("Error: " + e.getMessage());
         }
     }
-    
-    // Removing the car from the Car Gallery
+
+
+    /**
+     * Sells a car by its register number.
+     * Removes the car from the gallery and adds it to the sold list.
+     *
+     * @param registerNumber The register number of the car to be sold.
+     */
     public void sellCar(String registerNumber) {
         try {
             boolean carFound = false;  // Flag to check if car is found
@@ -83,7 +92,12 @@ public class CarDealerShop {
         }
     }
 
-    // Generating unique register number for each vehicle object
+    /**
+     * Generates a unique register number for a car.
+     * Ensures that the generated number is not already taken.
+     *
+     * @return A unique register number.
+     */
     public static String generateUniqueRegisterNumber() {
         Random random = new Random();
         String generatedRegisterNumber;
@@ -109,11 +123,10 @@ public class CarDealerShop {
         return generatedRegisterNumber;
     }
 
-    // Check if a register number has already been taken
-    public static boolean isRegisterNumberTaken(String registerNumber) {
-        return takenRegisterNumbers.contains(registerNumber);
-    }
-
+    /**
+     * Sets the mean car sales probability based on the car collection.
+     * Calculates the average base probability of all cars in the collection.
+     */
     public void setMeanCarSalesProbability() {
         double total = 0;
         double sum = 0;
@@ -124,11 +137,17 @@ public class CarDealerShop {
         meanCarSalesProbability = sum / total;
     }
 
-    public double getMeanCarSalesProbability() {
-        return meanCarSalesProbability;
-    }
 
-    // REMEMBER TO LATER CHANGE THIS TO FIT THE UI AND CONTROLLER
+    /**
+     * Creates a specified number of cars and adds them to the car collection.
+     * Configures each car based on its type, fuel type, price, and variance.
+     *
+     * @param amount       The number of cars to create.
+     * @param carType      The type of the car (e.g., SUV, Sedan).
+     * @param fuelType     The type of fuel the car uses.
+     * @param meanPrice    The average price of the car.
+     * @param priceVariance The variance in the price of the car.
+     */
     public void createCar(int amount, String carType, String fuelType, double meanPrice, double priceVariance) {
         String actualFuelType = fuelType.toLowerCase();
         // Loop to create the specified amount of cars
@@ -164,6 +183,18 @@ public class CarDealerShop {
         }
     }
 
+
+    /**
+     * Creates a specified number of cars and adds them to the car collection.
+     * Configures each car based on its type, fuel type, price, variance, <strong>and base price</strong>.
+     *
+     * @param amount       The number of cars to create.
+     * @param carType      The type of the car (e.g., SUV, Sedan).
+     * @param fuelType     The type of fuel the car uses.
+     * @param meanPrice    The average price of the car.
+     * @param priceVariance The variance in the price of the car.
+     * @param basePrice     The base price of the car.
+     */
     public void createCar(int amount, String carType, String fuelType, double meanPrice, double priceVariance, double basePrice) {
         String actualFuelType = fuelType.toLowerCase();
         // Loop to create the specified amount of cars
@@ -199,41 +230,39 @@ public class CarDealerShop {
         }
     }
 
-    public LinkedList<Customer> getCustomerAtTheDealership(){
-        return customerAtTheDealership;
-    }
 
+    /**
+     * @hidden
+     */
+    public double getMeanCarSalesProbability() {
+        return meanCarSalesProbability;
+    }
+    /**
+     * @hidden
+     */
+    public List<Car> getCarCollection() {
+        return carCollection;
+    }
+    /**
+     * @hidden
+     */
+    public List<Car> getSoldCars() {
+        return soldCars;
+    }
+    /**
+     * @hidden
+     */
     public void addCustomerAtTheDealership(Customer customer){
         if (customer != null) {
             customerAtTheDealership.add(customer);
         }
     }
-
+    /**
+     * @hidden
+     */
     public void removeCustomerAtTheDealership(Customer customer){
         if (customer != null) {
             customerAtTheDealership.remove(customer);
         }
-    }
-
-    // Main method to run the test
-    public static void main(String[] args) {
-        // Create a CarDealerShop instance
-        CarDealerShop shop = new CarDealerShop();
-
-        // Creating a Van object with sample values
-        Van van = new Van("gas", 20000, 5000);
-        shop.addCar(van);  // Add van to the shop collection
-
-        // Creating an SUV object with sample values
-        SUV suv = new SUV("electric", 35000, 10000);
-        shop.addCar(suv);  // Add SUV to the shop collection
-
-        // Output the register numbers to verify that they were generated
-        System.out.println("Van Register Number: " + van.getRegisterNumber());
-        System.out.println("SUV Register Number: " + suv.getRegisterNumber());
-
-        String vanregister = van.getRegisterNumber();
-
-        shop.sellCar(vanregister);
     }
 }

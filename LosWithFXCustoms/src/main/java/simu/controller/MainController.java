@@ -19,7 +19,10 @@ import javafx.collections.ObservableList;
 import javafx.beans.property.ReadOnlyStringWrapper;
 import simu.view.ShrekPathView;
 
-
+/**
+ * Serves as the main controller for the simulation, managing UI interactions, simulation parameters,
+ * car data, and the execution of the simulation.
+ */
 public class MainController {
     public TextField dealerShipName;
     @FXML private TextField meanPrice;

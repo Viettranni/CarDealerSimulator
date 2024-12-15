@@ -5,6 +5,9 @@ import javafx.animation.SequentialTransition;
 import javafx.application.Platform;
 import simu.view.ShrekPathView;
 
+/**
+ * Controls and manages the animation sequence for the simulation view.
+ */
 public class AnimationController {
     private ShrekPathView view;
     private SequentialTransition animation;

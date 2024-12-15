@@ -6,6 +6,10 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 
+/**
+ * Initializes and launches the graphical user interface (GUI) for the simulation application.
+ * Uses JavaFX and FXML to define the layout and styling of the main window.
+ */
 public class InitUI extends Application {
 
     @Override

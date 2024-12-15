@@ -4,7 +4,10 @@ import eduni.distributions.Normal;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-
+/**
+ * Represents a car with attributes like type, fuel type, price, and probabilities.
+ * Includes methods for calculating sales and type-specific probabilities.
+ */
 public class Car {
     private String registerNumber;
     private String carType;

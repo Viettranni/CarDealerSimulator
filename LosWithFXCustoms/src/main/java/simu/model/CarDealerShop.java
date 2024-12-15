@@ -4,6 +4,9 @@ import java.util.*;
 
 import simu.model.cartypes.*;
 
+/**
+ * Manages the car dealership operations, including inventory, sales, and customer interactions.
+ */
 public class CarDealerShop {
     private List<Car> carCollection;
     private List<Car> soldCars;

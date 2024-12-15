@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ExternalStorageConfigurationManager" enabled="true" />
   <component name="JavadocGenerationManager">
-    <option name="OUTPUT_DIRECTORY" value="$USER_HOME$/Documents/JDocs" />
+    <option name="OUTPUT_DIRECTORY" value="$PROJECT_DIR$/../JavaDocsManager" />
   </component>
   <component name="MavenProjectsManager">
     <option name="originalFiles">

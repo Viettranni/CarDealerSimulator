@@ -6,7 +6,10 @@ import simu.framework.Clock;
 import simu.model.*;
 import java.util.*;
 
-
+/**
+ * Manages the initialization, configuration, and execution of the car dealership simulation,
+ * including database interactions and simulation parameters.
+ */
 public class SimuController implements Runnable {
     // Instance variables
     private MyEngine myEngine;

@@ -2,11 +2,15 @@ package simu.view;
 
 import javafx.animation.SequentialTransition;
 import javafx.animation.TranslateTransition;
-import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.image.Image;
 import javafx.scene.layout.Pane;
 import javafx.util.Duration;
 
+/**
+ * Provides a graphical representation of a customer's journey through various service points,
+ * including animated interactions with cars, visual effects, and timed transitions.
+ */
 public class ShrekPathView extends Pane {
 
     private ImageView backgroundView;

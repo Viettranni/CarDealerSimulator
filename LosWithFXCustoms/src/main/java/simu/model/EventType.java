@@ -2,7 +2,9 @@ package simu.model;
 
 import simu.framework.IEventType;
 
-// Event types are defined by the requirements of the simulation model
+/**
+ * Represents event types for simulation stages, including customer arrivals and service point departures.
+ */
 public enum EventType implements IEventType {
 	ARR1, DEP1, DEP2, DEP3, DEP4;
 }

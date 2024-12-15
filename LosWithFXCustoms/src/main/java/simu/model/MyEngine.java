@@ -10,6 +10,9 @@ import simu.model.servicepoints.ClosureServicePoint;
 import simu.model.servicepoints.FinanceServicePoint;
 import simu.model.servicepoints.TestdriveServicePoint;
 
+/**
+ * Simulates the operations of a car dealership, managing customer flow, service points, and vehicle sales.
+ */
 public class MyEngine extends Engine {
 	private ArrivalProcess arrivalProcess;
 	private ServicePoint[] servicePoints;

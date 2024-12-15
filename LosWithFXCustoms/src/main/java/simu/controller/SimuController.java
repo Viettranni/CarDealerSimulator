@@ -14,12 +14,9 @@ public class SimuController implements Runnable {
     private CarsDao carsDao;
 
     // Means and variances
-    private int arrivalMean;
-    private final int ARRIVALINTERVALMULTIPLIER = 200;
     private int simulationTime;
     private boolean simulationInitialized = false;
     private String statusMessage;
-    private ArrayList<String[]> carsToBeCreated;
     private boolean simulationComplete = false;
 
 
@@ -46,11 +43,11 @@ public class SimuController implements Runnable {
      *
      * @param arrivalMean             Mean time between arrivals in time units.
      * @param arrivalVariance         Variance in time between arrivals in time units.
-     * @param financeMean             Mean time for the finance service in time units.
+     * @param financeMean             Meantime for the finance service in time units.
      * @param financeVariance         Variance in the finance service time in time units.
-     * @param testDriveMean           Mean time for the test-drive service in time units.
+     * @param testDriveMean           Meantime for the test-drive service in time units.
      * @param testDriveVariance       Variance in the test-drive service time in time units.
-     * @param closureMean             Mean time for the closure service in time units.
+     * @param closureMean             Meantime for the closure service in time units.
      * @param closureVariance         Variance in the closure service time in time units.
      * @param simulationSpeed         Simulation speed multiplier (e.g., 1 for normal speed).
      * @param carsToBeCreated         List of cars to be created during the simulation.
@@ -342,7 +339,6 @@ public class SimuController implements Runnable {
      * @return List of cars retrieved from the specified table, or an empty list if
      *         the table does not exist.
      */
-
     public ArrayList<String[]> getCarsToBeCreated(String tableName) {
         ArrayList<String> tableNames = getTableNames();
         ArrayList<String[]> carsToBeCreated = new ArrayList<>();

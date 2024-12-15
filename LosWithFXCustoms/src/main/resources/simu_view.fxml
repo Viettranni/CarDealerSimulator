@@ -141,7 +141,7 @@
                             <TableColumn fx:id="carAmountColumn" prefWidth="43.0" text="Qty" />
                             <TableColumn fx:id="carTypeColumn" prefWidth="70.0" text="Type" />
                             <TableColumn fx:id="carFuelTypeColumn" prefWidth="73.0" text="Fuel" />
-                            <TableColumn fx:id="carMeanPriceColumnn" prefWidth="93.0" text="Mean Price" />
+                            <TableColumn fx:id="carMeanPriceColumn" prefWidth="93.0" text="Mean Price" />
                             <TableColumn fx:id="carPriceVarianceColumn" prefWidth="93.0" text="Variance" />
                             <TableColumn fx:id="carActionColumn" prefWidth="90.0" text="Action" />
                         </columns>

@@ -34,7 +34,6 @@ public class MyEngine extends Engine {
 	private final int seed = 123;
 	private final double ARRIVALCOEFFICIENT = 100;
 	private double arrivalInterval;
-	ContinuousGenerator serviceTime = null;
 	ContinuousGenerator arrivalServiceTime = null;
 	ContinuousGenerator financeServiceTime = null;
 	ContinuousGenerator testdriveServiceTime = null;
@@ -42,132 +41,11 @@ public class MyEngine extends Engine {
 	Random r = null;
 
 
-	public static final boolean TEXTDEMO = true;
-	public static final boolean FIXEDARRIVALTIMES = false;
-	public static final boolean FIXEDSERVICETIMES = false;
-
-	/*
-	 * This is the place where you implement your own simulator
-	 *
-	 * Demo simulation case:
-	 * Simulate four service points:
-	 * ArrivalServicePoint -> FinanceServicePoint -> Test-driveServicePoint -> ClosureServicePoint
-	 */
 
 	public MyEngine() {
 		r = new Random();
 		this.carDealerShop = new CarDealerShop();
 		currentServicePointIndex = 0;
-	}
-	public MyEngine(int arrivalMean, int arrivalVariance, int financeMean, int financeVariance,
-					int testdriveMean, int testdriveVariance, int closureMean, int closureVariance,
-					int simulationSpeed, ArrayList<String[]> carsToBeCreated, int arrivalServicePoints,
-					int financeServicePoints, int testdriveServicePoints, int closureServicePoints, int arrivalInterval) {
-		this.carDealerShop = new CarDealerShop();
-		this.carsToBeCreated = carsToBeCreated;
-		this.arrivalMean = arrivalMean;
-		this.arrivalVariance = arrivalVariance;
-		this.financeMean = financeMean;
-		this.financeVariance = financeVariance;
-		this.testdriveMean = testdriveMean;
-		this.testdriveVariance = testdriveVariance;
-		this.closureMean = closureMean;
-		this.closureVariance = closureVariance;
-		this.simulationSpeed = simulationSpeed;
-		this.arrivalServicePoints = arrivalServicePoints;
-		this.financeServicePoints = financeServicePoints;
-		this.testdriveServicePoints = testdriveServicePoints;
-		this.closureServicePoints = closureServicePoints;
-		this.totalServicePoints = arrivalServicePoints + financeServicePoints + testdriveServicePoints + closureServicePoints;
-		this.arrivalInterval = arrivalInterval;
-		servicePoints = new ServicePoint[totalServicePoints];
-		currentServicePointIndex = 0;
-
-		// Create cars
-		carsToBeCreated(carsToBeCreated);
-		carDealerShop.setMeanCarSalesProbability();
-		double salesProbabilty = carDealerShop.getMeanCarSalesProbability();
-		arrivalInterval = Math.max(1, (int) (ARRIVALCOEFFICIENT * salesProbabilty));
-		Trace.out(Trace.Level.INFO, "Cars at the beginning of the simulation: " + carDealerShop.getCarCollection().size());
-		Trace.out(Trace.Level.INFO, "SalesProbability: " + salesProbabilty);
-
-		if (TEXTDEMO) {
-			// Special setup for text example
-			r = new Random();
-
-			ContinuousGenerator arrivalTime = null;
-			if (FIXEDARRIVALTIMES) {
-				// Fixed customer arrival times
-				arrivalTime = new ContinuousGenerator() {
-					@Override
-					public double sample() {
-						return 10;
-					}
-
-					@Override
-					public void setSeed(long seed) {
-					}
-
-					@Override
-					public long getSeed() {
-						return 0;
-					}
-
-					@Override
-					public void reseed() {
-					}
-				};
-			} else {
-				// Exponential distribution for variable customer arrival times
-				arrivalTime = new Negexp(arrivalInterval, Integer.toUnsignedLong(r.nextInt()));
-			}
-			if (FIXEDSERVICETIMES) {
-				// Fixed service times
-				serviceTime = new ContinuousGenerator() {
-					@Override
-					public double sample() {
-						return 9;
-					}
-
-					@Override
-					public void setSeed(long seed) {
-					}
-
-					@Override
-					public long getSeed() {
-						return 0;
-					}
-
-					@Override
-					public void reseed() {
-					}
-				};
-			} else {
-				// Normal distribution for variable service times
-				arrivalServiceTime = new Normal(arrivalMean, arrivalVariance, seed);
-				financeServiceTime = new Normal(financeMean, financeVariance, seed);
-				testdriveServiceTime = new Normal(testdriveMean, testdriveVariance, seed);
-				closureServiceTime = new Normal(closureMean, closureVariance, seed);
-			}
-			createArrivalServicePoints(arrivalServicePoints, arrivalServiceTime, eventList);
-			createFinanceServicePoints(financeServicePoints, financeServiceTime, eventList);
-			createTestdriveServicePoints(testdriveServicePoints, testdriveServiceTime, eventList, carDealerShop);
-			createClosureServicePoints(closureServicePoints, closureServiceTime, eventList, carDealerShop);
-
-			arrivalProcess = new ArrivalProcess(arrivalTime, eventList, EventType.ARR1);
-		} else {
-			arrivalServiceTime = new Normal(arrivalMean, arrivalVariance, seed);
-			financeServiceTime = new Normal(financeMean, financeVariance, seed);
-			testdriveServiceTime = new Normal(testdriveMean, testdriveVariance, seed);
-			closureServiceTime = new Normal(closureMean, closureVariance, seed);
-			// Realistic simulation with variable arrival and service times
-			createArrivalServicePoints(arrivalServicePoints, arrivalServiceTime, eventList);
-			createFinanceServicePoints(financeServicePoints, financeServiceTime, eventList);
-			createTestdriveServicePoints(testdriveServicePoints, testdriveServiceTime, eventList, carDealerShop);
-			createClosureServicePoints(closureServicePoints, closureServiceTime, eventList, carDealerShop);
-
-			arrivalProcess = new ArrivalProcess(new Negexp(arrivalInterval, new Random().nextLong()), eventList, EventType.ARR1);
-		}
 	}
 
 	@Override
@@ -175,8 +53,21 @@ public class MyEngine extends Engine {
 		arrivalProcess.generateNextEvent();
 	}
 
+
+	/**
+	 * Processes a simulation event and manages customer interactions with service points.
+	 *
+	 * <p><strong>Key Steps:</strong></p>
+	 * <ul>
+	 *   <li>Processes arrival events to add customers to the system.</li>
+	 *   <li>Handles departure events from each service point (arrival, finance, test-drive, closure).</li>
+	 *   <li>Tracks customer journey metrics such as wait times and service preferences.</li>
+	 * </ul>
+	 *
+	 * @param t The simulation event to be processed. Must not be null.
+	 * @throws InterruptedException If the thread sleep during simulation delay is interrupted.
+	 */
 	@Override
-	// Creates new customers and moves them through each servicePoint if possible
 	protected void runEvent(Event t) {// B phase events
 		Customer customer;
 		ArrayList<ServicePoint> arrivalServicePoints = getServicePointsByEventType(EventType.DEP1);
@@ -187,10 +78,6 @@ public class MyEngine extends Engine {
 		ServicePoint shortestFinanceServicePoint = null;
 		ServicePoint shortestTestdriveServicePoint = null;
 		ServicePoint shortestClosureServicePoint = null;
-		ServicePoint longestArrivalServicePoint = null;
-		ServicePoint longestFinanceServicePoint = null;
-		ServicePoint longestTestdriveServicePoint = null;
-		ServicePoint longestClosureServicePoint = null;
 		Trace.out(Trace.Level.INFO, "ArrivalServicePoints: " + arrivalServicePoints.size());
 		Trace.out(Trace.Level.INFO, "FinanceServicePoints: " + financeServicePoints.size());
 		Trace.out(Trace.Level.INFO, "TestdriveServicePoints: " + testdriveServicePoints.size());
@@ -315,8 +202,13 @@ public class MyEngine extends Engine {
 		}
 	}
 
+
+
+	/**
+	 * Attempts to initiate service at all service points that have a queue
+	 * and are not currently reserved. This method is executed in each simulation cycle.
+	 */
 	@Override
-	// Checks all the servicePoints in the simulation and begins service is possible
 	protected void tryCEvents() {
 		// Loop through each servicePoint in servicePoints
 		for (ServicePoint point : servicePoints) {
@@ -328,6 +220,21 @@ public class MyEngine extends Engine {
 		}
 	}
 
+
+	/**
+	 * Displays the results of the simulation in the console.
+	 *
+	 * <p>This method outputs detailed statistics about the simulation, including:</p>
+	 * <ul>
+	 *   <li>Processed customer details: arrival/removal times, service durations, preferences, and outcomes.</li>
+	 *   <li>Average metrics across all customers (e.g., time spent, budget, credit scores).</li>
+	 *   <li>Car and fuel type preferences for all customers.</li>
+	 *   <li>Sales statistics, including percentages for car types, fuel types, and combinations.</li>
+	 *   <li>Remaining cars and total cars sold during the simulation.</li>
+	 * </ul>
+	 *
+	 * <p><strong>Note:</strong> Results are displayed in a tabular format for readability.</p>
+	 */
 	@Override
 	protected void results() {
 		System.out.println("Simulation ended at " + Clock.getInstance().getClock());
@@ -469,7 +376,25 @@ public class MyEngine extends Engine {
 		System.out.println("Cars sold: " + totalSoldCars);
 	}
 
-	// Creates the amount of cars User asks for
+
+	/**
+	 * Initializes the car inventory for the simulation.
+	 *
+	 * <p>This method generates cars based on the provided list of parameters and adds them
+	 * to the <code>CarDealerShop</code>. Each car is initialized with its type, fuel type,
+	 * price, variance, and optional base price.</p>
+	 *
+	 * @param carsToBeCreated A list of car specifications where each entry contains:
+	 *                        <ol>
+	 *                          <li>Amount of cars to create</li>
+	 *                          <li>Car type (e.g., sedan, SUV)</li>
+	 *                          <li>Fuel type (e.g., petrol, electric)</li>
+	 *                          <li>Mean price</li>
+	 *                          <li>Variance in price</li>
+	 *                          <li>Base price (optional)</li>
+	 *                        </ol>
+	 * @throws NumberFormatException If any numeric value in the input is invalid.
+	 */
 	public void carsToBeCreated(ArrayList<String[]> carsToBeCreated) {
 		String carType;
 		int amount;
@@ -502,19 +427,19 @@ public class MyEngine extends Engine {
 		}
 		Trace.out(Trace.Level.INFO, "Cars at the beginning of the simulation: " + carDealerShop.getCarCollection().size());
 	}
-
+	/**
+	 * @hidden
+	 */
 	public static void addProcessedCustomer(Customer customer) {
 		if (customer != null && !processedCustomers.contains(customer)) {
 			processedCustomers.add(customer);
 		}
 	}
-
+	/**
+	 * @hidden
+	 */
 	public EventList getEventList() {
 		return eventList;
-	}
-
-	public ArrivalProcess getArrivalProcess() {
-		return arrivalProcess;
 	}
 
 	public void setArrivalProcess(double arrivalInterval, EventList eventList) {
@@ -523,135 +448,146 @@ public class MyEngine extends Engine {
 		this.arrivalProcess = new ArrivalProcess(arrivalTime, eventList, EventType.ARR1);
 		Trace.out(Trace.Level.INFO, "arrivalTime: " + arrivalTime.sample() + " arrivalinterval: " + arrivalInterval + " eventlist: " + eventList + "eventype: " + EventType.ARR1 );
 	}
-
-	public ServicePoint[] getServicePoints() {
-		return servicePoints;
-	}
-
+	/**
+	 * @hidden
+	 */
 	public void setServicePoints(int totalServicePoints) {
 		this.servicePoints = new ServicePoint[totalServicePoints];
 	}
-
-	public static ArrayList<Customer> getProcessedCustomers() {
-		return processedCustomers;
-	}
-
+	/**
+	 * @hidden
+	 */
 	public ArrayList<Customer> getProcessedCustomer(){
 		return processedCustomers;
 	}
-
-	public static void setProcessedCustomers(ArrayList<Customer> processedCustomers) {
-		MyEngine.processedCustomers = processedCustomers;
-	}
-
+	/**
+	 * @hidden
+	 */
 	public CarDealerShop getCarDealerShop() {
 		return carDealerShop;
 	}
-
-	public void setCarDealerShop(CarDealerShop carDealerShop) {
-		this.carDealerShop = carDealerShop;
-	}
-
-
+	/**
+	 * @hidden
+	 */
 	public int getArrivalMean() {
 		return arrivalMean;
 	}
-
+	/**
+	 * @hidden
+	 */
 	public void setArrivalMean(int arrivalMean) {
 		this.arrivalMean = arrivalMean;
 	}
-
+	/**
+	 * @hidden
+	 */
 	public int getArrivalVariance() {
 		return arrivalVariance;
 	}
-
+	/**
+	 * @hidden
+	 */
 	public void setArrivalVariance(int arrivalVariance) {
 		this.arrivalVariance = arrivalVariance;
 	}
-
+	/**
+	 * @hidden
+	 */
 	public int getFinanceMean() {
 		return financeMean;
 	}
-
+	/**
+	 * @hidden
+	 */
 	public void setFinanceMean(int financeMean) {
 		this.financeMean = financeMean;
 	}
-
+	/**
+	 * @hidden
+	 */
 	public int getFinanceVariance() {
 		return financeVariance;
 	}
-
+	/**
+	 * @hidden
+	 */
 	public void setFinanceVariance(int financeVariance) {
 		this.financeVariance = financeVariance;
 	}
-
+	/**
+	 * @hidden
+	 */
 	public int getTestdriveMean() {
 		return testdriveMean;
 	}
-
+	/**
+	 * @hidden
+	 */
 	public void setTestdriveMean(int testdriveMean) {
 		this.testdriveMean = testdriveMean;
 	}
-
+	/**
+	 * @hidden
+	 */
 	public int getTestdriveVariance() {
 		return testdriveVariance;
 	}
-
+	/**
+	 * @hidden
+	 */
 	public void setTestdriveVariance(int testdriveVariance) {
 		this.testdriveVariance = testdriveVariance;
 	}
-
+	/**
+	 * @hidden
+	 */
 	public int getClosureMean() {
 		return closureMean;
 	}
-
+	/**
+	 * @hidden
+	 */
 	public void setClosureMean(int closureMean) {
 		this.closureMean = closureMean;
 	}
-
+	/**
+	 * @hidden
+	 */
 	public int getClosureVariance() {
 		return closureVariance;
 	}
-
+	/**
+	 * @hidden
+	 */
 	public void setClosureVariance(int closureVariance) {
 		this.closureVariance = closureVariance;
 	}
-
-	public void setCarsToBeCreated(ArrayList<String[]> carsToBeCreated) {
-		this.carsToBeCreated = carsToBeCreated;
-	}
-
-	public ArrayList<String[]> getCarsToBeCreated() {
-		return carsToBeCreated;
-	}
-
+	/**
+	 * @hidden
+	 */
 	public synchronized int getSimulationSpeed() {
 		return simulationSpeed;
 	}
-
+	/**
+	 * @hidden
+	 */
 	public synchronized void setSimulationSpeed(int simulationSpeed) {
 		this.simulationSpeed = simulationSpeed;
 	}
 
-	public synchronized int slowDownSimulationSpeed(int increment) {
-		simulationSpeed += increment;
-		return simulationSpeed;
-	}
 
-	public synchronized int speedUpSimulationSpeed(int decrement) {
-		if (simulationSpeed <= 0) {
-			simulationSpeed = 0;
-			return simulationSpeed;
-		}
-		simulationSpeed -= decrement;
-
-		return simulationSpeed;
-	}
-	// Creates arrivalServicePoints
-	// Populates the servicePoints list by using a global currentServicePointIndex
-	// This makes possible the creation of different servicePoints by different methods
-	// And each servicePoint type is next to its own type
-	// For example (arrivals, finances, test-drives, closures)
+	/**
+	 * Creates service points for customer arrivals in the simulation.
+	 *
+	 * <p>This method initializes the specified number of arrival service points, configures
+	 * them with the provided service time distribution, and associates them with the
+	 * event list. The service points are added to the <code>servicePoints</code> array.</p>
+	 *
+	 * @param amount             The number of arrival service points to create.
+	 * @param arrivalServiceTime A distribution generator for arrival service times.
+	 * @param eventList          The simulation event list to associate with the service points.
+	 * @throws IllegalStateException If the <code>servicePoints</code> array is full.
+	 */
 	public void createArrivalServicePoints(int amount, ContinuousGenerator arrivalServiceTime, EventList eventList) {
 		for (int i = 0; i < amount; i++) {
 			if (currentServicePointIndex < servicePoints.length) {
@@ -662,24 +598,34 @@ public class MyEngine extends Engine {
 			}
 		}
 	}
-
+	/**
+	 * @hidden
+	 */
 	public void setCurrentServicePointIndex(int amount){
 		currentServicePointIndex = amount;
 	}
-
-	public int getCurrentServicePointIndex() {
-		return currentServicePointIndex;
-	}
-
+	/**
+	 * @hidden
+	 */
 	public void setArrivalServicePoints(int arrivalServicePoints) {
 		this.arrivalServicePoints = arrivalServicePoints;
 	}
-
+	/**
+	 * @hidden
+	 */
 	public int getArrivalServicePoints() {
 		return arrivalServicePoints;
 	}
 
-	// Same in here for financeServicePoints as in arrivalServicePointCreation
+
+	/**
+	 * Creates finance service points for the simulation. Each point is added to the
+	 * <code>servicePoints</code> array, and the current service point index is updated.
+	 *
+	 * @param amount             Number of finance service points to create.
+	 * @param financeServiceTime Distribution for finance service times.
+	 * @param eventList          List of simulation events.
+	 */
 	public void createFinanceServicePoints(int amount, ContinuousGenerator financeServiceTime, EventList eventList) {
 		for (int i = 0; i < amount; i++) {
 			if (currentServicePointIndex < servicePoints.length) {
@@ -690,16 +636,29 @@ public class MyEngine extends Engine {
 			}
 		}
 	}
-
+	/**
+	 * @hidden
+	 */
 	public void setFinanceServicePoints(int financeServicePoints) {
 		this.financeServicePoints = financeServicePoints;
 	}
-
+	/**
+	 * @hidden
+	 */
 	public int getFinanceServicePoints() {
 		return financeServicePoints;
 	}
 
-	// Same in here for test-driveServicePoints as in arrivalServicePointCreation
+
+	/**
+	 * Creates test-drive service points for the simulation. Each point is added to the
+	 * <code>servicePoints</code> array, and the current service point index is updated.
+	 *
+	 * @param amount                Number of test-drive service points to create.
+	 * @param testdriveServiceTime  Distribution for test-drive service times.
+	 * @param eventList             List of simulation events.
+	 * @param carDealerShop         Reference to the car dealer shop for accessing cars.
+	 */
 	public void createTestdriveServicePoints(int amount, ContinuousGenerator testdriveServiceTime, EventList eventList, CarDealerShop carDealerShop) {
 		for (int i = 0; i < amount; i++) {
 			if (currentServicePointIndex < servicePoints.length) {
@@ -710,16 +669,34 @@ public class MyEngine extends Engine {
 			}
 		}
 	}
-
+	/**
+	 * @hidden
+	 */
 	public void setTestdriveServicePoints(int testdriveServicePoints) {
 		this.testdriveServicePoints = testdriveServicePoints;
 	}
-
+	/**
+	 * @hidden
+	 */
 	public int getTestdriveServicePoints() {
 		return testdriveServicePoints;
 	}
 
-	// Same in here for closureServicePoints as in arrivalServicePointCreation
+
+	/**
+	 * Creates closure service points for the simulation.
+	 *
+	 * <p>This method initializes the specified number of closure service points. Each service
+	 * point is configured with the provided service time distribution, event list, and a reference
+	 * to the <code>CarDealerShop</code>. The created service points are added to the
+	 * <code>servicePoints</code> array.</p>
+	 *
+	 * @param amount             The number of closure service points to create.
+	 * @param closureServiceTime A distribution generator for closure service times.
+	 * @param eventList          The simulation event list to associate with the service points.
+	 * @param carDealerShop      A reference to the car dealership for accessing car-related data.
+	 * @throws IllegalStateException If the <code>servicePoints</code> array is full.
+	 */
 	public void createClosureServicePoints(int amount, ContinuousGenerator closureServiceTime, EventList eventList, CarDealerShop carDealerShop) {
 		for (int i = 0; i < amount; i++) {
 			if (currentServicePointIndex < servicePoints.length) {
@@ -730,74 +707,103 @@ public class MyEngine extends Engine {
 			}
 		}
 	}
-
+	/**
+	 * @hidden
+	 */
 	public void setClosureServicePoints(int closureServicePoints) {
 		this.closureServicePoints = closureServicePoints;
 	}
-
+	/**
+	 * @hidden
+	 */
 	public int getClosureServicePoints() {
 		return closureServicePoints;
 	}
-
+	/**
+	 * @hidden
+	 */
 	public int getTotalServicePoints() {
 		return totalServicePoints;
 	}
-
+	/**
+	 * @hidden
+	 */
 	public void setTotalServicePoints(int arrivalServicePoints, int financeServicePoints, int testdriveServicePoints, int closureServicePoints) {
 		this.totalServicePoints = arrivalServicePoints + financeServicePoints + testdriveServicePoints + closureServicePoints;
 	}
-
+	/**
+	 * @hidden
+	 */
 	public double getArrivalInterval() {
 		return arrivalInterval;
 	}
-
+	/**
+	 * @hidden
+	 */
 	public void setArrivalInterval(double salesProbabilty) {
 		this.arrivalInterval = Math.max(1, (int) (ARRIVALCOEFFICIENT * salesProbabilty));
 		Trace.out(Trace.Level.INFO, "SalesProbability: " + salesProbabilty);
 	}
-
-	public ContinuousGenerator getServiceTime() {
-		return serviceTime;
-	}
-
-	public void setServiceTime(ContinuousGenerator serviceTime) {
-		this.serviceTime = serviceTime;
-	}
-
+	/**
+	 * @hidden
+	 */
 	public ContinuousGenerator getArrivalServiceTime() {
 		return arrivalServiceTime;
 	}
-
+	/**
+	 * @hidden
+	 */
 	public void setArrivalServiceTime(int arrivalMean, int arrivalVariance) {
 		this.arrivalServiceTime = new Normal(arrivalMean, arrivalVariance, seed);
 	}
-
+	/**
+	 * @hidden
+	 */
 	public ContinuousGenerator getFinanceServiceTime() {
 		return financeServiceTime;
 	}
-
+	/**
+	 * @hidden
+	 */
 	public void setFinanceServiceTime(int financeMean, int financeVariance) {
 		this.financeServiceTime = new Normal(financeMean, financeVariance, seed);
 	}
-
+	/**
+	 * @hidden
+	 */
 	public ContinuousGenerator getTestdriveServiceTime() {
 		return testdriveServiceTime;
 	}
-
+	/**
+	 * @hidden
+	 */
 	public void setTestdriveServiceTime(int testdriveMean, int testdriveVariance) {
 		this.testdriveServiceTime = new Normal(testdriveMean, testdriveVariance, seed);
 	}
-
+	/**
+	 * @hidden
+	 */
 	public ContinuousGenerator getClosureServiceTime() {
 		return closureServiceTime;
 	}
-
+	/**
+	 * @hidden
+	 */
 	public void setClosureServiceTime(int closureMean, int closureVariance) {
 		this.closureServiceTime = new Normal(closureMean, closureVariance, seed);
 	}
 
-	// Loop through all servicePoints and retrieve the servicePoints with matching eventType
-	// Event Type is passed as an argument
+
+	/**
+	 * Retrieves all service points that match the specified event type.
+	 *
+	 * <p>This method filters the <code>servicePoints</code> array and returns a list of
+	 * service points that handle the given event type. If no matching service points are
+	 * found, an empty list is returned.</p>
+	 *
+	 * @param type The event type to filter service points by (e.g., ARRIVAL, FINANCE, TESTDRIVE, CLOSURE).
+	 * @return A list of service points that handle the specified event type. Returns an empty list if no matches are found.
+	 */
 	public ArrayList<ServicePoint> getServicePointsByEventType(EventType type) {
 		ArrayList<ServicePoint> filteredPoints = new ArrayList<>();
 		for (ServicePoint p : servicePoints) {
@@ -808,8 +814,17 @@ public class MyEngine extends Engine {
 		return filteredPoints;
 	}
 
-	// Get the servicePoint with the shortest queue
-	// ServicePoints are passed as an argument
+
+	/**
+	 * Identifies the service point with the shortest queue from a given list.
+	 *
+	 * <p>This method evaluates the queue sizes of all service points in the provided list
+	 * and returns the one with the shortest queue. If multiple service points have the same
+	 * queue size, the first encountered is returned.</p>
+	 *
+	 * @param points A list of service points to evaluate. Must not be null.
+	 * @return The service point with the shortest queue, or <code>null</code> if the list is empty.
+	 */
 	private ServicePoint getShortestQueue(ArrayList<ServicePoint> points) {
 		if (points == null || points.isEmpty()) {
 			return null; // No points to evaluate
@@ -822,51 +837,6 @@ public class MyEngine extends Engine {
 				shortestServicePoint = point; // Update shortest point
 			}
 		}
-
 		return shortestServicePoint;
 	}
-
-	// Get the servicePoint with the longest queue
-	// ServicePoints are passed as an argument
-	private ServicePoint getLongestQueue(ArrayList<ServicePoint> points) {
-		if (points == null || points.isEmpty()) {
-			return null; // No points to evaluate
-		}
-
-		ServicePoint longestServicePoint = points.get(0); // Assume first point has the longest queue initially
-
-		for (ServicePoint point : points) {
-			if (point.getQueue().size() > longestServicePoint.getQueue().size()) {
-				longestServicePoint = point; // Update if a longer queue is found
-			}
-		}
-
-		return longestServicePoint;
-	}
-
-
-
-
-
-
-	/*public synchronized void pause() {
-		paused = !paused;
-	}
-
-	public synchronized boolean isPaused() {
-		return paused;
-	}*/
-	public static Set<Integer> findDuplicateIds() {
-		Set<Integer> seenIds = new HashSet<>();
-		Set<Integer> duplicateIds = new HashSet<>();
-
-		for (Customer customer : processedCustomers) {
-			if (!seenIds.add(customer.getId())) {
-				duplicateIds.add(customer.getId());
-			}
-		}
-
-		return duplicateIds;
-	}
-
 }

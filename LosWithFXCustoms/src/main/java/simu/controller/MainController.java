@@ -52,7 +52,7 @@ public class MainController {
     @FXML private TableColumn<String[], String> carAmountColumn;
     @FXML private TableColumn<String[], String> carTypeColumn;
     @FXML private TableColumn<String[], String> carFuelTypeColumn;
-    @FXML private TableColumn<String[], String> carMeanPriceColumnn;
+    @FXML private TableColumn<String[], String> carMeanPriceColumn;
     @FXML private TableColumn<String[], String> carPriceVarianceColumn;
     @FXML private TableColumn<String[], Button> carActionColumn;
     @FXML private Slider simulationSpeedSlider;
@@ -64,7 +64,6 @@ public class MainController {
     // ------------------------------- animation stuff -----------------------------//
     @FXML private TabPane rightSideTabPane;
     @FXML private StackPane animationContainer;
-    private ShrekPathView customerPathSimulation;
     ShrekPathView view;
     AnimationController controller;
     // ------------------------------- animation stuff -----------------------------//
@@ -222,7 +221,7 @@ public class MainController {
         carAmountColumn.setCellValueFactory(param -> new ReadOnlyStringWrapper(param.getValue()[0])); // Car Amount (index 0)
         carTypeColumn.setCellValueFactory(param -> new ReadOnlyStringWrapper(param.getValue()[1])); // Car Type (index 1)
         carFuelTypeColumn.setCellValueFactory(param -> new ReadOnlyStringWrapper(param.getValue()[2])); // Fuel Type (index 2)
-        carMeanPriceColumnn.setCellValueFactory(param -> new ReadOnlyStringWrapper(param.getValue()[3])); // Mean Price (index 3)
+        carMeanPriceColumn.setCellValueFactory(param -> new ReadOnlyStringWrapper(param.getValue()[3])); // Mean Price (index 3)
         carPriceVarianceColumn.setCellValueFactory(param -> new ReadOnlyStringWrapper(param.getValue()[4])); // Price variance (index 4)
 
         // Add delete button to the action column
@@ -339,8 +338,8 @@ public class MainController {
         int arrivalVariance = (int) arrivalVarianceSlider.getValue();
         int financeMean = (int) financeMeanSlider.getValue();
         int financeVariance = (int) financeVarianceSlider.getValue();
-        int testdriveMean = (int) testDriveMeanSlider.getValue();
-        int testdriveVariance = (int) testDriveVarianceSlider.getValue();
+        int testDriveMean = (int) testDriveMeanSlider.getValue();
+        int testDriveVariance = (int) testDriveVarianceSlider.getValue();
         int closureMean = (int) closureMeanSlider.getValue();
         int closureVariance = (int) closureVarianceSlider.getValue();
         int simulationTime = (int) (simulationDurationSlider.getValue() * 60);
@@ -358,7 +357,7 @@ public class MainController {
         consoleLog.appendText("Simulation initialized with the following values:");
         consoleLog.appendText("\nArrival mean: " + arrivalMean + "\nArrival Variance: " + arrivalVariance);
         consoleLog.appendText("\nFinance mean: " + financeMean + "\nFinance Variance: " + financeVariance);
-        consoleLog.appendText("\nTest drive mean: " + testdriveMean + "\nTest drive Variance: " + testdriveVariance);
+        consoleLog.appendText("\nTest drive mean: " + testDriveMean + "\nTest drive Variance: " + testDriveVariance);
         consoleLog.appendText("\nClosure mean: " + closureMean + "\nClosure Variance: " + closureVariance);
         consoleLog.appendText("\nArrival service points: " + arrivalServicePoint);
         consoleLog.appendText("\nFinance service points: " + financeServicePoint);
@@ -378,8 +377,8 @@ public class MainController {
             consoleLog.appendText("Unfortunately, you didn't provide DealerShip name, preset wouldn't be saved.\n");
         }
 
-        simuController.initializeSimulation(arrivalMean, arrivalVariance, financeMean, financeVariance, testdriveMean,
-                                            testdriveVariance, closureMean, closureVariance, simulationSpeed
+        simuController.initializeSimulation(arrivalMean, arrivalVariance, financeMean, financeVariance, testDriveMean,
+                                            testDriveVariance, closureMean, closureVariance, simulationSpeed
                                             ,carsToBeCreated, arrivalServicePoint, financeServicePoint,
                                             testDriveServicePoint, closureServicePoint);
 
@@ -392,7 +391,7 @@ public class MainController {
         // Monitor simulation progress in a separate thread
         updateUI();
 
-        // Make Shruk running
+        // Make Shrek running
         new Thread(() -> {
             Platform.runLater(() -> {
                 controller.restartAnimation();
@@ -693,7 +692,7 @@ public class MainController {
             }
 
             // Print remaining cars with prices
-            consoleLog.appendText("\nCars left at the dealershop:\n");
+            consoleLog.appendText("\nCars left at the dealer shop:\n");
             for (simu.model.Car car : simuController.getMyEngine().getCarDealerShop().getCarCollection()) {
                 consoleLog.appendText(car.getCarType() + " (" + car.getFuelType() + ") - Base price at: $" + car.getBasePrice() + ") - Selling price at: $" + car.getMeanPrice() + "\n");
             }
@@ -705,7 +704,7 @@ public class MainController {
             }
 
             // Print remaining cars and sold cars
-            consoleLog.appendText("\nCars left at the dealershop: " + simuController.getMyEngine().getCarDealerShop().getCarCollection().size() + "\n");
+            consoleLog.appendText("\nCars left at the dealer shop: " + simuController.getMyEngine().getCarDealerShop().getCarCollection().size() + "\n");
             consoleLog.appendText("\nCars sold: " + totalSoldCars + "\n");
         });
     }
